@@ -1,0 +1,13 @@
+[user]
+	email = pengsteam16@gmail.com
+	name = Nastem
+[color]
+	branch = true
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[core]
+	editor = nvim

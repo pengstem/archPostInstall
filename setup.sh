@@ -53,6 +53,8 @@ create_link() {
 
 # Shell
 create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"
+create_link "$CONFIGS_DIR/p10k.zsh"         "$HOME/.p10k.zsh"               "P10k Config"
+create_link "$CONFIGS_DIR/gitconfig"        "$HOME/.gitconfig"              "Gitconfig"
 
 # Terminals
 create_link "$CONFIGS_DIR/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "Kitty"
