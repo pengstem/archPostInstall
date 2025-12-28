@@ -7,3 +7,30 @@ ttf-jetbrains-mono-nerd
 ttf-liberation
 ttf-maplemono-nf-cn-unhinted
 ttf-nerd-fonts-symbols
+# -- Core Tools & Shell --
+zsh
+git
+tmux
+neovim
+kitty
+starship
+zoxide
+fzf
+bat
+ripgrep
+fd
+eza
+thefuck
+tealdeer
+btop
+bottom
+yazi
+systemctl-tui
+# -- Dev Tools --
+rustup
+docker
+uv
+bun-bin
+# -- Zsh Plugins (System Package versions if available, else managed by OMZ) --
+zsh-autosuggestions
+zsh-syntax-highlighting
