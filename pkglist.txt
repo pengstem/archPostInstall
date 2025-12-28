@@ -1,0 +1,9 @@
+bibata-cursor-theme-bin
+noto-fonts
+noto-fonts-emoji
+ttf-dejavu
+ttf-jetbrains-mono
+ttf-jetbrains-mono-nerd
+ttf-liberation
+ttf-maplemono-nf-cn-unhinted
+ttf-nerd-fonts-symbols
