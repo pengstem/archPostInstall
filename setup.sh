@@ -51,4 +51,7 @@ create_link "$REPO_DIR/fcitx5" "$HOME/.config/fcitx5"
 # Ghostty
 create_link "$REPO_DIR/ghostty" "$HOME/.config/ghostty"
 
+# Zed
+create_link "$REPO_DIR/zed" "$HOME/.config/zed"
+
 echo "Setup complete!"
