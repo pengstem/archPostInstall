@@ -25,12 +25,17 @@ tealdeer
 btop
 bottom
 yazi
+telegram
+steam
 systemctl-tui
 # -- Dev Tools --
 rustup
 docker
 uv
 bun-bin
+# -- Extras --
+spotify
+sparkle
 # -- Zsh Plugins (System Package versions if available, else managed by OMZ) --
 zsh-autosuggestions
 zsh-syntax-highlighting

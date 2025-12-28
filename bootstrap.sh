@@ -1,48 +1,69 @@
 #!/bin/bash
 
-set -e  # Exit immediately if a command exits with a non-zero status.
+# =============================================================================
+# Arch Linux Post-Install Bootstrap
+# =============================================================================
 
-# Define repo root
+set -e  # Exit on error
+
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPTS_DIR="$REPO_DIR/scripts"
 
-echo "==========================================================="
-echo "   🚀 Starting Arch Linux Post-Install Setup"
-echo "==========================================================="
-echo " This script will:"
-echo " 1. Install system packages (from pkglist.txt)"
-echo " 2. Setup Shell (Oh My Zsh, plugins, tools)"
-echo " 3. Symlink configuration files (Dotfiles)"
-echo "==========================================================="
+# ANSI Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+log_header() {
+    echo -e "\n${BLUE}=========================================================== ${NC}"
+    echo -e "${BLUE}   $1${NC}"
+    echo -e "${BLUE}=========================================================== ${NC}\n"
+}
+
+log_info() {
+    echo -e "${GREEN}➜ $1${NC}"
+}
+
+# --- Start ---
+
+log_header "🚀 Starting Arch Linux Post-Install Setup"
+
+echo "This script will configured your system:"
+echo " 1. Install system packages"
+echo " 2. Setup Shell environment"
+echo " 3. Symlink configuration files"
 echo ""
 
-# Request sudo upfront to clear the timeout
-echo "🔒 Requesting sudo privileges for package installation..."
+# Ensure scripts are executable
+chmod +x "$SCRIPTS_DIR"/*.sh "$REPO_DIR/setup.sh"
+
+# Request sudo upfront
+log_info "Requesting sudo privileges..."
 sudo -v
-# Keep-alive: update existing `sudo` time stamp until finished
+# Keep sudo alive
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
-echo ""
-echo "📦 [1/3] Installing System Packages..."
-"$REPO_DIR/scripts/install_packages.sh"
+# 1. Packages
+log_header "📦 [1/3] Installing System Packages"
+"$SCRIPTS_DIR/install_packages.sh"
 
-echo ""
-echo "gw [2/3] Setting up Shell & Tools..."
-"$REPO_DIR/scripts/install_shell_tools.sh"
+# 2. Shell
+log_header "🐚 [2/3] Setting up Shell & Tools"
+"$SCRIPTS_DIR/install_shell_tools.sh"
 
-echo ""
-echo "🔗 [3/3] Linking Dotfiles..."
+# 3. Dotfiles
+log_header "🔗 [3/3] Linking Dotfiles"
 "$REPO_DIR/setup.sh"
 
-echo ""
-echo "🐚 Changing default shell to Zsh..."
+# 4. Default Shell
+log_header "⚙️  Finalizing"
 if [ "$SHELL" != "$(which zsh)" ]; then
+    log_info "Changing default shell to Zsh..."
     chsh -s "$(which zsh)"
-    echo "   Default shell changed to Zsh."
 else
-    echo "   Zsh is already the default shell."
+    log_info "Zsh is already the default shell."
 fi
 
 echo ""
-echo "==========================================================="
-echo "   🎉 Setup Complete! Please restart your computer."
-echo "==========================================================="
+echo -e "${GREEN}✅ Setup Complete! Please restart your computer to apply all changes.${NC}"
+echo ""

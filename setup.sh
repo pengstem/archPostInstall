@@ -1,57 +1,70 @@
 #!/bin/bash
 
-# Define the base directory of the repo
+# =============================================================================
+# Arch Post-Install: Dotfiles Setup Script
+# =============================================================================
+
+set -e
+
+# Define directories
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIGS_DIR="$REPO_DIR/configs"
+
+echo "==========================================================="
+echo "   🔗 Setting up Symbolic Links"
+echo "==========================================================="
 
 # Function to create symlink
 create_link() {
     local src="$1"
     local dest="$2"
+    local name="$3"
 
-    echo "Processing $dest..."
+    printf "  %-15s " "[$name]"
 
-    # Check if destination exists
+    # Check source
+    if [ ! -e "$src" ]; then
+        echo "❌ Source not found: $src"
+        return
+    fi
+
+    # Check existing destination
     if [ -e "$dest" ] || [ -L "$dest" ]; then
-        # Check if it's already a link to the correct place
+        # Check if already correctly linked
         if [ -L "$dest" ] && [ "$(readlink -f "$dest")" == "$src" ]; then
-            echo "  Already correctly linked."
+            echo "✅ Already linked"
             return
         fi
 
-        # Backup existing file/dir
-        echo "  Backing up existing $dest to $dest.bak"
-        mv "$dest" "$dest.bak"
+        # Backup
+        echo -n "🔄 Backing up... "
+        mv "$dest" "$dest.bak_$(date +%s)"
     fi
 
-    # Ensure parent directory exists
+    # Ensure parent dir
     mkdir -p "$(dirname "$dest")"
 
-    # Create the link
+    # Link
     ln -s "$src" "$dest"
-    echo "  Linked $src -> $dest"
+    echo "✅ Linked"
 }
 
-# --- Configurations to Link ---
+# --- Link Configurations ---
 
-# Tmux
-create_link "$REPO_DIR/tmux" "$HOME/.config/tmux"
+# Shell
+create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"
 
-# Zshrc
-create_link "$REPO_DIR/.zshrc" "$HOME/.zshrc"
+# Terminals
+create_link "$CONFIGS_DIR/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "Kitty"
+create_link "$CONFIGS_DIR/ghostty"          "$HOME/.config/ghostty"         "Ghostty"
 
-# Kitty
-create_link "$REPO_DIR/kitty.conf" "$HOME/.config/kitty/kitty.conf"
+# Editors
+create_link "$CONFIGS_DIR/nvim"             "$HOME/.config/nvim"            "Neovim"
+create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed"
 
-# Neovim
-create_link "$REPO_DIR/nvim" "$HOME/.config/nvim"
+# Tools
+create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
+create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
 
-# Fcitx5
-create_link "$REPO_DIR/fcitx5" "$HOME/.config/fcitx5"
-
-# Ghostty
-create_link "$REPO_DIR/ghostty" "$HOME/.config/ghostty"
-
-# Zed
-create_link "$REPO_DIR/zed" "$HOME/.config/zed"
-
-echo "Setup complete!"
+echo ""
+echo "✨ Configuration linking complete!"
