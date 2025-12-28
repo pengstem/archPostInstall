@@ -48,4 +48,7 @@ create_link "$REPO_DIR/nvim" "$HOME/.config/nvim"
 # Fcitx5
 create_link "$REPO_DIR/fcitx5" "$HOME/.config/fcitx5"
 
+# Ghostty
+create_link "$REPO_DIR/ghostty" "$HOME/.config/ghostty"
+
 echo "Setup complete!"

@@ -1,0 +1,75 @@
+# This is the configuration file for Ghostty.
+#
+# This template file has been automatically created at the following
+# path since Ghostty couldn't find any existing config files on your system:
+#
+#   /home/nastem/.config/ghostty/config
+#
+# The template does not set any default options, since Ghostty ships
+# with sensible defaults for all options. Users should only need to set
+# options that they want to change from the default.
+#
+# Run `ghostty +show-config --default --docs` to view a list of
+# all available config options and their default values.
+#
+# Additionally, each config option is also explained in detail
+# on Ghostty's website, at https://ghostty.org/docs/config.
+
+# Config syntax crash course
+# ==========================
+# # The config file consists of simple key-value pairs,
+# # separated by equals signs.
+# font-family = Iosevka
+# window-padding-x = 2
+#
+# # Spacing around the equals sign does not matter.
+# # All of these are identical:
+# key=value
+# key= value
+# key =value
+# key = value
+#
+# # Any line beginning with a # is a comment. It's not possible to put
+# # a comment after a config option, since it would be interpreted as a
+# # part of the value. For example, this will have a value of "#123abc":
+# background = #123abc
+#
+# # Empty values are used to reset config keys to default.
+# key =
+#
+# # Some config options have unique syntaxes for their value,
+# # which is explained in the docs for that config option.
+# # Just for example:
+# resize-overlay-duration = 4s 200ms
+
+# 主题与字体
+theme = light:Nordfox,dark:Nordfox
+font-size = 12.5
+
+# 背景透明与模糊
+# 1.0=不透明；0=完全透明。先用 0.85 体验较稳妥
+background-opacity = 0.75
+# 开启模糊：macOS 原生支持；Linux 见下方“桌面环境说明”
+background-blur = true
+
+# 观感优化
+window-padding-x = 10
+window-padding-y = 10
+unfocused-split-opacity = 0.95
+cursor-style = bar
+cursor-opacity = 0.85
+
+# 实用小招
+# 打开配置文件（可自己改成喜欢的组合键）
+keybind = ctrl+shift+o=open_config
+# 立即重载配置（两端默认都有，但写上也不冲突）
+keybind = ctrl+shift+comma=reload_config
+# 是否显示header😢
+window-decoration = false
+keybind = ctrl+shift+f12=toggle_window_decorations
+# 强制 Tab 位于底部 (类似于 iTerm2 的某些布局)
+gtk-tabs-location = bottom
+
+# 是否让 Tab 占满整个宽度 (默认 true)
+gtk-wide-tabs = false
+gtk-titlebar-hide-when-maximized = true
