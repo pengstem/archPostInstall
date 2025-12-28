@@ -1,1 +1,157 @@
-/home/nastem/.zshrc
+# =============================================================================
+# 0. Powerlevel10k Instant Prompt
+# =============================================================================
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# =============================================================================
+# 1. Oh My Zsh Configuration
+# =============================================================================
+export ZSH="$HOME/.oh-my-zsh"
+
+# Theme
+# Note: You have 'starship' enabled below, which usually overrides the OMZ theme.
+# P10k is kept here for the instant prompt functionality.
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Update Behavior (Remind only)
+zstyle ':omz:update' mode reminder
+
+# Plugins
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  fzf
+  fzf-tab
+  tldr
+  web-search
+  sudo
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# =============================================================================
+# 2. Environment Variables
+# =============================================================================
+# Core Editors & Pagers
+export EDITOR='nvim'
+export VISUAL='nvim'
+export SUDO_EDITOR='nvim'
+export MANPAGER="nvim +Man!"
+export MANWIDTH=420
+
+# Secrets
+# (Recommendation: Move these to ~/.zshenv or a separate .env file in the future)
+export ANTHROPIC_AUTH_TOKEN=[REDACTED]
+export ANTHROPIC_BASE_URL=https://anyrouter.top
+
+# =============================================================================
+# 3. PATH Management
+# =============================================================================
+# Define application base directories
+export BUN_INSTALL="$HOME/.bun"
+export PNPM_HOME="/home/nastem/.local/share/pnpm"
+export NVM_DIR="$HOME/.nvm"
+
+# Construct PATH
+# 'typeset -U' ensures that the path array contains unique entries (removes duplicates)
+typeset -U path PATH
+path=(
+  "$HOME/.local/bin"
+  "$HOME/.npm-global/bin"
+  "$HOME/.cargo/bin"
+  "$BUN_INSTALL/bin"
+  "$PNPM_HOME"
+  "$path[@]"  # Append existing system paths
+)
+export PATH
+
+# =============================================================================
+# 4. Tool Initialization
+# =============================================================================
+# NVM (Node Version Manager)
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Bun Completions
+[ -s "/home/nastem/.bun/_bun" ] && source "/home/nastem/.bun/_bun"
+
+# Zoxide (Smarter cd) - Configured to replace the 'cd' command directly
+eval "$(zoxide init zsh --cmd cd)"
+
+# TheFuck (Console command fixer)
+eval $(thefuck --alias)
+
+# Starship Prompt (Cross-shell prompt)
+# Note: This loads *after* OMZ, so it takes precedence over the P10k theme.
+eval "$(starship init zsh)"
+
+# Powerlevel10k Config (Loaded for compatibility/instant prompt settings)
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# =============================================================================
+# 5. Aliases
+# =============================================================================
+# Modern replacements for standard commands (using eza)
+alias ls='eza --icons'
+alias ll='eza -l --icons --git'
+alias la='eza -la --icons --git'
+alias lt='eza --tree --level=2 --icons'
+
+# System Utilities
+alias st='systemctl-tui'
+
+# Global Aliases (Usage: 'command --help')
+# These pipe output into bat for syntax highlighting
+alias -g -- --h1='-h 2>&1 | bat --language=help --style=plain'
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
+
+# =============================================================================
+# 6. Custom Functions
+# =============================================================================
+# Yazi Wrapper (File Manager with cwd change on exit)
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
+
+# 'Should I' Decision Maker
+function shouldi(){
+  if [[ $# == 0 ]]; then
+    echo "What are you up to bad boy?"
+    return 88
+  fi
+  todo=$*
+  sohash=$(echo -n "$todo" | sha256sum | awk '{print $1}')
+  lastchar=${sohash: -1}
+  index=$(( 16#$lastchar ))
+  so=${sohash: -$index:1}
+  if [[ "$so" =~ [13579bdf] ]]; then
+    echo " Why don't we just fuck it up?"
+    return 0
+  fi
+  echo " Forget about it, we will make it up~"
+}
+
+# =============================================================================
+# 7. Final Shell Options
+# =============================================================================
+# Keybindings (Emacs mode)
+bindkey -e
+
+# Help command support
+unalias run-help 2>/dev/null
+autoload -Uz run-help
+
+# Completion System
+# -C skips the check for insecure directories for speed
+autoload -Uz compinit
+compinit -C

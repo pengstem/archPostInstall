@@ -7,3 +7,4 @@ lockscreen extension
 system monitor
 user themes
 volume mixer
+blur my shell

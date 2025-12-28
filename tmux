@@ -1,1 +1,0 @@
-/home/nastem/.config/tmux
