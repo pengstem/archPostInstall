@@ -106,6 +106,7 @@ create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed
 # Tools
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
 create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
+create_link "$CONFIGS_DIR/rime"             "$HOME/.local/share/fcitx5/rime" "Fcitx5 Rime"
 
 # Applications
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
