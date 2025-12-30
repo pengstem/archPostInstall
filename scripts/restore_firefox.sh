@@ -20,11 +20,6 @@ echo "Source: $BACKUP_FILE"
 echo "Destination: $DEST_DIR/.mozilla"
 
 # Check if Firefox is running
-if pgrep "firefox" > /dev/null; then
-    echo "ERROR: Firefox is running."
-    echo "Please close Firefox before restoring configuration."
-    exit 1
-fi
 
 # Warn about overwriting
 if [ -d "$DEST_DIR/.mozilla" ]; then

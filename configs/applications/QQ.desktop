@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=QQ
+Exec=/home/nastem/Applications/QQ.AppImage
+Type=Application
+Terminal=false
+Categories=Network;InstantMessaging;
+Comment=QQ Desktop Client

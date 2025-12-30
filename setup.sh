@@ -49,7 +49,46 @@ create_link() {
     echo "✅ Linked"
 }
 
+# Function to create symlink with sudo (for /etc files)
+create_sudo_link() {
+    local src="$1"
+    local dest="$2"
+    local name="$3"
+
+    printf "  %-15s " "[$name]"
+
+    # Check source
+    if [ ! -e "$src" ]; then
+        echo "❌ Source not found: $src"
+        return
+    fi
+
+    # Check existing destination
+    if sudo test -e "$dest" || sudo test -L "$dest"; then
+        # Check if already correctly linked
+        if sudo test -L "$dest" && [ "$(sudo readlink -f "$dest")" == "$src" ]; then
+            echo "✅ Already linked"
+            return
+        fi
+
+        # Backup
+        echo -n "🔄 Backing up... "
+        sudo mv "$dest" "$dest.bak_$(date +%s)"
+    fi
+
+    # Ensure parent dir
+    sudo mkdir -p "$(dirname "$dest")"
+
+    # Link
+    sudo ln -s "$src" "$dest"
+    echo "✅ Linked (sudo)"
+}
+
 # --- Link Configurations ---
+
+# System Configs (Requires Sudo)
+create_sudo_link "$CONFIGS_DIR/pacman/pacman.conf" "/etc/pacman.conf" "Pacman"
+create_sudo_link "$CONFIGS_DIR/paru/paru.conf"     "/etc/paru.conf"   "Paru"
 
 # Shell
 create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"
@@ -67,6 +106,10 @@ create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed
 # Tools
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
 create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
+
+# Applications
+create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
+create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/applications/WeChat.desktop" "WeChat"
 
 echo ""
 echo "✨ Configuration linking complete!"

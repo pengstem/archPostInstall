@@ -3,6 +3,7 @@ return {
   config = function()
     require("transparent").clear_prefix("BufferLine")
     require("transparent").clear_prefix("lualine")
+
     -- require("transparent").clear_prefix("NeoTree")
     -- require("transparent").clear_prefix("Lsp")
     -- require("transparent").clear_prefix("Noice")

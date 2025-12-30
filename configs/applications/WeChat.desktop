@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=WeChat
+Exec=/home/nastem/Applications/WeChat.AppImage
+Type=Application
+Terminal=false
+Categories=Network;InstantMessaging;
+Comment=WeChat Desktop Client
