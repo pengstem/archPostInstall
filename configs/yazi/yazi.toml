@@ -1,0 +1,8 @@
+[manager]
+sort_by = "natural"
+sort_dir_first = true
+show_hidden = true
+linemode = "size"
+
+[preview]
+tab_size = 2

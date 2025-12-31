@@ -6,6 +6,7 @@ configs/kitty/kitty.conf ~/.config/kitty/kitty.conf
 configs/ghostty ~/.config/ghostty
 configs/nvim ~/.config/nvim
 configs/zed ~/.config/zed
+configs/yazi ~/.config/yazi
 configs/fcitx5 ~/.config/fcitx5
 configs/rime ~/.local/share/fcitx5/rime
 configs/pacman/pacman.conf /etc/pacman.conf
