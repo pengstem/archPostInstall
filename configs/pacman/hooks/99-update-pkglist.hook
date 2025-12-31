@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = Update archPostInstall pkglist.txt
+When = PostTransaction
+Exec = /home/nastem/Project/archPostInstall/scripts/update_pkglist.sh
