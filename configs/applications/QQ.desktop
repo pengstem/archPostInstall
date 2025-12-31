@@ -2,6 +2,7 @@
 Name=QQ
 Exec=/home/nastem/Applications/QQ.AppImage
 Type=Application
+Icon=/home/nastem/.local/share/icons/qq.png
 Terminal=false
 Categories=Network;InstantMessaging;
 Comment=QQ Desktop Client
