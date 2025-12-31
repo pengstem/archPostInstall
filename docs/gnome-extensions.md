@@ -1,10 +1,10 @@
-Bing Wallpaper
-copyous
-dash to dock
-hide top bar
-just perfection
-lockscreen extension
-system monitor
-user themes
-volume mixer
-blur my shell
+lockscreen-extension@pratap.fastmail.fm
+BingWallpaper@ineffable-gmail.com
+blur-my-shell@aunetx
+hidetopbar@mathieu.bidon.ca
+just-perfection-desktop@just-perfection
+user-theme@gnome-shell-extensions.gcampax.github.com
+copyous@boerdereinar.dev
+appindicatorsupport@rgcjonas.gmail.com
+dash-to-dock@micxgx.gmail.com
+Vitals@CoreCoding.com

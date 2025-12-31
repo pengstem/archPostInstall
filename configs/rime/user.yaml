@@ -1,5 +1,5 @@
 var:
-  last_build_time: 1767145454
+  last_build_time: 1767160589
   option:
     ascii_punct: true
     emoji: true
@@ -10,4 +10,4 @@ var:
     bopomofo: 1767071940
     luna_pinyin: 1767072077
     luna_pinyin_fluency: 1767072613
-    rime_frost_double_pinyin_flypy: 1767154660
+    rime_frost_double_pinyin_flypy: 1767178926

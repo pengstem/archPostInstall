@@ -1,4 +1,4 @@
-# Package list generated on Wed Dec 31 12:18:50 PM CST 2025
+# Package list generated on Wed Dec 31 01:48:31 PM CST 2025
 7zip
 amd-ucode
 base
@@ -63,10 +63,10 @@ npm
 nvidia-open-dkms
 nvidia-utils
 os-prober
+qimgv-debug
 ripgrep
 rustup
 sassc
-snap-pac
 sparkle-bin
 spotify-launcher
 starship
@@ -82,7 +82,6 @@ ttf-jetbrains-mono-nerd
 ttf-liberation
 ttf-maplemono-nf-cn-unhinted
 uv
-vim
 visual-studio-code-bin
 wl-clipboard
 xdg-user-dirs
