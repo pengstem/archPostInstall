@@ -1,0 +1,31 @@
+# Documentation Overview
+
+This folder contains reference notes and quick guidance for maintaining the Arch post-install setup. It is intentionally concise and kept in sync with the automation scripts.
+
+## Where to Look
+- `docs/fileLocationList.md` is the source-to-target mapping for symlinked configs.
+- `docs/gnome-extensions.md` and `docs/gnome-appearrance.md` are updated by the GNOME sync script.
+- `docs/thoughts.md` is a freeform notes file for future changes.
+
+## Quick Start
+- Full setup: `./bootstrap.sh`
+- Symlink configs only: `./setup.sh`
+- Unified CLI: `./scripts/archpostinstall.sh --help` (or `archpostinstall --help` after linking)
+
+## GNOME Sync and Backups
+- GNOME sync writes the current extension list and theme settings into `docs/`.
+- Archives are stored under `backups/gnome/` by default.
+- Enable auto-sync after linking:
+  - `systemctl --user daemon-reload`
+  - `systemctl --user enable --now archpostinstall-gnome-sync.path`
+- Optional env vars:
+  - `GNOME_BACKUP_DIR` to override backup location
+  - `GNOME_SYNC_THROTTLE_SECONDS` to adjust archive frequency
+
+## Package List Updates
+- Pacman hook triggers `archpostinstall-update-pkglist` after transactions.
+- Manual refresh: `./scripts/update_pkglist.sh` (writes `scripts/pkglist.txt`).
+
+## Firefox Backup/Restore
+- Backups go to `backups/firefox/` by default.
+- Use `./scripts/backup/backup_firefox.sh` and `./scripts/backup/restore_firefox.sh` for manual control.
