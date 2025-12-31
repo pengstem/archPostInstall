@@ -3,3 +3,5 @@ configs/rime/*.userdb/
 configs/rime/sync/
 backups/**/*.tar.gz
 backups/**/.last_backup
+configs/baidupcs/pcs_config.json
+configs/baidupcs/pcs_command_history.txt

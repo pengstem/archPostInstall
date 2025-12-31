@@ -1,0 +1,41 @@
+{
+  "baidu_active_uid": 0,
+  "baidu_user_list": [
+    {
+      "uid": 0,
+      "name": "REPLACE_ME",
+      "sex": "unknown",
+      "age": 0,
+      "bduss": "REPLACE_ME",
+      "ptoken": "",
+      "stoken": "",
+      "baiduid": "",
+      "sboxtkn": "",
+      "cookies": "REPLACE_ME",
+      "accesstoken": "",
+      "workdir": "/"
+    }
+  ],
+  "appid": 266719,
+  "cache_size": 262144,
+  "max_parallel": 20,
+  "max_upload_parallel": 4,
+  "max_download_load": 5,
+  "max_upload_load": 4,
+  "max_download_rate": 0,
+  "max_upload_rate": 0,
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36",
+  "pcs_ua": "",
+  "pcs_addr": "pcs.baidu.com",
+  "pan_ua": "",
+  "savedir": "$HOME/Downloads",
+  "enable_https": true,
+  "fix_pcs_addr": false,
+  "force_login_username": "",
+  "proxy": "",
+  "proxy_hostnames": "",
+  "local_addrs": "",
+  "no_check": true,
+  "ignore_illegal": false,
+  "u_policy": "skip"
+}

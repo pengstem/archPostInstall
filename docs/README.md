@@ -26,6 +26,10 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - Pacman hook triggers `archpostinstall-update-pkglist` after transactions.
 - Manual refresh: `./scripts/update_pkglist.sh` (writes `scripts/pkglist.txt`).
 
+## BaiduPCS-Go
+- Copy your real config to `configs/baidupcs/pcs_config.json` before running `./setup.sh`.
+- The example template lives at `configs/baidupcs/pcs_config.json.example` and does not contain secrets.
+
 ## Firefox Backup/Restore
 - Backups go to `backups/firefox/` by default.
 - Use `./scripts/backup/backup_firefox.sh` and `./scripts/backup/restore_firefox.sh` for manual control.

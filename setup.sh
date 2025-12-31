@@ -121,6 +121,11 @@ create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed
 # Tools
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
+if [ -f "$CONFIGS_DIR/baidupcs/pcs_config.json" ]; then
+    create_link "$CONFIGS_DIR/baidupcs" "$HOME/.config/BaiduPCS-Go" "BaiduPCS-Go"
+else
+    echo "  [BaiduPCS-Go] Skipped (pcs_config.json missing in configs/baidupcs)"
+fi
 create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
 create_link "$CONFIGS_DIR/rime"             "$HOME/.local/share/fcitx5/rime" "Fcitx5 Rime"
 
