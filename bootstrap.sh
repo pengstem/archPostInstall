@@ -45,7 +45,12 @@ echo " 3. Symlink configuration files"
 echo ""
 
 # Ensure scripts are executable
-chmod +x "$SCRIPTS_DIR"/*.sh "$REPO_DIR/setup.sh"
+chmod +x \
+    "$SCRIPTS_DIR"/*.sh \
+    "$SCRIPTS_DIR"/install/*.sh \
+    "$SCRIPTS_DIR"/backup/*.sh \
+    "$SCRIPTS_DIR"/gnome/*.sh \
+    "$REPO_DIR/setup.sh"
 
 # Request sudo upfront
 log_info "Requesting sudo privileges..."
@@ -55,11 +60,11 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 # 1. Packages
 log_header "📦 [1/3] Installing System Packages"
-"$SCRIPTS_DIR/install_packages.sh"
+"$SCRIPTS_DIR/install/install_packages.sh"
 
 # 2. Shell
 log_header "🐚 [2/3] Setting up Shell & Tools"
-"$SCRIPTS_DIR/install_shell_tools.sh"
+"$SCRIPTS_DIR/install/install_shell_tools.sh"
 
 # 3. Dotfiles
 log_header "🔗 [3/3] Linking Dotfiles"

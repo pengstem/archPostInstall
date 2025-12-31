@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PKGLIST="$SCRIPT_DIR/pkglist.txt"
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PKGLIST="$REPO_DIR/scripts/pkglist.txt"
 
 if [ ! -f "$PKGLIST" ]; then
     echo "Error: Package list not found at $PKGLIST"

@@ -1,0 +1,6 @@
+[Unit]
+Description=Sync GNOME extensions and themes
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/archpostinstall-gnome-sync

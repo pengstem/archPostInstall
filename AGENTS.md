@@ -4,21 +4,26 @@
 - `bootstrap.sh` orchestrates the full post-install flow.
 - `setup.sh` symlinks tracked configs into user and system locations.
 - `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, tmux, fcitx5/rime, pacman/paru, desktop entries).
-- `scripts/` contains install and backup/restore utilities; `scripts/pkglist.txt` is the package source of truth.
-- Markdown notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md` are reference docs.
+- `scripts/` is split by function: `scripts/install/`, `scripts/backup/`, `scripts/gnome/`; `scripts/pkglist.txt` is the package source of truth.
+- `configs/systemd/user/` defines the GNOME sync path/service units.
+- `configs/pacman/hooks/` contains pacman hooks (for example, automatic pkglist updates).
+- `docs/` holds reference notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md`.
+- `backups/` is the default archive location for GNOME themes/extensions and Firefox profiles.
 
 ## Build, Test, and Development Commands
 - `./bootstrap.sh` runs the full setup (packages, shell tools, symlinks, default shell). Requires sudo.
+- `./scripts/archpostinstall.sh` provides a unified CLI wrapper for common tasks (see `--help`).
 - `./setup.sh` only creates/updates symlinks for dotfiles.
-- `./scripts/install_packages.sh` installs packages from `scripts/pkglist.txt` via paru/yay/pacman.
-- `./scripts/install_shell_tools.sh` installs or updates Oh My Zsh, plugins, and powerlevel10k.
-- `./scripts/backup_firefox.sh` and `./scripts/restore_firefox.sh` manage `~/.mozilla` backups.
-- `./scripts/backup_themes_extensions.sh` and `./scripts/restore_themes_extensions.sh` handle themes, icons, and GNOME extensions.
+- `./scripts/install/install_packages.sh` installs packages from `scripts/pkglist.txt` via paru/yay/pacman.
+- `./scripts/install/install_shell_tools.sh` installs or updates Oh My Zsh, plugins, and powerlevel10k.
+- `./scripts/backup/backup_firefox.sh` and `./scripts/backup/restore_firefox.sh` manage `~/.mozilla` backups (default `backups/firefox/`).
+- `./scripts/backup/backup_themes_extensions.sh` and `./scripts/backup/restore_themes_extensions.sh` handle themes, icons, and GNOME extensions (default `backups/gnome/`).
+- `./scripts/gnome/backup_gnome_state.sh` refreshes GNOME extension/theme notes and archives assets (used by the systemd path unit).
 
 ## Coding Style & Naming Conventions
 - Bash scripts use `#!/bin/bash`; keep `set -e` in scripts that should fail fast.
 - Indent with 4 spaces in shell scripts; use lower_snake_case for functions and UPPER_SNAKE_CASE for constants.
-- Keep configs under `configs/<tool>/...` mirroring target paths (see `fileLocationList.md`).
+- Keep configs under `configs/<tool>/...` mirroring target paths (see `docs/fileLocationList.md`).
 - Use `.desktop` naming for application launchers in `configs/applications/`.
 
 ## Testing Guidelines
@@ -31,4 +36,6 @@
 
 ## Security & Configuration Tips
 - `setup.sh` writes to `/etc` for `pacman.conf` and `paru.conf`; review diffs before running.
+- Pacman hook calls `/usr/local/bin/archpostinstall-update-pkglist`, linked to `scripts/update_pkglist.sh` by `setup.sh`.
+- GNOME sync runs from `~/.local/bin/archpostinstall-gnome-sync`; enable the user unit after linking.
 - Backup existing dotfiles when testing changes; the scripts already create timestamped backups for symlink targets.

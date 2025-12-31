@@ -1,4 +1,5 @@
-scripts/firefox_backup_20251228_140914.tar.gz
 configs/rime/build/
 configs/rime/*.userdb/
 configs/rime/sync/
+backups/**/*.tar.gz
+backups/**/.last_backup

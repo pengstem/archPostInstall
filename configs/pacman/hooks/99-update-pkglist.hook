@@ -8,4 +8,4 @@ Target = *
 [Action]
 Description = Update archPostInstall pkglist.txt
 When = PostTransaction
-Exec = /home/nastem/Project/archPostInstall/scripts/update_pkglist.sh
+Exec = /usr/local/bin/archpostinstall-update-pkglist

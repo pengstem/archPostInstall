@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch GNOME settings and assets for changes
+
+[Path]
+PathChanged=%h/.config/dconf/user
+PathChanged=%h/.local/share/gnome-shell/extensions
+PathChanged=%h/.themes
+PathChanged=%h/.local/share/icons
+
+[Install]
+WantedBy=default.target

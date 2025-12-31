@@ -2,9 +2,13 @@
 
 set -euo pipefail
 
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
 # Default backup name with timestamp
 BACKUP_NAME="firefox_backup_$(date +%Y%m%d_%H%M%S).tar.gz"
-OUTPUT_DIR="${1:-$(pwd)}"
+OUTPUT_DIR="${1:-$REPO_DIR/backups/firefox}"
 mkdir -p "$OUTPUT_DIR"
 if [ ! -w "$OUTPUT_DIR" ]; then
     echo "Error: Output directory is not writable: $OUTPUT_DIR"
