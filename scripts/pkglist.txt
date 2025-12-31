@@ -1,9 +1,11 @@
-# Package list generated on Tue Dec 30 10:09:24 PM CST 2025
+# Package list generated on Wed Dec 31 12:01:38 PM CST 2025
 7zip
 amd-ucode
 base
 base-devel
 bat
+bibata-cursor-theme-bin
+bluez-utils
 bottom
 btop
 btrfs-assistant
@@ -32,6 +34,8 @@ gnome-browser-connector
 gnome-control-center
 gnome-keyring
 gnome-shell
+gnome-shell-extension-vitals
+gnome-themes-extra
 gnome-tweaks
 google-chrome
 grub
@@ -58,9 +62,9 @@ npm
 nvidia-open-dkms
 nvidia-utils
 os-prober
-paru
 ripgrep
 rustup
+sassc
 snap-pac
 sparkle-bin
 spotify-launcher
@@ -75,8 +79,10 @@ ttf-dejavu
 ttf-jetbrains-mono
 ttf-jetbrains-mono-nerd
 ttf-liberation
+ttf-maplemono-nf-cn-unhinted
 uv
 vim
+visual-studio-code-bin
 wl-clipboard
 xdg-user-dirs
 yay

@@ -17,7 +17,7 @@ trap 'rm -f "$tmpfile"' EXIT
 
 {
     echo "# Package list generated on $(date "+%a %b %d %I:%M:%S %p %Z %Y")"
-    LC_ALL=C pacman -Qqe | sort
+    LC_ALL=C pacman -Qqe | grep -vE '^paru(-debug)?$' | sort
 } > "$tmpfile"
 
 install -m 0644 "$tmpfile" "$PKGLIST"
