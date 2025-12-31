@@ -4,7 +4,17 @@
 # Arch Linux Post-Install Bootstrap
 # =============================================================================
 
-set -e  # Exit on error
+set -euo pipefail  # Exit on error, undefined vars, or pipe failures
+
+if [[ "${EUID}" -eq 0 ]]; then
+    echo "Please run this script as a regular user with sudo privileges."
+    exit 1
+fi
+
+if ! command -v sudo >/dev/null 2>&1; then
+    echo "Error: sudo is required but not installed."
+    exit 1
+fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS_DIR="$REPO_DIR/scripts"
@@ -28,7 +38,7 @@ log_info() {
 
 log_header "🚀 Starting Arch Linux Post-Install Setup"
 
-echo "This script will configured your system:"
+echo "This script will configure your system:"
 echo " 1. Install system packages"
 echo " 2. Setup Shell environment"
 echo " 3. Symlink configuration files"
@@ -57,9 +67,13 @@ log_header "🔗 [3/3] Linking Dotfiles"
 
 # 4. Default Shell
 log_header "⚙️  Finalizing"
-if [ "$SHELL" != "$(which zsh)" ]; then
+CURRENT_SHELL="${SHELL:-}"
+ZSH_PATH="$(command -v zsh || true)"
+if [ -z "$ZSH_PATH" ]; then
+    log_info "Zsh not found; skipping default shell change."
+elif [ "$CURRENT_SHELL" != "$ZSH_PATH" ]; then
     log_info "Changing default shell to Zsh..."
-    chsh -s "$(which zsh)"
+    chsh -s "$ZSH_PATH"
 else
     log_info "Zsh is already the default shell."
 fi

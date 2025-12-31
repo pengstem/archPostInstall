@@ -4,7 +4,12 @@
 # Arch Post-Install: Dotfiles Setup Script
 # =============================================================================
 
-set -e
+set -euo pipefail
+
+if [[ "${EUID}" -eq 0 ]]; then
+    echo "Please run this script as a regular user with sudo privileges."
+    exit 1
+fi
 
 # Define directories
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,9 +36,13 @@ create_link() {
     # Check existing destination
     if [ -e "$dest" ] || [ -L "$dest" ]; then
         # Check if already correctly linked
-        if [ -L "$dest" ] && [ "$(readlink -f "$dest")" == "$src" ]; then
-            echo "✅ Already linked"
-            return
+        if [ -L "$dest" ]; then
+            local resolved_dest
+            resolved_dest="$(readlink -f "$dest" 2>/dev/null || true)"
+            if [ "$resolved_dest" == "$src" ]; then
+                echo "✅ Already linked"
+                return
+            fi
         fi
 
         # Backup
@@ -66,9 +75,13 @@ create_sudo_link() {
     # Check existing destination
     if sudo test -e "$dest" || sudo test -L "$dest"; then
         # Check if already correctly linked
-        if sudo test -L "$dest" && [ "$(sudo readlink -f "$dest")" == "$src" ]; then
-            echo "✅ Already linked"
-            return
+        if sudo test -L "$dest"; then
+            local resolved_dest
+            resolved_dest="$(sudo readlink -f "$dest" 2>/dev/null || true)"
+            if [ "$resolved_dest" == "$src" ]; then
+                echo "✅ Already linked"
+                return
+            fi
         fi
 
         # Backup

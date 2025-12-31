@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,6 +10,16 @@ if [ ! -f "$PKGLIST" ]; then
     echo "Error: Package list not found at $PKGLIST"
     exit 1
 fi
+
+require_cmd() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        echo "Error: Required command not found: $1"
+        exit 1
+    fi
+}
+
+require_cmd sudo
+require_cmd pacman
 
 echo "==========================================================="
 echo "   📦 Installing Packages"
@@ -24,6 +34,7 @@ install_paru() {
     # Create temporary directory
     local tmp_dir
     tmp_dir=$(mktemp -d)
+    trap 'rm -rf "$tmp_dir"' RETURN
     
     git clone https://aur.archlinux.org/paru-bin.git "$tmp_dir/paru-bin"
     
@@ -31,32 +42,30 @@ install_paru() {
     makepkg -si --noconfirm
     popd > /dev/null
     
-    rm -rf "$tmp_dir"
     echo "   ✅ paru installed."
 }
 
 # Check for AUR helpers
 if command -v paru > /dev/null; then
-    PACMAN_CMD="paru -S --needed --noconfirm"
+    PACMAN_CMD=(paru -S --needed --noconfirm)
     echo "   Using: paru (Already installed)"
 elif command -v yay > /dev/null; then
-    PACMAN_CMD="yay -S --needed --noconfirm"
+    PACMAN_CMD=(yay -S --needed --noconfirm)
     echo "   Using: yay"
 else
     echo "   ⚠️ No AUR helper found. Installing paru..."
     install_paru
-    PACMAN_CMD="paru -S --needed --noconfirm"
+    PACMAN_CMD=(paru -S --needed --noconfirm)
 fi
 
 # Install packages
 echo "   Reading package list from $PKGLIST..."
 # Filter out comments and empty lines
-PACKAGES=$(grep -vE '^\s*#|^\s*$' "$PKGLIST")
+mapfile -t PACKAGES < <(grep -vE '^\s*(#|$)' "$PKGLIST" || true)
 
-if [ -n "$PACKAGES" ]; then
-    # We use echo to pass the list to xargs or run directly. 
-    # Passing directly to paru is better to handle dependencies in one go.
-    echo "$PACKAGES" | xargs $PACMAN_CMD
+if (( ${#PACKAGES[@]} )); then
+    # Passing directly to the helper is better for dependency resolution.
+    "${PACMAN_CMD[@]}" "${PACKAGES[@]}"
 else
     echo "   Package list is empty."
 fi

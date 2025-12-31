@@ -1,7 +1,22 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Define directories
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+require_cmd() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Error: Required command not found: $1"
+    exit 1
+  fi
+}
+
+require_cmd git
+require_cmd curl
+if ! command -v zsh >/dev/null 2>&1; then
+  echo "Warning: zsh is not installed. Install it before setting it as default shell."
+fi
 
 echo "Installing/Updating Shell Tools..."
 
@@ -22,10 +37,14 @@ install_plugin() {
 
   if [ ! -d "$target_dir" ]; then
     echo "Installing $plugin_name..."
-    git clone "$repo_url" "$target_dir"
+    git clone --depth=1 "$repo_url" "$target_dir"
   else
     echo "Updating $plugin_name..."
-    git -C "$target_dir" pull
+    if [ -d "$target_dir/.git" ]; then
+      git -C "$target_dir" pull --ff-only
+    else
+      echo "Warning: $target_dir exists but is not a git repo. Skipping update."
+    fi
   fi
 }
 
@@ -45,7 +64,11 @@ if [ ! -d "$P10K_DIR" ]; then
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
 else
   echo "Updating Powerlevel10k..."
-  git -C "$P10K_DIR" pull
+  if [ -d "$P10K_DIR/.git" ]; then
+    git -C "$P10K_DIR" pull --ff-only
+  else
+    echo "Warning: $P10K_DIR exists but is not a git repo. Skipping update."
+  fi
 fi
 
 echo "Shell tools setup complete!"

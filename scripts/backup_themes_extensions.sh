@@ -1,8 +1,12 @@
 #!/bin/bash
 
-OUTPUT_DIR="$(pwd)"
-if [ -n "$1" ]; then
-    OUTPUT_DIR="$1"
+set -euo pipefail
+
+OUTPUT_DIR="${1:-$(pwd)}"
+mkdir -p "$OUTPUT_DIR"
+if [ ! -w "$OUTPUT_DIR" ]; then
+    echo "Error: Output directory is not writable: $OUTPUT_DIR"
+    exit 1
 fi
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
