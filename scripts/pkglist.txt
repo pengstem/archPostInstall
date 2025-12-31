@@ -1,4 +1,4 @@
-# Package list generated on Wed Dec 31 12:08:13 PM CST 2025
+# Package list generated on Wed Dec 31 12:18:50 PM CST 2025
 7zip
 amd-ucode
 base
@@ -51,6 +51,7 @@ linux-lts
 linux-lts-headers
 linux-zen
 linux-zen-headers
+man-db
 mpv
 nautilus
 neovim
