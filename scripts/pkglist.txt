@@ -1,4 +1,4 @@
-# Package list generated on Wed Dec 31 01:48:31 PM CST 2025
+# Package list generated on Fri Jan 02 09:10:16 PM CST 2026
 7zip
 amd-ucode
 base
@@ -87,6 +87,8 @@ wl-clipboard
 xdg-user-dirs
 yay
 yazi
+zathura
+zathura-pdf-mupdf
 zed
 zoxide
 zram-generator
