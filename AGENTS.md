@@ -4,11 +4,11 @@
 - `README.md` is the entry point for setup and layout information.
 - `bootstrap.sh` orchestrates the full post-install flow.
 - `setup.sh` symlinks tracked configs into user and system locations.
-- `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, yazi, zathura, BaiduPCS-Go, tmux, fcitx5/rime, pacman/paru, desktop entries).
+- `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, yazi, zathura, BaiduPCS-Go, tmux, fcitx5/rime, pacman/paru, desktop entries). See `configs/README.md`.
 - `scripts/` is split by function: `scripts/install/`, `scripts/backup/`, `scripts/gnome/`; `scripts/pkglist.txt` is the package source of truth.
 - `configs/systemd/user/` defines the GNOME sync path/service units.
 - `configs/pacman/hooks/` contains pacman hooks (for example, automatic pkglist updates).
-- `docs/` holds reference notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md` (see `docs/README.md`).
+- `docs/` holds reference notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md` (see `docs/README.md` and `docs/commands.md`).
 - `backups/` is the default archive location for GNOME themes/extensions and Firefox profiles.
 
 ## Build, Test, and Development Commands

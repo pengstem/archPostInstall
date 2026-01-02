@@ -1,23 +1,25 @@
-configs/tmux ~/.config/tmux
-configs/zshrc ~/.zshrc
-configs/p10k.zsh ~/.p10k.zsh
-configs/gitconfig ~/.gitconfig
-configs/kitty/kitty.conf ~/.config/kitty/kitty.conf
-configs/ghostty ~/.config/ghostty
-configs/nvim ~/.config/nvim
-configs/zed ~/.config/zed
-configs/yazi ~/.config/yazi
-configs/zathura ~/.config/zathura
-configs/baidupcs ~/.config/BaiduPCS-Go
-configs/fcitx5 ~/.config/fcitx5
-configs/rime ~/.local/share/fcitx5/rime
-configs/pacman/pacman.conf /etc/pacman.conf
-configs/paru/paru.conf /etc/paru.conf
-configs/pacman/hooks/99-update-pkglist.hook /etc/pacman.d/hooks/99-update-pkglist.hook
-configs/systemd/user/archpostinstall-gnome-sync.service ~/.config/systemd/user/archpostinstall-gnome-sync.service
-configs/systemd/user/archpostinstall-gnome-sync.path ~/.config/systemd/user/archpostinstall-gnome-sync.path
-configs/applications/QQ.desktop ~/.local/share/applications/QQ.desktop
-configs/applications/WeChat.desktop ~/.local/share/applications/WeChat.desktop
-scripts/update_pkglist.sh /usr/local/bin/archpostinstall-update-pkglist
-scripts/gnome/backup_gnome_state.sh ~/.local/bin/archpostinstall-gnome-sync
-scripts/archpostinstall.sh ~/.local/bin/archpostinstall
+| Source | Target | Notes |
+| --- | --- | --- |
+| configs/tmux | ~/.config/tmux | user config |
+| configs/zshrc | ~/.zshrc | user config |
+| configs/p10k.zsh | ~/.p10k.zsh | user config |
+| configs/gitconfig | ~/.gitconfig | user config |
+| configs/kitty/kitty.conf | ~/.config/kitty/kitty.conf | user config |
+| configs/ghostty | ~/.config/ghostty | user config |
+| configs/nvim | ~/.config/nvim | user config |
+| configs/zed | ~/.config/zed | user config |
+| configs/yazi | ~/.config/yazi | user config |
+| configs/zathura | ~/.config/zathura | user config |
+| configs/baidupcs | ~/.config/BaiduPCS-Go | requires pcs_config.json |
+| configs/fcitx5 | ~/.config/fcitx5 | user config |
+| configs/rime | ~/.local/share/fcitx5/rime | user config |
+| configs/pacman/pacman.conf | /etc/pacman.conf | sudo |
+| configs/paru/paru.conf | /etc/paru.conf | sudo |
+| configs/pacman/hooks/99-update-pkglist.hook | /etc/pacman.d/hooks/99-update-pkglist.hook | sudo |
+| configs/systemd/user/archpostinstall-gnome-sync.service | ~/.config/systemd/user/archpostinstall-gnome-sync.service | user unit |
+| configs/systemd/user/archpostinstall-gnome-sync.path | ~/.config/systemd/user/archpostinstall-gnome-sync.path | user unit |
+| configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
+| configs/applications/WeChat.desktop | ~/.local/share/applications/WeChat.desktop | user desktop entry |
+| scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
+| scripts/gnome/backup_gnome_state.sh | ~/.local/bin/archpostinstall-gnome-sync | user bin |
+| scripts/archpostinstall.sh | ~/.local/bin/archpostinstall | user bin |
