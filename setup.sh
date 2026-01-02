@@ -121,6 +121,7 @@ create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed
 # Tools
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
+create_link "$CONFIGS_DIR/zathura"          "$HOME/.config/zathura"         "Zathura"
 if [ -f "$CONFIGS_DIR/baidupcs/pcs_config.json" ]; then
     create_link "$CONFIGS_DIR/baidupcs" "$HOME/.config/BaiduPCS-Go" "BaiduPCS-Go"
 else

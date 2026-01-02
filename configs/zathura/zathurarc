@@ -1,0 +1,67 @@
+# ~/.config/zathura/zathurarc
+# =========================================================
+# Core: default 2-page "book spread"
+# =========================================================
+
+# Always render two pages side-by-side
+set pages-per-row 2
+
+# "Book spread" behaviour:
+# value is a list per pages-per-row; default is 1:2
+# - for 1 page/row -> column 1
+# - for 2 pages/row -> column 2 (first page on the right, left blank)
+set first-page-column "1:2"
+
+# Auto fit on open:
+# - best-fit: good default for dual-page (keeps both pages visible)
+# - width: fits to width (often too large for dual-page unless window is wide)
+set adjust-open "best-fit"
+
+# =========================================================
+# Clipboard / selection
+# =========================================================
+# Put mouse-selected text into CLIPBOARD (Ctrl+V pastable)
+set selection-clipboard "clipboard"
+
+# =========================================================
+# Scrolling feel
+# =========================================================
+# Stop half/full-page scrolling at page boundaries
+set scroll-page-aware "true"
+
+# Keep a bit of overlap when scrolling full pages (context continuity)
+set scroll-full-overlap 0.05
+
+# Increase step for keyboard/scroll commands (tune to taste)
+set scroll-step 80
+
+set smooth-scroll
+# NOTE: don't set "smooth-scroll" blindly.
+# On newer zathura/girara, the option may be removed / always-on, and can warn:
+# "Unknown option: smooth-scroll". Keep config clean. 
+# (If you *see* it supported in your manpage, then you can add it.)
+# ---------------------------------------------------------  :contentReference[oaicite:7]{index=7}
+
+# =========================================================
+# Optional: SyncTeX (LaTeX)
+# =========================================================
+# Zathura supports SyncTeX forward/backward via CLI + D-Bus.  :contentReference[oaicite:8]{index=8}
+set synctex "true"
+# Backward sync: edit this to your editor workflow (example uses nvim)
+# set synctex-editor-command "nvim --server /tmp/nvimserver --remote +%{line} %{input}"
+# The option exists in zathurarc:  :contentReference[oaicite:9]{index=9}
+
+# If forward sync depends on D-Bus, do NOT disable dbus-service.
+# (Disabling D-Bus service breaks SyncTeX forward sync.)  :contentReference[oaicite:10]{index=10}
+
+# Optional: don't auto-raise zathura window on D-Bus commands (some people prefer this)
+# set dbus-raise-window "false"  :contentReference[oaicite:11]{index=11}
+
+# =========================================================
+# Optional: simple key toggles (best practice: keep them obvious)
+# =========================================================
+# map <F10> set pages-per-row 1
+# map <F11> set pages-per-row 2
+# map <F9>  toggle_page_mode
+# (Mapping syntax and shortcut functions are documented.)  :contentReference[oaicite:12]{index=12}
+set guioptions "svh"

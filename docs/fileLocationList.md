@@ -7,6 +7,7 @@ configs/ghostty ~/.config/ghostty
 configs/nvim ~/.config/nvim
 configs/zed ~/.config/zed
 configs/yazi ~/.config/yazi
+configs/zathura ~/.config/zathura
 configs/baidupcs ~/.config/BaiduPCS-Go
 configs/fcitx5 ~/.config/fcitx5
 configs/rime ~/.local/share/fcitx5/rime
