@@ -1,4 +1,4 @@
-# Package list generated on Fri Jan 02 09:10:16 PM CST 2026
+# Package list generated on Sat Jan 03 12:23:00 AM CST 2026
 7zip
 amd-ucode
 base
@@ -51,6 +51,7 @@ linux-lts
 linux-lts-headers
 linux-zen
 linux-zen-headers
+localsend
 man-db
 mpv
 nautilus
@@ -64,6 +65,7 @@ nvidia-open-dkms
 nvidia-utils
 os-prober
 qimgv-debug
+resvg
 ripgrep
 rustup
 sassc
