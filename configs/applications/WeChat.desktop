@@ -4,5 +4,6 @@ Exec=/home/nastem/Applications/WeChat.AppImage
 Type=Application
 Icon=/home/nastem/.local/share/icons/wechat.png
 Terminal=false
+StartupWMClass=wechat
 Categories=Network;InstantMessaging;
 Comment=WeChat Desktop Client
