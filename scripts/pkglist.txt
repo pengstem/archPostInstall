@@ -1,4 +1,4 @@
-# Package list generated on Sat Jan 03 12:23:00 AM CST 2026
+# Package list generated on Sat Jan 03 11:11:51 PM CST 2026
 7zip
 amd-ucode
 base
@@ -84,6 +84,7 @@ ttf-jetbrains-mono-nerd
 ttf-liberation
 ttf-maplemono-nf-cn-unhinted
 uv
+ventoy-bin
 visual-studio-code-bin
 wl-clipboard
 xdg-user-dirs
