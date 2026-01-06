@@ -1,4 +1,4 @@
-# Package list generated on Sun Jan 04 10:53:26 AM CST 2026
+# Package list generated on Tue Jan 06 10:44:03 AM CST 2026
 7zip
 amd-ucode
 base
@@ -30,6 +30,7 @@ gdb
 gdm
 ghostty
 git
+github-cli
 gnome-browser-connector
 gnome-control-center
 gnome-keyring
@@ -53,10 +54,12 @@ linux-zen
 linux-zen-headers
 localsend
 man-db
+man-pages
 mpv
 nautilus
 neovim
 networkmanager
+newsboat
 noto-fonts-cjk
 noto-fonts-emoji
 noto-fonts-extra
@@ -69,6 +72,7 @@ resvg
 ripgrep
 rustup
 sassc
+scrcpy
 sparkle-bin
 spotify-launcher
 starship
@@ -76,8 +80,10 @@ steam
 sudo
 systemctl-tui
 tealdeer
+telegram-desktop
 thefuck
 tmux
+tokei
 ttf-dejavu
 ttf-jetbrains-mono
 ttf-jetbrains-mono-nerd
@@ -90,6 +96,7 @@ wl-clipboard
 xdg-user-dirs
 yay
 yazi
+yt-dlp
 zathura
 zathura-pdf-mupdf
 zed
