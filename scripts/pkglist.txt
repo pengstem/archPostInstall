@@ -1,4 +1,4 @@
-# Package list generated on Tue Jan 06 10:44:03 AM CST 2026
+# Package list generated on Fri Jan 09 12:05:52 AM CST 2026
 7zip
 amd-ucode
 base
@@ -12,6 +12,7 @@ btrfs-assistant
 btrfs-progs
 dkms
 docker
+dust
 efibootmgr
 exfat-utils
 eza
@@ -45,6 +46,7 @@ inotify-tools
 kitty
 lazygit
 libgda6
+libreoffice-fresh
 librime
 libva-nvidia-driver
 linux-firmware
@@ -77,6 +79,7 @@ sparkle-bin
 spotify-launcher
 starship
 steam
+strace
 sudo
 systemctl-tui
 tealdeer
@@ -91,6 +94,7 @@ ttf-liberation
 ttf-maplemono-nf-cn-unhinted
 uv
 ventoy-bin
+vim
 visual-studio-code-bin
 wl-clipboard
 xdg-user-dirs
