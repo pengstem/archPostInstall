@@ -49,6 +49,7 @@ export MANWIDTH=420
 # (Recommendation: Move these to ~/.zshenv or a separate .env file in the future)
 export ANTHROPIC_AUTH_TOKEN=[REDACTED]
 export ANTHROPIC_BASE_URL=https://anyrouter.top
+export DEEPSEEK_API_KEY=[REDACTED]
 
 # =============================================================================
 # 3. PATH Management
