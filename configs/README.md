@@ -6,7 +6,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `applications/` user `.desktop` launchers
 - `baidupcs/` BaiduPCS-Go template; real `pcs_config.json` is ignored
 - `fcitx5/` input method config
-- `ghostty/`, `kitty/`, `zathura/` terminal and reader configs
+- `ghostty/`, `kitty/`, `mpv/`, `zathura/` terminal and media/reader configs
 - `nvim/`, `zed/` editor configs
 - `rime/` schema and dictionaries (live `user.yaml` is ignored)
 - `tmux/` tmux config and helper scripts

@@ -10,6 +10,7 @@
 | configs/zed | ~/.config/zed | user config |
 | configs/yazi | ~/.config/yazi | user config |
 | configs/zathura | ~/.config/zathura | user config |
+| configs/mpv | ~/.config/mpv | user config |
 | configs/baidupcs | ~/.config/BaiduPCS-Go | requires pcs_config.json |
 | configs/fcitx5 | ~/.config/fcitx5 | user config |
 | configs/rime | ~/.local/share/fcitx5/rime | user config |
