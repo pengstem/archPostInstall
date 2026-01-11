@@ -30,6 +30,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
   - `systemctl --user enable --now archpostinstall-dpms-idle.timer`
   - `systemctl --user enable --now archpostinstall-dpms-restore.timer`
 - Set `DPMS_KILL_OTHER_GUI=0` to avoid best-effort closing of non-whitelisted GUI apps.
+- If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
 
 ## Package List Updates
 - Pacman hook triggers `archpostinstall-update-pkglist` after transactions.

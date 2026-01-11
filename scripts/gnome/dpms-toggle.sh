@@ -165,6 +165,9 @@ maybe_log_other_gui() {
                 break
             fi
         done
+        if [ "${cls,,}" = "org.gnome.shell" ] || [ "${cls,,}" = "gnome-shell" ]; then
+            keep=1
+        fi
         if [ "$keep" -eq 1 ]; then
             continue
         fi

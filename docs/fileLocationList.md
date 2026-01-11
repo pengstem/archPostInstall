@@ -29,4 +29,5 @@
 | scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
 | scripts/gnome/backup_gnome_state.sh | ~/.local/bin/archpostinstall-gnome-sync | user bin |
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
+| scripts/gnome/dpms-toggle.sh | /usr/local/bin/dpms-toggle | sudo |
 | scripts/archpostinstall.sh | ~/.local/bin/archpostinstall | user bin |
