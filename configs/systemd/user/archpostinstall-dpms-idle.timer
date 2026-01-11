@@ -1,0 +1,11 @@
+[Unit]
+Description=Run dpms-toggle on idle
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=30s
+Unit=archpostinstall-dpms-idle.service
+
+[Install]
+WantedBy=default.target

@@ -16,5 +16,6 @@ A personal Arch Linux post-install and dotfiles repo. It automates package insta
 ## Notes
 - Pacman hook updates `scripts/pkglist.txt` automatically after transactions.
 - GNOME sync writes extension/theme notes into `docs/` and archives assets into `backups/gnome/`.
+- DPMS automation is configured in `configs/archpostinstall/dpms.conf` and uses user systemd timers.
 - Secrets are not tracked: copy `configs/baidupcs/pcs_config.json.example` to `configs/baidupcs/pcs_config.json` locally.
 - `configs/rime/user.yaml` is ignored because it changes with typing.

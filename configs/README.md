@@ -4,6 +4,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 
 ## Notable Directories
 - `applications/` user `.desktop` launchers
+- `archpostinstall/` helper configs (dpms automation)
 - `baidupcs/` BaiduPCS-Go template; real `pcs_config.json` is ignored
 - `fcitx5/` input method config
 - `ghostty/`, `kitty/`, `mpv/`, `zathura/` terminal and media/reader configs

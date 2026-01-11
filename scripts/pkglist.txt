@@ -1,4 +1,4 @@
-# Package list generated on Sat Jan 10 02:32:44 PM CST 2026
+# Package list generated on Sun Jan 11 11:44:20 PM CST 2026
 7zip
 amd-ucode
 base
@@ -57,6 +57,7 @@ linux-zen-headers
 localsend
 man-db
 man-pages
+mosh
 mpv
 nautilus
 neovim

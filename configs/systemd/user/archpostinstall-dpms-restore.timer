@@ -1,0 +1,11 @@
+[Unit]
+Description=Poll for display-on to restore apps
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=30s
+AccuracySec=30s
+Unit=archpostinstall-dpms-restore.service
+
+[Install]
+WantedBy=default.target

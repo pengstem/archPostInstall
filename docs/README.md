@@ -23,6 +23,14 @@ This folder contains reference notes and quick guidance for maintaining the Arch
   - `GNOME_BACKUP_DIR` to override backup location
   - `GNOME_SYNC_THROTTLE_SECONDS` to adjust archive frequency
 
+## DPMS Toggle and Auto-Idle
+- `dpms-toggle` turns the display off/on and manages app shutdown/restore.
+- Configure app lists and power profile in `configs/archpostinstall/dpms.conf`.
+- Enable timers after linking:
+  - `systemctl --user enable --now archpostinstall-dpms-idle.timer`
+  - `systemctl --user enable --now archpostinstall-dpms-restore.timer`
+- Set `DPMS_KILL_OTHER_GUI=0` to avoid best-effort closing of non-whitelisted GUI apps.
+
 ## Package List Updates
 - Pacman hook triggers `archpostinstall-update-pkglist` after transactions.
 - Manual refresh: `./scripts/update_pkglist.sh` (writes `scripts/pkglist.txt`).

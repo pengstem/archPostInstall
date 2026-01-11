@@ -4,7 +4,7 @@
 - `README.md` is the entry point for setup and layout information.
 - `bootstrap.sh` orchestrates the full post-install flow.
 - `setup.sh` symlinks tracked configs into user and system locations.
-- `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, yazi, zathura, mpv, BaiduPCS-Go, tmux, fcitx5/rime, pacman/paru, desktop entries). See `configs/README.md`.
+- `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, yazi, zathura, mpv, BaiduPCS-Go, tmux, fcitx5/rime, pacman/paru, desktop entries, archpostinstall helpers). See `configs/README.md`.
 - `scripts/` is split by function: `scripts/install/`, `scripts/backup/`, `scripts/gnome/`; `scripts/pkglist.txt` is the package source of truth.
 - `configs/systemd/user/` defines the GNOME sync path/service units.
 - `configs/pacman/hooks/` contains pacman hooks (for example, automatic pkglist updates).
@@ -20,6 +20,7 @@
 - `./scripts/backup/backup_firefox.sh` and `./scripts/backup/restore_firefox.sh` manage `~/.mozilla` backups (default `backups/firefox/`).
 - `./scripts/backup/backup_themes_extensions.sh` and `./scripts/backup/restore_themes_extensions.sh` handle themes, icons, and GNOME extensions (default `backups/gnome/`).
 - `./scripts/gnome/backup_gnome_state.sh` refreshes GNOME extension/theme notes and archives assets (used by the systemd path unit).
+- `./scripts/gnome/dpms-toggle.sh` toggles display power, manages autostart apps, and cooperates with idle/restore timers.
 
 ## Coding Style & Naming Conventions
 - Bash scripts use `#!/bin/bash`; keep `set -e` in scripts that should fail fast.
@@ -39,6 +40,7 @@
 - `setup.sh` writes to `/etc` for `pacman.conf` and `paru.conf`; review diffs before running.
 - Pacman hook calls `/usr/local/bin/archpostinstall-update-pkglist`, linked to `scripts/update_pkglist.sh` by `setup.sh`.
 - GNOME sync runs from `~/.local/bin/archpostinstall-gnome-sync`; enable the user unit after linking.
+- DPMS automation uses `~/.local/bin/dpms-toggle` plus systemd user timers (`archpostinstall-dpms-idle.timer`, `archpostinstall-dpms-restore.timer`).
 - `configs/baidupcs/pcs_config.json` is ignored; keep secrets there and use `pcs_config.json.example` as a template.
 - `configs/rime/user.yaml` is ignored to avoid churn from live input.
 - Backup existing dotfiles when testing changes; the scripts already create timestamped backups for symlink targets.
