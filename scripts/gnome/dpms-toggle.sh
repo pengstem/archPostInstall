@@ -11,30 +11,32 @@ STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall"
 STATE_FILE="$STATE_DIR/dpms.state"
 
 DPMS_REOPEN_NAMES=("firefox" "wechat" "qq")
-DPMS_KILL_MATCHES=("firefox" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
+DPMS_KILL_MATCHES=("firefox" "WeChat.AppImage|/tmp/.mount_WeChat|WeChatAppEx|/usr/bin/wechat" "QQ.AppImage|/tmp/.mount_QQ|/usr/bin/qq|/qq")
 DPMS_WM_CLASSES=("firefox" "wechat" "qq")
-DPMS_REOPEN_COMMANDS=("firefox" "gtk-launch WeChat" "gtk-launch QQ")
-DPMS_KILL_ONLY_MATCHES=()
-DPMS_KILL_ONLY_WM_CLASSES=()
-DPMS_KEEP_PROCS=("kitty" "sparkle")
+DPMS_REOPEN_COMMANDS=("firefox" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
+DPMS_KILL_ONLY_MATCHES=("steam")
+DPMS_KILL_ONLY_WM_CLASSES=("steam")
+DPMS_KEEP_PROCS=("kitty" "sparkle" "gnome-shell" "org.gnome.Shell")
 DPMS_POWER_PROFILE_ON="balanced"
 DPMS_POWER_PROFILE_OFF="power-saver"
 DPMS_POWER_PROFILE_OFF_SSH="power-saver"
 DPMS_IDLE_MINUTES=15
 DPMS_REOPEN_DELAY_SEC=2
-DPMS_START_WAIT_SEC=10
-DPMS_START_RETRIES=2
+DPMS_START_WAIT_SEC=15
+DPMS_START_RETRIES=3
 DPMS_KILL_WAIT_SEC=6
-DPMS_KILL_OTHER_GUI=0
-DPMS_VERBOSE=1
+DPMS_KILL_OTHER_GUI=1
+DPMS_VERBOSE=2
 DPMS_LOG_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall/dpms.log"
-DPMS_SUSPEND_IF_NO_SSH=0
-DPMS_SUSPEND_DELAY_SEC=60
+DPMS_SUSPEND_IF_NO_SSH=1
+DPMS_SUSPEND_DELAY_SEC=30
 
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
     . "$CONFIG_FILE"
 fi
+
+GNOME_EVAL_WARNED=0
 
 require_cmd() {
     if ! command -v "$1" >/dev/null 2>&1; then
@@ -78,13 +80,26 @@ have_gdbus() {
     command -v gdbus >/dev/null 2>&1
 }
 
-gnome_eval() {
+gnome_eval_raw() {
     local js="$1"
+    local output
     if ! have_gdbus; then
         return 1
     fi
-    gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
-        --method org.gnome.Shell.Eval "$js" >/dev/null 2>&1
+    output="$(gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
+        --method org.gnome.Shell.Eval "$js" 2>/dev/null)" || return 1
+    if ! echo "$output" | grep -q "^(true,"; then
+        if [ "$GNOME_EVAL_WARNED" -eq 0 ]; then
+            log "GNOME Shell Eval unavailable: $output"
+            GNOME_EVAL_WARNED=1
+        fi
+        return 1
+    fi
+    printf "%s" "$output"
+}
+
+gnome_eval() {
+    gnome_eval_raw "$1" >/dev/null
 }
 
 get_wm_classes() {
@@ -92,9 +107,7 @@ get_wm_classes() {
         return 1
     fi
     local result classes
-    result="$(gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
-        --method org.gnome.Shell.Eval \
-        "global.get_window_actors().map(w => w.get_meta_window().get_wm_class()).join('\\n')")" || return 1
+    result="$(gnome_eval_raw "global.get_window_actors().map(w => w.get_meta_window().get_wm_class()).join('\\n')")" || return 1
 
     classes="$(echo "$result" | sed -n "s/^([^,]*, '\\(.*\\)')$/\\1/p")"
     if [ -n "$classes" ]; then
@@ -281,6 +294,11 @@ run_command() {
             cmd="gio launch ${target}.desktop"
         fi
     fi
+    local first
+    first="$(echo "$cmd" | awk '{print $1}')"
+    if [[ "$first" == /* ]] && [ ! -x "$first" ]; then
+        log "Warning: command not executable: $first"
+    fi
     log "Executing: $cmd"
     nohup bash -c "$cmd" >/dev/null 2>&1 &
 }
@@ -314,12 +332,18 @@ wait_for_app_start() {
 
 maybe_log_other_gui() {
     if ! have_gdbus; then
+        if [ "$DPMS_KILL_OTHER_GUI" -eq 1 ]; then
+            log "gdbus not available; skipping other GUI shutdown."
+        fi
         return 0
     fi
 
     local classes
     classes="$(get_wm_classes || true)"
     if [ -z "$classes" ]; then
+        if [ "$DPMS_KILL_OTHER_GUI" -eq 1 ]; then
+            log "No WM classes available; skipping other GUI shutdown."
+        fi
         return 0
     fi
 
@@ -360,7 +384,7 @@ dpms_off() {
     fi
 
     local i name match wm_class
-    declare -A reopen_set
+    local reopen_apps=()
 
     for i in "${!DPMS_REOPEN_NAMES[@]}"; do
         name="${DPMS_REOPEN_NAMES[$i]}"
@@ -370,6 +394,7 @@ dpms_off() {
             wm_class="${DPMS_WM_CLASSES[$i]}"
         fi
         if is_app_running "$match" "$wm_class"; then
+            reopen_apps+=("$name")
             log "Stopping $name (match: $match, class: ${wm_class:-none})"
             list_running_match "$match" | while read -r line; do
                 log "  $line"
@@ -382,8 +407,10 @@ dpms_off() {
             fi
             if is_app_running "$match" "$wm_class"; then
                 log "Warning: $name still running after close/kill."
+                list_running_match "$match" | while read -r line; do
+                    log "  $line"
+                done
             else
-                reopen_set["$name"]=1
                 log "$name stopped."
             fi
         else
@@ -432,10 +459,11 @@ dpms_off() {
         set_power_profile "$DPMS_POWER_PROFILE_OFF"
     fi
 
-    local reopen_apps=()
-    for name in "${!reopen_set[@]}"; do
-        reopen_apps+=("$name")
-    done
+    if [ "${#reopen_apps[@]}" -gt 0 ]; then
+        log "Apps to reopen: ${reopen_apps[*]}"
+    else
+        log "No apps to reopen."
+    fi
     save_state "${reopen_apps[*]}" "$profile_before"
     log "Display off."
 
@@ -444,7 +472,7 @@ dpms_off() {
             log "Scheduling suspend in ${DPMS_SUSPEND_DELAY_SEC}s..."
             (
                 sleep "$DPMS_SUSPEND_DELAY_SEC"
-                if ! is_display_on; then
+                if ! is_display_on && ! has_ssh_session; then
                     systemctl suspend || true
                 fi
             ) &
@@ -468,6 +496,12 @@ dpms_on() {
         set_power_profile "$profile_before"
     else
         set_power_profile "$DPMS_POWER_PROFILE_ON"
+    fi
+
+    if [ -n "${REOPEN_APPS:-}" ]; then
+        log "Reopen list: $REOPEN_APPS"
+    else
+        log "No apps recorded for reopen."
     fi
 
     if [ -n "${REOPEN_APPS:-}" ]; then
@@ -515,6 +549,9 @@ dpms_on() {
                 fi
                 if ! is_app_running "$match" "$wm_class"; then
                     log "Error: failed to start $name after retries."
+                    list_running_match "$match" | while read -r line; do
+                        log "  $line"
+                    done
                 fi
             else
                 log "No command mapping found for $name"
@@ -535,7 +572,60 @@ dpms_restore() {
     fi
 }
 
+get_logind_idle_seconds() {
+    if ! command -v loginctl >/dev/null 2>&1; then
+        return 1
+    fi
+
+    local session_id raw hint since uptime_usec
+    session_id="${XDG_SESSION_ID:-}"
+
+    if [ -n "$session_id" ]; then
+        raw="$(loginctl show-session "$session_id" -p IdleHint -p IdleSinceHintMonotonic 2>/dev/null)" || return 1
+    else
+        raw="$(loginctl show-user "$USER" -p IdleHint -p IdleSinceHintMonotonic 2>/dev/null)" || return 1
+    fi
+
+    hint="$(echo "$raw" | awk -F= '/IdleHint=/{print $2}')"
+    since="$(echo "$raw" | awk -F= '/IdleSinceHintMonotonic=/{print $2}')"
+    if [ -z "$hint" ]; then
+        return 1
+    fi
+
+    if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+        log "IdleHint: $hint (IdleSinceHintMonotonic: ${since:-n/a})"
+    fi
+
+    if [ "$hint" = "no" ]; then
+        echo 0
+        return 0
+    fi
+    if [ "$hint" != "yes" ]; then
+        return 1
+    fi
+
+    if ! [[ "$since" =~ ^[0-9]+$ ]] || [ "$since" -le 0 ]; then
+        return 1
+    fi
+    if [ ! -r /proc/uptime ]; then
+        return 1
+    fi
+    uptime_usec="$(awk '{printf "%d", $1*1000000}' /proc/uptime 2>/dev/null || true)"
+    if ! [[ "$uptime_usec" =~ ^[0-9]+$ ]] || [ "$uptime_usec" -lt "$since" ]; then
+        return 1
+    fi
+
+    echo $(((uptime_usec - since) / 1000000))
+}
+
 get_idle_seconds() {
+    local logind_idle
+    logind_idle="$(get_logind_idle_seconds 2>/dev/null || true)"
+    if [ -n "$logind_idle" ]; then
+        echo "$logind_idle"
+        return 0
+    fi
+
     if ! command -v gdbus >/dev/null 2>&1; then
         return 1
     fi
@@ -551,6 +641,7 @@ get_idle_seconds() {
         ms="$(echo "$raw" | sed -E 's/[^0-9]*([0-9]+).*/\\1/')"
     fi
     if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
+        log "Failed to parse idle time from: $raw"
         return 1
     fi
 
@@ -562,6 +653,11 @@ get_idle_seconds() {
 }
 
 dpms_idle() {
+    if ! [[ "${DPMS_IDLE_MINUTES:-}" =~ ^[0-9]+$ ]] || [ "$DPMS_IDLE_MINUTES" -le 0 ]; then
+        log "Idle timeout disabled; skipping."
+        return 0
+    fi
+
     local idle_seconds
     idle_seconds="$(get_idle_seconds)" || {
         log "Idle monitor unavailable; skipping."
