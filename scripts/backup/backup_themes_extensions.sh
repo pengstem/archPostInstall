@@ -14,6 +14,42 @@ if [ ! -w "$OUTPUT_DIR" ]; then
 fi
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+RETENTION_DAYS="${GNOME_BACKUP_RETENTION_DAYS:-30}"
+
+prune_old_backups() {
+    local retention_days="$1"
+    local output_dir="$2"
+    local -a patterns=(
+        "themes_backup_*.tar.gz"
+        "icons_backup_*.tar.gz"
+        "gnome_extensions_backup_*.tar.gz"
+    )
+
+    if (( retention_days <= 0 )); then
+        echo "Skipping old GNOME backup cleanup (retention disabled)."
+        return 0
+    fi
+
+    local -a find_expr=()
+    local pattern
+    for pattern in "${patterns[@]}"; do
+        find_expr+=(-name "$pattern" -o)
+    done
+    unset 'find_expr[${#find_expr[@]}-1]'
+
+    local -a old_files=()
+    while IFS= read -r file; do
+        old_files+=("$file")
+    done < <(find "$output_dir" -maxdepth 1 -type f \( "${find_expr[@]}" \) -mtime "+$retention_days" 2>/dev/null)
+
+    if ((${#old_files[@]} == 0)); then
+        echo "No old GNOME backups to prune."
+        return 0
+    fi
+
+    echo "Pruning ${#old_files[@]} old GNOME backup(s) older than ${retention_days} day(s)..."
+    rm -f "${old_files[@]}"
+}
 
 # 1. Backup Themes (~/.themes)
 if [ -d "$HOME/.themes" ]; then
@@ -44,6 +80,12 @@ if [ -d "$EXT_DIR" ]; then
     tar -czf "$EXT_BACKUP" -C "$HOME/.local/share/gnome-shell" extensions
 else
     echo "No extensions found in $EXT_DIR, skipping."
+fi
+
+if [[ "$RETENTION_DAYS" =~ ^[0-9]+$ ]]; then
+    prune_old_backups "$RETENTION_DAYS" "$OUTPUT_DIR"
+else
+    echo "Warning: GNOME_BACKUP_RETENTION_DAYS must be a non-negative integer. Skipping cleanup."
 fi
 
 echo "Backup process finished."
