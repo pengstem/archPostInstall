@@ -12,6 +12,7 @@ DPMS_TLP_PROFILE_ON="balanced"
 DPMS_TLP_PROFILE_OFF="power-saver"
 DPMS_TLP_PROFILE_OFF_SSH="performance"
 DPMS_TLP_USE_SUDO=1
+POWER_SOURCE=""
 
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
@@ -25,10 +26,9 @@ log() {
 }
 
 power_path="/sys/class/power_supply/${POWER_SUPPLY}/power_now"
-if [ ! -r "$power_path" ]; then
-    log "Missing power_now at $power_path"
-    exit 1
-fi
+energy_path="/sys/class/power_supply/${POWER_SUPPLY}/energy_now"
+current_path="/sys/class/power_supply/${POWER_SUPPLY}/current_now"
+voltage_path="/sys/class/power_supply/${POWER_SUPPLY}/voltage_now"
 
 status_path="/sys/class/power_supply/${POWER_SUPPLY}/status"
 if [ -r "$status_path" ]; then
@@ -72,7 +72,16 @@ set_profile() {
     run_tlp_profile "$profile"
 }
 
-measure_power_avg() {
+is_effectively_zero() {
+    local value="$1"
+    awk -v v="$value" 'BEGIN { exit (v < 0.001 && v > -0.001) ? 0 : 1 }'
+}
+
+measure_power_avg_power_now() {
+    if [ ! -r "$power_path" ]; then
+        return 1
+    fi
+
     local samples=$((MEASURE_SECONDS / MEASURE_INTERVAL))
     local sum=0
     local i value avg
@@ -86,12 +95,117 @@ measure_power_avg() {
     done
 
     if [ "$samples" -le 0 ]; then
-        log "Invalid sampling configuration."
         return 1
     fi
 
     avg=$((sum / samples))
     awk -v v="$avg" 'BEGIN { printf "%.3f", v / 1000000 }'
+}
+
+measure_power_avg_energy_delta() {
+    if [ ! -r "$energy_path" ]; then
+        return 1
+    fi
+
+    local start end delta
+    start="$(cat "$energy_path")"
+    sleep "$MEASURE_SECONDS"
+    end="$(cat "$energy_path")"
+
+    if ! [[ "$start" =~ ^-?[0-9]+$ ]] || ! [[ "$end" =~ ^-?[0-9]+$ ]]; then
+        return 1
+    fi
+
+    delta=$((start - end))
+    if [ "$delta" -le 0 ]; then
+        return 1
+    fi
+
+    awk -v d="$delta" -v s="$MEASURE_SECONDS" 'BEGIN { printf "%.3f", (d / 1000000) / (s / 3600) }'
+}
+
+measure_power_avg_current_voltage() {
+    if [ ! -r "$current_path" ] || [ ! -r "$voltage_path" ]; then
+        return 1
+    fi
+
+    local samples=$((MEASURE_SECONDS / MEASURE_INTERVAL))
+    local sum=0
+    local i current voltage
+    local avg
+
+    for ((i=0; i<samples; i++)); do
+        current="$(cat "$current_path")"
+        voltage="$(cat "$voltage_path")"
+        if [[ "$current" =~ ^-?[0-9]+$ ]] && [[ "$voltage" =~ ^-?[0-9]+$ ]]; then
+            sum=$((sum + current * voltage))
+        fi
+        sleep "$MEASURE_INTERVAL"
+    done
+
+    if [ "$samples" -le 0 ]; then
+        return 1
+    fi
+
+    avg=$((sum / samples))
+    awk -v v="$avg" 'BEGIN { printf "%.3f", (v < 0 ? -v : v) / 1000000000000 }'
+}
+
+measure_power_avg_upower() {
+    if ! command -v upower >/dev/null 2>&1; then
+        return 1
+    fi
+
+    local device
+    device="$(upower -e 2>/dev/null | awk -v bat="$POWER_SUPPLY" '$0 ~ "battery_"bat"$" {print; exit}')"
+    if [ -z "$device" ]; then
+        return 1
+    fi
+
+    local rate
+    rate="$(upower -i "$device" 2>/dev/null | awk -F: '/energy-rate/ {gsub(/^[[:space:]]+/, "", $2); print $2; exit}')"
+    if [ -z "$rate" ]; then
+        return 1
+    fi
+
+    printf "%.3f" "$(echo "$rate" | awk '{print $1}')"
+}
+
+measure_power_avg() {
+    local avg
+    POWER_SOURCE="power_now"
+    avg="$(measure_power_avg_power_now || true)"
+    if [ -n "$avg" ]; then
+        if is_effectively_zero "$avg" && [ "${status:-}" != "Discharging" ]; then
+            avg=""
+        else
+            echo "$avg"
+            return 0
+        fi
+    fi
+
+    POWER_SOURCE="energy_delta"
+    avg="$(measure_power_avg_energy_delta || true)"
+    if [ -n "$avg" ]; then
+        echo "$avg"
+        return 0
+    fi
+
+    POWER_SOURCE="current_voltage"
+    avg="$(measure_power_avg_current_voltage || true)"
+    if [ -n "$avg" ]; then
+        echo "$avg"
+        return 0
+    fi
+
+    POWER_SOURCE="upower"
+    avg="$(measure_power_avg_upower || true)"
+    if [ -n "$avg" ]; then
+        echo "$avg"
+        return 0
+    fi
+
+    return 1
 }
 
 measure_profile() {
@@ -103,8 +217,11 @@ measure_profile() {
         return 1
     fi
     sleep "$SETTLE_SECONDS"
-    avg="$(measure_power_avg)"
-    printf "%s: %s W (profile: %s)\n" "$label" "$avg" "$profile"
+    avg="$(measure_power_avg)" || {
+        log "No usable power source found for $label."
+        return 1
+    }
+    printf "%s: %s W (profile: %s, source: %s)\n" "$label" "$avg" "$profile" "$POWER_SOURCE"
 }
 
 if ! have_tlp; then
