@@ -26,6 +26,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 ## DPMS Toggle and Auto-Idle
 - `dpms-toggle` turns the display off/on and manages app shutdown/restore.
 - Configure app lists and power profile in `configs/archpostinstall/dpms.conf`.
+- Logs are written to `~/.cache/archpostinstall/dpms.log` for troubleshooting.
 - Enable timers after linking:
   - `systemctl --user enable --now archpostinstall-dpms-idle.timer`
   - `systemctl --user enable --now archpostinstall-dpms-restore.timer`

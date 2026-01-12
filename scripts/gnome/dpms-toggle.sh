@@ -19,7 +19,12 @@ DPMS_POWER_PROFILE_OFF="power-saver"
 DPMS_POWER_PROFILE_OFF_SSH="power-saver"
 DPMS_IDLE_MINUTES=15
 DPMS_REOPEN_DELAY_SEC=2
+DPMS_KILL_WAIT_SEC=6
 DPMS_KILL_OTHER_GUI=0
+DPMS_VERBOSE=1
+DPMS_LOG_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall/dpms.log"
+DPMS_SUSPEND_IF_NO_SSH=0
+DPMS_SUSPEND_DELAY_SEC=60
 
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
@@ -42,18 +47,37 @@ if [ "${#DPMS_REOPEN_NAMES[@]}" -ne "${#DPMS_KILL_MATCHES[@]}" ] || \
 fi
 
 log() {
-    printf "[dpms-toggle] %s\n" "$*"
+    local ts msg
+    ts="$(date '+%Y-%m-%d %H:%M:%S')"
+    msg="$ts [dpms-toggle] $*"
+    if [ -n "${DPMS_LOG_FILE:-}" ]; then
+        mkdir -p "$(dirname "$DPMS_LOG_FILE")"
+        printf "%s\n" "$msg" >> "$DPMS_LOG_FILE"
+    fi
+    if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
+        printf "%s\n" "$msg"
+    fi
 }
 
 get_dpms_mode() {
-    busctl --user get-property org.gnome.Mutter.DisplayConfig \
+    local mode
+    mode="$(busctl --user get-property org.gnome.Mutter.DisplayConfig \
         /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode \
-        | awk '{print $2}'
+        2>/dev/null | awk '{print $2}' || true)"
+    if [ -z "$mode" ] || ! [[ "$mode" =~ ^[0-9]+$ ]]; then
+        log "Warning: unable to read PowerSaveMode; assuming display on."
+        echo 0
+        return 0
+    fi
+    echo "$mode"
 }
 
 set_dpms_mode() {
-    busctl --user set-property org.gnome.Mutter.DisplayConfig \
-        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode i "$1"
+    if ! busctl --user set-property org.gnome.Mutter.DisplayConfig \
+        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode i "$1"; then
+        log "Error: failed to set PowerSaveMode to $1"
+        return 1
+    fi
 }
 
 is_display_on() {
@@ -114,15 +138,75 @@ clear_state() {
     rm -f "$STATE_FILE"
 }
 
+match_candidates() {
+    local match="$1"
+    local base
+    base="$(basename "$match")"
+    printf "%s\n" "$match"
+    if [ "$base" != "$match" ]; then
+        printf "%s\n" "$base"
+    fi
+}
+
+is_running_match() {
+    local match="$1"
+    local cand
+    while IFS= read -r cand; do
+        if pgrep -f "$cand" >/dev/null 2>&1; then
+            return 0
+        fi
+    done < <(match_candidates "$match")
+    return 1
+}
+
+list_running_match() {
+    local match="$1"
+    local cand
+    while IFS= read -r cand; do
+        pgrep -af "$cand" 2>/dev/null || true
+    done < <(match_candidates "$match")
+}
+
+wait_for_exit() {
+    local match="$1"
+    local timeout="$2"
+    local elapsed=0
+    while is_running_match "$match"; do
+        if [ "$elapsed" -ge "$timeout" ]; then
+            return 1
+        fi
+        sleep 1
+        elapsed=$((elapsed + 1))
+    done
+    return 0
+}
+
 kill_match() {
     local match="$1"
-    if pgrep -f "$match" >/dev/null 2>&1; then
-        pkill -TERM -f "$match" || true
-        sleep 1
-        if pgrep -f "$match" >/dev/null 2>&1; then
-            pkill -KILL -f "$match" || true
+    local cand
+    local stopped=0
+
+    while IFS= read -r cand; do
+        if pgrep -f "$cand" >/dev/null 2>&1; then
+            log "Sending TERM to match: $cand"
+            pkill -TERM -f "$cand" || true
+            stopped=1
         fi
+    done < <(match_candidates "$match")
+
+    if [ "$stopped" -eq 0 ]; then
+        return 1
     fi
+
+    if ! wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC"; then
+        log "Force killing match: $match"
+        while IFS= read -r cand; do
+            pkill -KILL -f "$cand" || true
+        done < <(match_candidates "$match")
+        wait_for_exit "$match" 2 || true
+    fi
+
+    return 0
 }
 
 run_command() {
@@ -130,6 +214,7 @@ run_command() {
     if [ -z "$cmd" ]; then
         return 0
     fi
+    log "Executing: $cmd"
     nohup bash -c "$cmd" >/dev/null 2>&1 &
 }
 
@@ -190,10 +275,21 @@ dpms_off() {
     for i in "${!DPMS_REOPEN_NAMES[@]}"; do
         name="${DPMS_REOPEN_NAMES[$i]}"
         match="${DPMS_KILL_MATCHES[$i]}"
-        if pgrep -f "$match" >/dev/null 2>&1; then
+        if is_running_match "$match"; then
             reopen_apps+=("$name")
-            log "Stopping $name..."
-            kill_match "$match"
+            log "Stopping $name (match: $match)"
+            list_running_match "$match" | while read -r line; do
+                log "  $line"
+            done
+            if ! kill_match "$match"; then
+                log "No matching process found for $name after check."
+            elif is_running_match "$match"; then
+                log "Warning: $name still running after kill."
+            else
+                log "$name stopped."
+            fi
+        else
+            log "Not running: $name (match: $match)"
         fi
     done
 
@@ -201,17 +297,36 @@ dpms_off() {
 
     local profile_before
     profile_before="$(get_power_profile)"
+    if [ -n "$profile_before" ]; then
+        log "Power profile before: $profile_before"
+    fi
 
     set_dpms_mode 1
 
     if has_ssh_session; then
+        log "SSH session detected; using profile: $DPMS_POWER_PROFILE_OFF_SSH"
         set_power_profile "$DPMS_POWER_PROFILE_OFF_SSH"
     else
+        log "No SSH session; using profile: $DPMS_POWER_PROFILE_OFF"
         set_power_profile "$DPMS_POWER_PROFILE_OFF"
     fi
 
     save_state "${reopen_apps[*]}" "$profile_before"
     log "Display off."
+
+    if [ "$DPMS_SUSPEND_IF_NO_SSH" -eq 1 ] && ! has_ssh_session; then
+        if command -v systemctl >/dev/null 2>&1; then
+            log "Scheduling suspend in ${DPMS_SUSPEND_DELAY_SEC}s..."
+            (
+                sleep "$DPMS_SUSPEND_DELAY_SEC"
+                if ! is_display_on; then
+                    systemctl suspend || true
+                fi
+            ) &
+        else
+            log "systemctl not found; cannot suspend."
+        fi
+    fi
 }
 
 dpms_on() {
@@ -237,7 +352,7 @@ dpms_on() {
             sleep "$DPMS_REOPEN_DELAY_SEC"
         fi
 
-        local i name cmd idx
+        local i name cmd idx match
         for name in "${reopen_list[@]}"; do
             idx=-1
             for i in "${!DPMS_REOPEN_NAMES[@]}"; do
@@ -248,8 +363,15 @@ dpms_on() {
             done
             if [ "$idx" -ge 0 ]; then
                 cmd="${DPMS_REOPEN_COMMANDS[$idx]}"
+                match="${DPMS_KILL_MATCHES[$idx]}"
+                if is_running_match "$match"; then
+                    log "Skip start; already running: $name"
+                    continue
+                fi
                 log "Starting $name..."
                 run_command "$cmd"
+            else
+                log "No command mapping found for $name"
             fi
         done
     fi
@@ -294,6 +416,7 @@ dpms_idle() {
     }
 
     local threshold=$((DPMS_IDLE_MINUTES * 60))
+    log "Idle: ${idle_seconds}s (threshold: ${threshold}s)"
     if [ "$idle_seconds" -ge "$threshold" ]; then
         dpms_off
     fi
