@@ -268,11 +268,12 @@ run_tlp_profile() {
         return 0
     fi
     if [ "${DPMS_TLP_USE_SUDO:-0}" -eq 1 ]; then
-        if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-            sudo tlp "$profile"
-            return $?
+        if command -v sudo >/dev/null 2>&1; then
+            if sudo -n tlp "$profile" >/dev/null 2>&1; then
+                return 0
+            fi
         fi
-        log "sudo not available for tlp; skipping profile switch."
+        log "sudo tlp $profile not permitted; skipping profile switch."
         return 1
     fi
     tlp "$profile"
