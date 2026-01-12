@@ -21,6 +21,7 @@ DPMS_POWER_PROFILE_ON="balanced"
 DPMS_POWER_PROFILE_OFF="power-saver"
 DPMS_POWER_PROFILE_OFF_SSH="power-saver"
 DPMS_IDLE_MINUTES=15
+DPMS_SKIP_WHEN_PLAYING=1
 DPMS_REOPEN_DELAY_SEC=2
 DPMS_START_WAIT_SEC=15
 DPMS_START_RETRIES=3
@@ -652,6 +653,19 @@ get_idle_seconds() {
     echo $((ms / 1000))
 }
 
+is_media_playing() {
+    if ! command -v playerctl >/dev/null 2>&1; then
+        return 1
+    fi
+
+    local statuses
+    statuses="$(playerctl -a status 2>/dev/null || true)"
+    if echo "$statuses" | grep -qi '^Playing$'; then
+        return 0
+    fi
+    return 1
+}
+
 dpms_idle() {
     if ! [[ "${DPMS_IDLE_MINUTES:-}" =~ ^[0-9]+$ ]] || [ "$DPMS_IDLE_MINUTES" -le 0 ]; then
         log "Idle timeout disabled; skipping."
@@ -669,6 +683,10 @@ dpms_idle() {
         log "Idle: ${idle_seconds}s (threshold: ${threshold}s)"
     fi
     if [ "$idle_seconds" -ge "$threshold" ]; then
+        if [ "${DPMS_SKIP_WHEN_PLAYING:-0}" -eq 1 ] && is_media_playing; then
+            log "Media is playing; skipping display off."
+            return 0
+        fi
         dpms_off
     fi
 }
