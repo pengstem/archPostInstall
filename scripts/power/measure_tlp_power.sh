@@ -12,7 +12,6 @@ DPMS_TLP_PROFILE_ON="balanced"
 DPMS_TLP_PROFILE_OFF="power-saver"
 DPMS_TLP_PROFILE_OFF_SSH="performance"
 DPMS_TLP_USE_SUDO=1
-POWER_SOURCE=""
 
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
@@ -173,35 +172,28 @@ measure_power_avg_upower() {
 
 measure_power_avg() {
     local avg
-    POWER_SOURCE="power_now"
+
     avg="$(measure_power_avg_power_now || true)"
-    if [ -n "$avg" ]; then
-        if is_effectively_zero "$avg" && [ "${status:-}" != "Discharging" ]; then
-            avg=""
-        else
-            echo "$avg"
-            return 0
-        fi
+    if [ -n "$avg" ] && ! is_effectively_zero "$avg"; then
+        echo "${avg}|power_now"
+        return 0
     fi
 
-    POWER_SOURCE="energy_delta"
     avg="$(measure_power_avg_energy_delta || true)"
-    if [ -n "$avg" ]; then
-        echo "$avg"
+    if [ -n "$avg" ] && ! is_effectively_zero "$avg"; then
+        echo "${avg}|energy_delta"
         return 0
     fi
 
-    POWER_SOURCE="current_voltage"
     avg="$(measure_power_avg_current_voltage || true)"
-    if [ -n "$avg" ]; then
-        echo "$avg"
+    if [ -n "$avg" ] && ! is_effectively_zero "$avg"; then
+        echo "${avg}|current_voltage"
         return 0
     fi
 
-    POWER_SOURCE="upower"
     avg="$(measure_power_avg_upower || true)"
-    if [ -n "$avg" ]; then
-        echo "$avg"
+    if [ -n "$avg" ] && ! is_effectively_zero "$avg"; then
+        echo "${avg}|upower"
         return 0
     fi
 
@@ -217,11 +209,16 @@ measure_profile() {
         return 1
     fi
     sleep "$SETTLE_SECONDS"
-    avg="$(measure_power_avg)" || {
+    local result source
+    result="$(measure_power_avg)" || {
         log "No usable power source found for $label."
         return 1
     }
-    printf "%s: %s W (profile: %s, source: %s)\n" "$label" "$avg" "$profile" "$POWER_SOURCE"
+    IFS='|' read -r avg source <<< "$result"
+    if [ -z "$source" ]; then
+        source="unknown"
+    fi
+    printf "%s: %s W (profile: %s, source: %s)\n" "$label" "$avg" "$profile" "$source"
 }
 
 if ! have_tlp; then
