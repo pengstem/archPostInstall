@@ -16,6 +16,7 @@
 | configs/rime | ~/.local/share/fcitx5/rime | user config |
 | configs/archpostinstall/dpms.conf | ~/.config/archpostinstall/dpms.conf | user config |
 | configs/tlp/99-archpostinstall.conf | /etc/tlp.d/99-archpostinstall.conf | sudo |
+| configs/sudoers.d/archpostinstall-tlp | /etc/sudoers.d/archpostinstall-tlp | sudo |
 | configs/pacman/pacman.conf | /etc/pacman.conf | sudo |
 | configs/paru/paru.conf | /etc/paru.conf | sudo |
 | configs/pacman/hooks/99-update-pkglist.hook | /etc/pacman.d/hooks/99-update-pkglist.hook | sudo |

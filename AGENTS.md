@@ -40,6 +40,7 @@
 
 ## Security & Configuration Tips
 - `setup.sh` writes to `/etc` for `pacman.conf` and `paru.conf`; review diffs before running.
+- `setup.sh` installs `/etc/tlp.d/99-archpostinstall.conf` and `/etc/sudoers.d/archpostinstall-tlp` for TLP automation.
 - Pacman hook calls `/usr/local/bin/archpostinstall-update-pkglist`, linked to `scripts/update_pkglist.sh` by `setup.sh`.
 - GNOME sync runs from `~/.local/bin/archpostinstall-gnome-sync`; enable the user unit after linking.
 - DPMS automation uses `~/.local/bin/dpms-toggle` plus systemd user timers (`archpostinstall-dpms-idle.timer`, `archpostinstall-dpms-restore.timer`, `archpostinstall-dpms-log-cleanup.timer`).

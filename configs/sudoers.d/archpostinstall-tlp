@@ -1,0 +1,3 @@
+# Allow TLP profile switches without password for dpms automation.
+# Adjust the username if needed.
+nastem ALL=(root) NOPASSWD: /usr/bin/tlp performance, /usr/bin/tlp balanced, /usr/bin/tlp power-saver

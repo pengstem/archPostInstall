@@ -44,6 +44,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 
 ## TLP Power Management
 - TLP overrides live in `configs/tlp/99-archpostinstall.conf` and are linked to `/etc/tlp.d/99-archpostinstall.conf`.
+- `setup.sh` also installs `configs/sudoers.d/archpostinstall-tlp` so `dpms-toggle` can switch TLP profiles without prompts.
 - Power measurements can be taken with `./scripts/power/measure_tlp_power.sh` (or `archpostinstall measure-power`).
 
 ## BaiduPCS-Go

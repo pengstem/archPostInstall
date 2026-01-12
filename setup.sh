@@ -97,6 +97,23 @@ create_sudo_link() {
     echo "✅ Linked (sudo)"
 }
 
+# Function to install sudoers files with correct permissions
+install_sudoers() {
+    local src="$1"
+    local dest="$2"
+    local name="$3"
+
+    printf "  %-15s " "[$name]"
+
+    if [ ! -e "$src" ]; then
+        echo "❌ Source not found: $src"
+        return
+    fi
+
+    sudo install -m 0440 -o root -g root "$src" "$dest"
+    echo "✅ Installed"
+}
+
 # --- Link Configurations ---
 
 # System Configs (Requires Sudo)
@@ -106,6 +123,7 @@ create_sudo_link "$CONFIGS_DIR/pacman/hooks/99-update-pkglist.hook" "/etc/pacman
 create_sudo_link "$REPO_DIR/scripts/update_pkglist.sh" "/usr/local/bin/archpostinstall-update-pkglist" "Pkglist Sync"
 create_sudo_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "/usr/local/bin/dpms-toggle" "DPMS Toggle (System)"
 create_sudo_link "$CONFIGS_DIR/tlp/99-archpostinstall.conf" "/etc/tlp.d/99-archpostinstall.conf" "TLP"
+install_sudoers "$CONFIGS_DIR/sudoers.d/archpostinstall-tlp" "/etc/sudoers.d/archpostinstall-tlp" "TLP Sudoers"
 
 # Shell
 create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"
