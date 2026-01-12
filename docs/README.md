@@ -27,11 +27,13 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - `dpms-toggle` turns the display off/on and manages app shutdown/restore.
 - Configure app lists and power profile in `configs/archpostinstall/dpms.conf`.
 - Logs are written to `~/.cache/archpostinstall/dpms.log` for troubleshooting.
+- Log cleanup is handled by `archpostinstall-dpms-log-cleanup.timer` and controlled by `DPMS_LOG_CLEANUP_DAYS`/`DPMS_LOG_CLEANUP_MAX_FILES`.
 - Steam is closed automatically by default (see `DPMS_KILL_ONLY_MATCHES`).
 - For noisy logs, set `DPMS_VERBOSE=1`; for slower apps, increase `DPMS_START_WAIT_SEC`/`DPMS_START_RETRIES`.
 - Enable timers after linking:
   - `systemctl --user enable --now archpostinstall-dpms-idle.timer`
   - `systemctl --user enable --now archpostinstall-dpms-restore.timer`
+  - `systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer`
 - Set `DPMS_KILL_OTHER_GUI=0` to avoid best-effort closing of non-whitelisted GUI apps.
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
 

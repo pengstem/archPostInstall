@@ -141,6 +141,7 @@ create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/appli
 create_link "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$HOME/.local/bin/archpostinstall-gnome-sync" "Gnome Sync Bin"
 create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostinstall" "Archpostinstall Bin"
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
+create_link "$REPO_DIR/scripts/gnome/cleanup_dpms_logs.sh" "$HOME/.local/bin/archpostinstall-dpms-log-cleanup" "DPMS Log Cleanup"
 
 # Systemd (User)
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"
@@ -149,6 +150,8 @@ create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-idle.service"  "$HOM
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-idle.timer"    "$HOME/.config/systemd/user/archpostinstall-dpms-idle.timer"    "DPMS Idle Timer"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-restore.service" "$HOME/.config/systemd/user/archpostinstall-dpms-restore.service" "DPMS Restore Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-restore.timer"   "$HOME/.config/systemd/user/archpostinstall-dpms-restore.timer"   "DPMS Restore Timer"
+create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.service" "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.service" "DPMS Log Cleanup Service"
+create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "DPMS Log Cleanup Timer"
 
 echo ""
 echo "✨ Configuration linking complete!"

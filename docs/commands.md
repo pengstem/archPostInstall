@@ -48,4 +48,5 @@ systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path
 systemctl --user enable --now archpostinstall-dpms-idle.timer
 systemctl --user enable --now archpostinstall-dpms-restore.timer
+systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer
 ```
