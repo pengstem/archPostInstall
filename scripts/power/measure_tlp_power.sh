@@ -212,6 +212,9 @@ measure_profile() {
     local result source
     result="$(measure_power_avg)" || {
         log "No usable power source found for $label."
+        if [ "${status:-}" != "Discharging" ]; then
+            log "Tip: unplug AC so the battery is Discharging, or set POWER_SUPPLY to the active battery."
+        fi
         return 1
     }
     IFS='|' read -r avg source <<< "$result"
@@ -226,9 +229,18 @@ if ! have_tlp; then
     exit 1
 fi
 
-measure_profile "Power-saver" "$DPMS_TLP_PROFILE_OFF"
-measure_profile "Performance" "$DPMS_TLP_PROFILE_OFF_SSH"
+measure_ok=0
+if measure_profile "Power-saver" "$DPMS_TLP_PROFILE_OFF"; then
+    measure_ok=1
+fi
+if measure_profile "Performance" "$DPMS_TLP_PROFILE_OFF_SSH"; then
+    measure_ok=1
+fi
 
 if [ -n "${DPMS_TLP_PROFILE_ON:-}" ]; then
     set_profile "$DPMS_TLP_PROFILE_ON" || true
+fi
+
+if [ "$measure_ok" -eq 0 ]; then
+    exit 1
 fi
