@@ -74,7 +74,7 @@ log() {
         printf "%s\n" "$msg" >> "$DPMS_LOG_FILE"
     fi
     if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
-        printf "%s\n" "$msg"
+        printf "%s\n" "$msg" >&2
     fi
 }
 
@@ -664,14 +664,7 @@ get_logind_idle_seconds() {
     echo $(((uptime_usec - since) / 1000000))
 }
 
-get_idle_seconds() {
-    local logind_idle
-    logind_idle="$(get_logind_idle_seconds 2>/dev/null || true)"
-    if [ -n "$logind_idle" ]; then
-        echo "$logind_idle"
-        return 0
-    fi
-
+get_gnome_idle_seconds() {
     if ! command -v gdbus >/dev/null 2>&1; then
         return 1
     fi
@@ -696,6 +689,23 @@ get_idle_seconds() {
     fi
 
     echo $((ms / 1000))
+}
+
+get_idle_seconds() {
+    local gnome_idle logind_idle
+    gnome_idle="$(get_gnome_idle_seconds 2>/dev/null || true)"
+    if [ -n "$gnome_idle" ]; then
+        echo "$gnome_idle"
+        return 0
+    fi
+
+    logind_idle="$(get_logind_idle_seconds 2>/dev/null || true)"
+    if [ -n "$logind_idle" ]; then
+        echo "$logind_idle"
+        return 0
+    fi
+
+    return 1
 }
 
 is_media_playing() {
