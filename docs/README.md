@@ -28,6 +28,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - Configure app lists and power profile in `configs/archpostinstall/dpms.conf`.
 - Logs are written to `~/.cache/archpostinstall/dpms.log` for troubleshooting.
 - Steam is closed automatically by default (see `DPMS_KILL_ONLY_MATCHES`).
+- For noisy logs, set `DPMS_VERBOSE=1`; for slower apps, increase `DPMS_START_WAIT_SEC`/`DPMS_START_RETRIES`.
 - Enable timers after linking:
   - `systemctl --user enable --now archpostinstall-dpms-idle.timer`
   - `systemctl --user enable --now archpostinstall-dpms-restore.timer`

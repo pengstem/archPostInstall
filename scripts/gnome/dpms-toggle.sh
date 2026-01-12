@@ -508,6 +508,11 @@ dpms_on() {
                     log "Warning: $name did not start yet."
                     attempt=$((attempt + 1))
                 done
+                if ! is_app_running "$match" "$wm_class" && [ -x "$match" ] && [ "$cmd" != "$match" ]; then
+                    log "Fallback start using match path: $match"
+                    run_command "$match"
+                    wait_for_app_start "$match" "$wm_class" "$DPMS_START_WAIT_SEC" || true
+                fi
                 if ! is_app_running "$match" "$wm_class"; then
                     log "Error: failed to start $name after retries."
                 fi
@@ -541,9 +546,16 @@ get_idle_seconds() {
         --method org.gnome.Mutter.IdleMonitor.GetIdletime 2>/dev/null)" || return 1
 
     local ms
-    ms="$(echo "$raw" | tr -cd '0-9')"
-    if [ -z "$ms" ]; then
+    ms="$(echo "$raw" | sed -E 's/.*uint64[[:space:]]+([0-9]+).*/\\1/')"
+    if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
+        ms="$(echo "$raw" | sed -E 's/[^0-9]*([0-9]+).*/\\1/')"
+    fi
+    if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
         return 1
+    fi
+
+    if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+        log "Idle raw: $raw"
     fi
 
     echo $((ms / 1000))
