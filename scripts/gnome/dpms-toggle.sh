@@ -4,11 +4,12 @@ set -euo pipefail
 
 SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/archpostinstall/dpms.conf"
 STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall"
 STATE_FILE="$STATE_DIR/dpms.state"
+LOCK_FILE="$STATE_DIR/dpms.lock"
+LOCK_DIR="$STATE_DIR/dpms.lock.d"
 
 DPMS_REOPEN_NAMES=("firefox" "wechat" "qq")
 DPMS_KILL_MATCHES=("firefox" "WeChat.AppImage|/tmp/.mount_WeChat|WeChatAppEx|/usr/bin/wechat" "QQ.AppImage|/tmp/.mount_QQ|/usr/bin/qq|/qq")
@@ -29,6 +30,7 @@ DPMS_KILL_WAIT_SEC=6
 DPMS_KILL_OTHER_GUI=1
 DPMS_VERBOSE=2
 DPMS_LOG_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall/dpms.log"
+DPMS_LOG_MAX_BYTES=1048576
 DPMS_SUSPEND_IF_NO_SSH=0
 DPMS_SUSPEND_DELAY_SEC=30
 
@@ -36,8 +38,6 @@ if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
     . "$CONFIG_FILE"
 fi
-
-GNOME_EVAL_WARNED=0
 
 require_cmd() {
     if ! command -v "$1" >/dev/null 2>&1; then
@@ -70,12 +70,48 @@ log() {
     msg="$ts [dpms-toggle] $*"
     if [ -n "${DPMS_LOG_FILE:-}" ]; then
         mkdir -p "$(dirname "$DPMS_LOG_FILE")"
+        rotate_log
         printf "%s\n" "$msg" >> "$DPMS_LOG_FILE"
     fi
     if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
         printf "%s\n" "$msg"
     fi
 }
+
+rotate_log() {
+    local max_bytes="${DPMS_LOG_MAX_BYTES:-0}"
+    if [ -z "${DPMS_LOG_FILE:-}" ] || [ "$max_bytes" -le 0 ]; then
+        return 0
+    fi
+    if [ -f "$DPMS_LOG_FILE" ]; then
+        local size ts
+        size="$(wc -c < "$DPMS_LOG_FILE" 2>/dev/null || echo 0)"
+        if [ "$size" -ge "$max_bytes" ]; then
+            ts="$(date '+%Y%m%d-%H%M%S')"
+            mv "$DPMS_LOG_FILE" "${DPMS_LOG_FILE}.${ts}" 2>/dev/null || true
+        fi
+    fi
+}
+
+acquire_lock() {
+    mkdir -p "$STATE_DIR"
+    if command -v flock >/dev/null 2>&1; then
+        exec 9>"$LOCK_FILE"
+        if ! flock -n 9; then
+            log "Another dpms-toggle instance is running; skipping."
+            exit 0
+        fi
+        return 0
+    fi
+
+    if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+        log "Another dpms-toggle instance is running; skipping."
+        exit 0
+    fi
+    trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
+}
+
+acquire_lock
 
 have_gdbus() {
     command -v gdbus >/dev/null 2>&1
@@ -90,17 +126,10 @@ gnome_eval_raw() {
     output="$(gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
         --method org.gnome.Shell.Eval "$js" 2>/dev/null)" || return 1
     if ! echo "$output" | grep -q "^(true,"; then
-        if [ "$GNOME_EVAL_WARNED" -eq 0 ]; then
-            log "GNOME Shell Eval unavailable: $output"
-            GNOME_EVAL_WARNED=1
-        fi
+        log "GNOME Shell Eval unavailable: $output"
         return 1
     fi
     printf "%s" "$output"
-}
-
-gnome_eval() {
-    gnome_eval_raw "$1" >/dev/null
 }
 
 get_wm_classes() {
@@ -130,7 +159,7 @@ close_wm_class() {
         return 1
     fi
     local cls_lc="${cls,,}"
-    gnome_eval "global.get_window_actors().filter(w => w.get_meta_window().get_wm_class().toLowerCase() === '${cls_lc}').forEach(w => w.get_meta_window().delete(global.get_current_time()));"
+    gnome_eval_raw "global.get_window_actors().filter(w => w.get_meta_window().get_wm_class().toLowerCase() === '${cls_lc}').forEach(w => w.get_meta_window().delete(global.get_current_time()));" >/dev/null
 }
 
 get_dpms_mode() {
@@ -166,7 +195,7 @@ has_ssh_session() {
     fi
 
     if command -v who >/dev/null 2>&1; then
-        if who | awk '{print $NF}' | grep -qE '\\([^)]*\\)' | grep -vq '(:0)'; then
+        if who | awk '{print $NF}' | grep -E '\\([^)]*\\)' | grep -v '(:0)' | grep -q .; then
             return 0
         fi
     fi
@@ -215,8 +244,24 @@ clear_state() {
 match_candidates() {
     local match="$1"
     local base
+    local segment
+    local -a segments=()
     base="$(basename "$match")"
     printf "%s\n" "$match"
+
+    if [[ "$match" == *"|"* ]] && ! [[ "$match" =~ [\(\)\[\]\{\}] ]]; then
+        IFS='|' read -r -a segments <<< "$match"
+        for segment in "${segments[@]}"; do
+            if [[ "$segment" == *"/"* ]]; then
+                base="$(basename "$segment")"
+                if [ "$base" != "$segment" ]; then
+                    printf "%s\n" "$base"
+                fi
+            fi
+        done
+        return 0
+    fi
+
     if [ "$base" != "$match" ]; then
         printf "%s\n" "$base"
     fi
@@ -397,9 +442,9 @@ dpms_off() {
         if is_app_running "$match" "$wm_class"; then
             reopen_apps+=("$name")
             log "Stopping $name (match: $match, class: ${wm_class:-none})"
-            list_running_match "$match" | while read -r line; do
+            while read -r line; do
                 log "  $line"
-            done
+            done < <(list_running_match "$match")
             if [ -n "$wm_class" ]; then
                 close_wm_class "$wm_class" || true
             fi
@@ -408,9 +453,9 @@ dpms_off() {
             fi
             if is_app_running "$match" "$wm_class"; then
                 log "Warning: $name still running after close/kill."
-                list_running_match "$match" | while read -r line; do
+                while read -r line; do
                     log "  $line"
-                done
+                done < <(list_running_match "$match")
             else
                 log "$name stopped."
             fi
@@ -501,11 +546,6 @@ dpms_on() {
 
     if [ -n "${REOPEN_APPS:-}" ]; then
         log "Reopen list: $REOPEN_APPS"
-    else
-        log "No apps recorded for reopen."
-    fi
-
-    if [ -n "${REOPEN_APPS:-}" ]; then
         local reopen_list=()
         IFS=' ' read -r -a reopen_list <<< "$REOPEN_APPS"
         if [ "$DPMS_REOPEN_DELAY_SEC" -gt 0 ]; then
@@ -550,14 +590,16 @@ dpms_on() {
                 fi
                 if ! is_app_running "$match" "$wm_class"; then
                     log "Error: failed to start $name after retries."
-                    list_running_match "$match" | while read -r line; do
+                    while read -r line; do
                         log "  $line"
-                    done
+                    done < <(list_running_match "$match")
                 fi
             else
                 log "No command mapping found for $name"
             fi
         done
+    else
+        log "No apps recorded for reopen."
     fi
 
     clear_state
@@ -566,10 +608,13 @@ dpms_on() {
 
 dpms_restore() {
     if [ ! -f "$STATE_FILE" ]; then
+        log "No state file; nothing to restore."
         return 0
     fi
     if is_display_on; then
         dpms_on
+    else
+        log "Display still off; restore deferred."
     fi
 }
 
