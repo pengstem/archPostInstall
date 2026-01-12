@@ -34,6 +34,9 @@ DPMS_LOG_MAX_BYTES=1048576
 DPMS_SUSPEND_IF_NO_SSH=0
 DPMS_SUSPEND_DELAY_SEC=30
 
+IDLE_DEBUG_LINES=()
+IDLE_ERROR=""
+
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
     . "$CONFIG_FILE"
@@ -76,6 +79,22 @@ log() {
     if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
         printf "%s\n" "$msg" >&2
     fi
+}
+
+reset_idle_debug() {
+    IDLE_DEBUG_LINES=()
+    IDLE_ERROR=""
+}
+
+append_idle_debug() {
+    IDLE_DEBUG_LINES+=("$1")
+}
+
+emit_idle_debug() {
+    local line
+    for line in "${IDLE_DEBUG_LINES[@]}"; do
+        log "$line"
+    done
 }
 
 rotate_log() {
@@ -638,9 +657,7 @@ get_logind_idle_seconds() {
         return 1
     fi
 
-    if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-        log "IdleHint: $hint (IdleSinceHintMonotonic: ${since:-n/a})"
-    fi
+    append_idle_debug "IdleHint: $hint (IdleSinceHintMonotonic: ${since:-n/a})"
 
     if [ "$hint" = "no" ]; then
         echo 0
@@ -680,31 +697,40 @@ get_gnome_idle_seconds() {
         ms="$(echo "$raw" | sed -E 's/[^0-9]*([0-9]+).*/\\1/')"
     fi
     if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
-        log "Failed to parse idle time from: $raw"
+        IDLE_ERROR="Failed to parse idle time from: $raw"
         return 1
     fi
 
-    if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-        log "Idle raw: $raw"
-    fi
+    append_idle_debug "Idle raw: $raw"
 
     echo $((ms / 1000))
 }
 
 get_idle_seconds() {
-    local gnome_idle logind_idle
+    local gnome_idle logind_idle gnome_error
+    local -a gnome_debug=()
+
+    reset_idle_debug
     gnome_idle="$(get_gnome_idle_seconds 2>/dev/null || true)"
     if [ -n "$gnome_idle" ]; then
         echo "$gnome_idle"
         return 0
     fi
 
+    gnome_error="$IDLE_ERROR"
+    gnome_debug=("${IDLE_DEBUG_LINES[@]}")
+
+    reset_idle_debug
     logind_idle="$(get_logind_idle_seconds 2>/dev/null || true)"
     if [ -n "$logind_idle" ]; then
         echo "$logind_idle"
         return 0
     fi
 
+    if [ -n "$gnome_error" ]; then
+        IDLE_ERROR="$gnome_error"
+        IDLE_DEBUG_LINES=("${gnome_debug[@]}")
+    fi
     return 1
 }
 
@@ -727,14 +753,28 @@ dpms_idle() {
         return 0
     fi
 
+    if ! is_display_on; then
+        if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+            log "Display already off; skipping idle check."
+        fi
+        return 0
+    fi
+
     local idle_seconds
     idle_seconds="$(get_idle_seconds)" || {
+        if [ -n "${IDLE_ERROR:-}" ]; then
+            log "$IDLE_ERROR"
+        fi
+        if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+            emit_idle_debug
+        fi
         log "Idle monitor unavailable; skipping."
         return 0
     }
 
     local threshold=$((DPMS_IDLE_MINUTES * 60))
     if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+        emit_idle_debug
         log "Idle: ${idle_seconds}s (threshold: ${threshold}s)"
     fi
     if [ "$idle_seconds" -ge "$threshold" ]; then

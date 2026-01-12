@@ -1,5 +1,6 @@
 [Unit]
 Description=Restore apps when display turns on
+ConditionPathExists=%h/.cache/archpostinstall/dpms.state
 
 [Service]
 Type=oneshot

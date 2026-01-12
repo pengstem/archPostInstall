@@ -2,9 +2,10 @@
 Description=Poll for display-on to restore apps
 
 [Timer]
-OnBootSec=1min
-OnUnitActiveSec=30s
-AccuracySec=30s
+OnBootSec=2min
+OnUnitActiveSec=45s
+AccuracySec=15s
+RandomizedDelaySec=12s
 Unit=archpostinstall-dpms-restore.service
 
 [Install]
