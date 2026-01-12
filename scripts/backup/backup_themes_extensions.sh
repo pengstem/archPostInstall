@@ -14,59 +14,105 @@ if [ ! -w "$OUTPUT_DIR" ]; then
 fi
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-RETENTION_DAYS="${GNOME_BACKUP_RETENTION_DAYS:-30}"
+THEMES_PATTERN="themes_backup_*.tar.gz"
+ICONS_PATTERN="icons_backup_*.tar.gz"
+EXTENSIONS_PATTERN="gnome_extensions_backup_*.tar.gz"
 
-prune_old_backups() {
-    local retention_days="$1"
-    local output_dir="$2"
-    local -a patterns=(
-        "themes_backup_*.tar.gz"
-        "icons_backup_*.tar.gz"
-        "gnome_extensions_backup_*.tar.gz"
-    )
-
-    if (( retention_days <= 0 )); then
-        echo "Skipping old GNOME backup cleanup (retention disabled)."
+get_dir_hash() {
+    local path="$1"
+    if [ ! -d "$path" ]; then
+        echo ""
         return 0
     fi
 
-    local -a find_expr=()
-    local pattern
-    for pattern in "${patterns[@]}"; do
-        find_expr+=(-name "$pattern" -o)
+    find "$path" -type f -print0 2>/dev/null \
+        | sort -z \
+        | xargs -0 sha256sum 2>/dev/null \
+        | sha256sum \
+        | awk '{print $1}'
+}
+
+hash_changed() {
+    local new_hash="$1"
+    local hash_file="$2"
+    local old_hash=""
+
+    if [ -f "$hash_file" ]; then
+        old_hash="$(cat "$hash_file" 2>/dev/null || true)"
+    fi
+
+    if [ -n "$old_hash" ] && [ "$new_hash" = "$old_hash" ]; then
+        return 1
+    fi
+
+    return 0
+}
+
+backup_exists() {
+    local output_dir="$1"
+    local pattern="$2"
+    local -a matches=()
+
+    shopt -s nullglob
+    matches=("$output_dir"/$pattern)
+    shopt -u nullglob
+
+    ((${#matches[@]} > 0))
+}
+
+prune_backups_keep_newest() {
+    local output_dir="$1"
+    local pattern="$2"
+    local -a files=()
+    local file
+
+    while IFS= read -r -d '' file; do
+        files+=("$file")
+    done < <(find "$output_dir" -maxdepth 1 -type f -name "$pattern" -print0 2>/dev/null)
+
+    if ((${#files[@]} <= 1)); then
+        return 0
+    fi
+
+    local newest
+    newest="$(ls -t "${files[@]}" | head -n 1)"
+    for file in "${files[@]}"; do
+        if [ "$file" != "$newest" ]; then
+            rm -f "$file"
+        fi
     done
-    unset 'find_expr[${#find_expr[@]}-1]'
-
-    local -a old_files=()
-    while IFS= read -r file; do
-        old_files+=("$file")
-    done < <(find "$output_dir" -maxdepth 1 -type f \( "${find_expr[@]}" \) -mtime "+$retention_days" 2>/dev/null)
-
-    if ((${#old_files[@]} == 0)); then
-        echo "No old GNOME backups to prune."
-        return 0
-    fi
-
-    echo "Pruning ${#old_files[@]} old GNOME backup(s) older than ${retention_days} day(s)..."
-    rm -f "${old_files[@]}"
 }
 
 # 1. Backup Themes (~/.themes)
+THEMES_HASH_FILE="$OUTPUT_DIR/.themes_last_hash"
 if [ -d "$HOME/.themes" ]; then
-    THEME_BACKUP="$OUTPUT_DIR/themes_backup_$TIMESTAMP.tar.gz"
-    echo "Backing up ~/.themes to $THEME_BACKUP ..."
-    tar -czf "$THEME_BACKUP" -C "$HOME" .themes
+    THEMES_HASH="$(get_dir_hash "$HOME/.themes")"
+    if hash_changed "$THEMES_HASH" "$THEMES_HASH_FILE" || ! backup_exists "$OUTPUT_DIR" "$THEMES_PATTERN"; then
+        THEME_BACKUP="$OUTPUT_DIR/themes_backup_$TIMESTAMP.tar.gz"
+        echo "Backing up ~/.themes to $THEME_BACKUP ..."
+        tar -czf "$THEME_BACKUP" -C "$HOME" .themes
+        echo "$THEMES_HASH" > "$THEMES_HASH_FILE"
+    else
+        echo "Themes unchanged, skipping."
+    fi
 else
     echo "No ~/.themes found, skipping."
 fi
 
 # 2. Backup Icons (~/.local/share/icons)
 # Note: This might contain system icons if not careful, but usually ~/.local/share/icons is user specific.
+ICONS_HASH_FILE="$OUTPUT_DIR/.icons_last_hash"
 if [ -d "$HOME/.local/share/icons" ]; then
-    ICON_BACKUP="$OUTPUT_DIR/icons_backup_$TIMESTAMP.tar.gz"
-    echo "Backing up ~/.local/share/icons to $ICON_BACKUP ..."
-    # We cd to ~/.local/share so the archive starts with 'icons'
-    tar -czf "$ICON_BACKUP" -C "$HOME/.local/share" icons
+    ICONS_HASH="$(get_dir_hash "$HOME/.local/share/icons")"
+    if hash_changed "$ICONS_HASH" "$ICONS_HASH_FILE" || ! backup_exists "$OUTPUT_DIR" "$ICONS_PATTERN"; then
+        ICON_BACKUP="$OUTPUT_DIR/icons_backup_$TIMESTAMP.tar.gz"
+        echo "Backing up ~/.local/share/icons to $ICON_BACKUP ..."
+        # We cd to ~/.local/share so the archive starts with 'icons'
+        tar -czf "$ICON_BACKUP" -C "$HOME/.local/share" icons
+        echo "$ICONS_HASH" > "$ICONS_HASH_FILE"
+    else
+        echo "Icons unchanged, skipping."
+    fi
 else
     echo "No ~/.local/share/icons found, skipping."
 fi
@@ -82,10 +128,8 @@ else
     echo "No extensions found in $EXT_DIR, skipping."
 fi
 
-if [[ "$RETENTION_DAYS" =~ ^[0-9]+$ ]]; then
-    prune_old_backups "$RETENTION_DAYS" "$OUTPUT_DIR"
-else
-    echo "Warning: GNOME_BACKUP_RETENTION_DAYS must be a non-negative integer. Skipping cleanup."
-fi
+prune_backups_keep_newest "$OUTPUT_DIR" "$THEMES_PATTERN"
+prune_backups_keep_newest "$OUTPUT_DIR" "$ICONS_PATTERN"
+prune_backups_keep_newest "$OUTPUT_DIR" "$EXTENSIONS_PATTERN"
 
 echo "Backup process finished."
