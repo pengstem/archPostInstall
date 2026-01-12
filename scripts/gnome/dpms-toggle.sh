@@ -14,8 +14,10 @@ LOCK_DIR="$STATE_DIR/dpms.lock.d"
 
 DPMS_REOPEN_NAMES=("firefox" "wechat" "qq")
 DPMS_KILL_MATCHES=("firefox" "WeChat.AppImage|/tmp/.mount_WeChat|WeChatAppEx|/usr/bin/wechat" "QQ.AppImage|/tmp/.mount_QQ|/usr/bin/qq|/qq")
+DPMS_RUNNING_MATCHES=()
 DPMS_WM_CLASSES=("firefox" "wechat" "qq")
 DPMS_REOPEN_COMMANDS=("firefox" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
+DPMS_REOPEN_ACTIVATE_COMMANDS=()
 DPMS_KILL_ONLY_MATCHES=("steam")
 DPMS_KILL_ONLY_WM_CLASSES=("steam")
 DPMS_KEEP_PROCS=("kitty" "sparkle" "gnome-shell" "org.gnome.Shell")
@@ -61,9 +63,19 @@ if [ "${#DPMS_REOPEN_NAMES[@]}" -ne "${#DPMS_KILL_MATCHES[@]}" ] || \
     echo "Error: dpms.conf arrays must have the same length." >&2
     exit 1
 fi
+if [ "${#DPMS_RUNNING_MATCHES[@]}" -gt 0 ] && \
+   [ "${#DPMS_RUNNING_MATCHES[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
+    echo "Error: DPMS_RUNNING_MATCHES length must match DPMS_REOPEN_NAMES." >&2
+    exit 1
+fi
 if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ] && \
    [ "${#DPMS_WM_CLASSES[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
     echo "Error: DPMS_WM_CLASSES length must match DPMS_REOPEN_NAMES." >&2
+    exit 1
+fi
+if [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -gt 0 ] && \
+   [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
+    echo "Error: DPMS_REOPEN_ACTIVATE_COMMANDS length must match DPMS_REOPEN_NAMES." >&2
     exit 1
 fi
 if [ "${#DPMS_KILL_ONLY_WM_CLASSES[@]}" -gt 0 ] && \
@@ -653,7 +665,7 @@ dpms_on() {
             sleep "$DPMS_REOPEN_DELAY_SEC"
         fi
 
-        local i name cmd idx match wm_class attempt
+        local i name cmd activate_cmd idx match run_match wm_class attempt
         for name in "${reopen_list[@]}"; do
             idx=-1
             for i in "${!DPMS_REOPEN_NAMES[@]}"; do
@@ -665,31 +677,48 @@ dpms_on() {
             if [ "$idx" -ge 0 ]; then
                 cmd="${DPMS_REOPEN_COMMANDS[$idx]}"
                 match="${DPMS_KILL_MATCHES[$idx]}"
+                run_match="$match"
+                if [ "${#DPMS_RUNNING_MATCHES[@]}" -gt 0 ]; then
+                    run_match="${DPMS_RUNNING_MATCHES[$idx]}"
+                fi
+                activate_cmd=""
+                if [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -gt 0 ]; then
+                    activate_cmd="${DPMS_REOPEN_ACTIVATE_COMMANDS[$idx]}"
+                fi
                 wm_class=""
                 if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ]; then
                     wm_class="${DPMS_WM_CLASSES[$idx]}"
                 fi
-                if is_app_running "$match" "$wm_class"; then
-                    log "Skip start; already running: $name"
+                if is_app_running "$run_match" "$wm_class"; then
+                    if [ -n "$activate_cmd" ]; then
+                        log "Already running; activating $name"
+                        run_command "$activate_cmd"
+                    else
+                        log "Skip start; already running: $name"
+                    fi
                     continue
+                fi
+                if is_running_match "$match"; then
+                    log "Cleaning leftover processes for $name before start."
+                    kill_match "$match" || true
                 fi
                 attempt=1
                 while [ "$attempt" -le "$DPMS_START_RETRIES" ]; do
                     log "Starting $name (attempt $attempt)..."
                     run_command "$cmd"
-                    if wait_for_app_start "$match" "$wm_class" "$DPMS_START_WAIT_SEC"; then
+                    if wait_for_app_start "$run_match" "$wm_class" "$DPMS_START_WAIT_SEC"; then
                         log "$name started."
                         break
                     fi
                     log "Warning: $name did not start yet."
                     attempt=$((attempt + 1))
                 done
-                if ! is_app_running "$match" "$wm_class" && [ -x "$match" ] && [ "$cmd" != "$match" ]; then
+                if ! is_app_running "$run_match" "$wm_class" && [ -x "$match" ] && [ "$cmd" != "$match" ]; then
                     log "Fallback start using match path: $match"
                     run_command "$match"
-                    wait_for_app_start "$match" "$wm_class" "$DPMS_START_WAIT_SEC" || true
+                    wait_for_app_start "$run_match" "$wm_class" "$DPMS_START_WAIT_SEC" || true
                 fi
-                if ! is_app_running "$match" "$wm_class"; then
+                if ! is_app_running "$run_match" "$wm_class"; then
                     log "Error: failed to start $name after retries."
                     while read -r line; do
                         log "  $line"
