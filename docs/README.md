@@ -30,6 +30,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - Log cleanup is handled by `archpostinstall-dpms-log-cleanup.timer` and controlled by `DPMS_LOG_CLEANUP_DAYS`/`DPMS_LOG_CLEANUP_MAX_FILES`.
 - Steam is closed automatically by default (see `DPMS_KILL_ONLY_MATCHES`).
 - For noisy logs, set `DPMS_VERBOSE=1`; for slower apps, increase `DPMS_START_WAIT_SEC`/`DPMS_START_RETRIES`.
+- If TLP is installed, `dpms-toggle` applies profiles from `DPMS_TLP_PROFILE_*` (requires passwordless `sudo` for `tlp`).
 - Enable timers after linking:
   - `systemctl --user enable --now archpostinstall-dpms-idle.timer`
   - `systemctl --user enable --now archpostinstall-dpms-restore.timer`
@@ -40,6 +41,10 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 ## Package List Updates
 - Pacman hook triggers `archpostinstall-update-pkglist` after transactions.
 - Manual refresh: `./scripts/update_pkglist.sh` (writes `scripts/pkglist.txt`).
+
+## TLP Power Management
+- TLP overrides live in `configs/tlp/99-archpostinstall.conf` and are linked to `/etc/tlp.d/99-archpostinstall.conf`.
+- Power measurements can be taken with `./scripts/power/measure_tlp_power.sh` (or `archpostinstall measure-power`).
 
 ## BaiduPCS-Go
 - Copy your real config to `configs/baidupcs/pcs_config.json` before running `./setup.sh`.

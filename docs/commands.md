@@ -21,6 +21,7 @@ archpostinstall restore-themes <archives...>
 archpostinstall backup-firefox
 archpostinstall restore-firefox <archive>
 archpostinstall update-pkglist
+archpostinstall measure-power
 ```
 
 ## Direct Script Calls
@@ -38,6 +39,7 @@ Use these when you want explicit control:
 ./scripts/gnome/backup_gnome_state.sh
 ./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle|--idle|--restore]
 ./scripts/update_pkglist.sh
+./scripts/power/measure_tlp_power.sh
 ```
 
 ## Systemd (GNOME Sync)

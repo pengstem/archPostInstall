@@ -8,6 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/archpostinstall/dpms.conf"
 STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall"
 STATE_FILE="$STATE_DIR/dpms.state"
+TLP_STATE_FILE="$STATE_DIR/tlp.profile"
 LOCK_FILE="$STATE_DIR/dpms.lock"
 LOCK_DIR="$STATE_DIR/dpms.lock.d"
 
@@ -21,6 +22,10 @@ DPMS_KEEP_PROCS=("kitty" "sparkle" "gnome-shell" "org.gnome.Shell")
 DPMS_POWER_PROFILE_ON="balanced"
 DPMS_POWER_PROFILE_OFF="power-saver"
 DPMS_POWER_PROFILE_OFF_SSH="power-saver"
+DPMS_TLP_PROFILE_ON="balanced"
+DPMS_TLP_PROFILE_OFF="power-saver"
+DPMS_TLP_PROFILE_OFF_SSH="performance"
+DPMS_TLP_USE_SUDO=1
 DPMS_IDLE_MINUTES=15
 DPMS_SKIP_WHEN_PLAYING=1
 DPMS_REOPEN_DELAY_SEC=2
@@ -236,6 +241,77 @@ set_power_profile() {
     if command -v powerprofilesctl >/dev/null 2>&1; then
         powerprofilesctl set "$profile" || true
     fi
+}
+
+load_tlp_profile_state() {
+    if [ -f "$TLP_STATE_FILE" ]; then
+        cat "$TLP_STATE_FILE"
+    fi
+}
+
+save_tlp_profile_state() {
+    local profile="$1"
+    if [ -z "$profile" ]; then
+        return 0
+    fi
+    mkdir -p "$STATE_DIR"
+    printf "%s" "$profile" > "$TLP_STATE_FILE"
+}
+
+have_tlp() {
+    command -v tlp >/dev/null 2>&1
+}
+
+run_tlp_profile() {
+    local profile="$1"
+    if [ -z "$profile" ]; then
+        return 0
+    fi
+    if [ "${DPMS_TLP_USE_SUDO:-0}" -eq 1 ]; then
+        if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+            sudo tlp "$profile"
+            return $?
+        fi
+        log "sudo not available for tlp; skipping profile switch."
+        return 1
+    fi
+    tlp "$profile"
+}
+
+set_tlp_profile() {
+    local profile="$1"
+    if [ -z "$profile" ] || ! have_tlp; then
+        return 1
+    fi
+
+    local current
+    current="$(load_tlp_profile_state || true)"
+    if [ "$current" = "$profile" ]; then
+        return 0
+    fi
+
+    if run_tlp_profile "$profile"; then
+        log "TLP profile set: $profile"
+        save_tlp_profile_state "$profile"
+        return 0
+    fi
+
+    log "Failed to set TLP profile: $profile"
+    return 1
+}
+
+apply_power_profile() {
+    local tlp_profile="$1"
+    local ppd_profile="$2"
+
+    if [ -n "$tlp_profile" ] && have_tlp; then
+        if set_tlp_profile "$tlp_profile"; then
+            return 0
+        fi
+    fi
+
+    set_power_profile "$ppd_profile"
+    return 0
 }
 
 save_state() {
@@ -516,13 +592,18 @@ dpms_off() {
 
     set_dpms_mode 1
 
+    local tlp_target=""
+    local ppd_target=""
     if has_ssh_session; then
-        log "SSH session detected; using profile: $DPMS_POWER_PROFILE_OFF_SSH"
-        set_power_profile "$DPMS_POWER_PROFILE_OFF_SSH"
+        tlp_target="${DPMS_TLP_PROFILE_OFF_SSH:-}"
+        ppd_target="${DPMS_POWER_PROFILE_OFF_SSH:-}"
+        log "SSH session detected; using power profile: ${tlp_target:-$ppd_target}"
     else
-        log "No SSH session; using profile: $DPMS_POWER_PROFILE_OFF"
-        set_power_profile "$DPMS_POWER_PROFILE_OFF"
+        tlp_target="${DPMS_TLP_PROFILE_OFF:-}"
+        ppd_target="${DPMS_POWER_PROFILE_OFF:-}"
+        log "No SSH session; using power profile: ${tlp_target:-$ppd_target}"
     fi
+    apply_power_profile "$tlp_target" "$ppd_target"
 
     if [ "${#reopen_apps[@]}" -gt 0 ]; then
         log "Apps to reopen: ${reopen_apps[*]}"
@@ -557,11 +638,11 @@ dpms_on() {
     load_state
 
     local profile_before="${POWER_PROFILE_BEFORE:-}"
+    local ppd_target="$DPMS_POWER_PROFILE_ON"
     if [ -n "$profile_before" ]; then
-        set_power_profile "$profile_before"
-    else
-        set_power_profile "$DPMS_POWER_PROFILE_ON"
+        ppd_target="$profile_before"
     fi
+    apply_power_profile "${DPMS_TLP_PROFILE_ON:-}" "$ppd_target"
 
     if [ -n "${REOPEN_APPS:-}" ]; then
         log "Reopen list: $REOPEN_APPS"
@@ -625,6 +706,21 @@ dpms_on() {
     log "Display on."
 }
 
+sync_off_power_profile() {
+    local tlp_target=""
+    local ppd_target=""
+    if has_ssh_session; then
+        tlp_target="${DPMS_TLP_PROFILE_OFF_SSH:-}"
+        ppd_target="${DPMS_POWER_PROFILE_OFF_SSH:-}"
+        log "SSH active while display off; using power profile: ${tlp_target:-$ppd_target}"
+    else
+        tlp_target="${DPMS_TLP_PROFILE_OFF:-}"
+        ppd_target="${DPMS_POWER_PROFILE_OFF:-}"
+        log "No SSH while display off; using power profile: ${tlp_target:-$ppd_target}"
+    fi
+    apply_power_profile "$tlp_target" "$ppd_target"
+}
+
 dpms_restore() {
     if [ ! -f "$STATE_FILE" ]; then
         log "No state file; nothing to restore."
@@ -633,6 +729,7 @@ dpms_restore() {
     if is_display_on; then
         dpms_on
     else
+        sync_off_power_profile
         log "Display still off; restore deferred."
     fi
 }

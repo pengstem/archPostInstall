@@ -25,6 +25,7 @@ Commands:
   backup-firefox          Archive ~/.mozilla
   restore-firefox <file>  Restore ~/.mozilla from an archive
   update-pkglist          Refresh scripts/pkglist.txt from pacman
+  measure-power           Measure power draw for TLP profiles
 EOF
 }
 
@@ -73,6 +74,9 @@ case "$cmd" in
         ;;
     update-pkglist)
         "$REPO_DIR/scripts/update_pkglist.sh"
+        ;;
+    measure-power)
+        "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$@"
         ;;
     ""|-h|--help|help)
         usage

@@ -15,6 +15,7 @@
 | configs/fcitx5 | ~/.config/fcitx5 | user config |
 | configs/rime | ~/.local/share/fcitx5/rime | user config |
 | configs/archpostinstall/dpms.conf | ~/.config/archpostinstall/dpms.conf | user config |
+| configs/tlp/99-archpostinstall.conf | /etc/tlp.d/99-archpostinstall.conf | sudo |
 | configs/pacman/pacman.conf | /etc/pacman.conf | sudo |
 | configs/paru/paru.conf | /etc/paru.conf | sudo |
 | configs/pacman/hooks/99-update-pkglist.hook | /etc/pacman.d/hooks/99-update-pkglist.hook | sudo |
@@ -33,4 +34,5 @@
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
 | scripts/gnome/dpms-toggle.sh | /usr/local/bin/dpms-toggle | sudo |
 | scripts/gnome/cleanup_dpms_logs.sh | ~/.local/bin/archpostinstall-dpms-log-cleanup | user bin |
+| scripts/power/measure_tlp_power.sh | ~/.local/bin/archpostinstall-measure-power | user bin |
 | scripts/archpostinstall.sh | ~/.local/bin/archpostinstall | user bin |

@@ -4,8 +4,8 @@
 - `README.md` is the entry point for setup and layout information.
 - `bootstrap.sh` orchestrates the full post-install flow.
 - `setup.sh` symlinks tracked configs into user and system locations.
-- `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, yazi, zathura, mpv, BaiduPCS-Go, tmux, fcitx5/rime, pacman/paru, desktop entries, archpostinstall helpers). See `configs/README.md`.
-- `scripts/` is split by function: `scripts/install/`, `scripts/backup/`, `scripts/gnome/`; `scripts/pkglist.txt` is the package source of truth.
+- `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, yazi, zathura, mpv, BaiduPCS-Go, tmux, fcitx5/rime, pacman/paru, TLP, desktop entries, archpostinstall helpers). See `configs/README.md`.
+- `scripts/` is split by function: `scripts/install/`, `scripts/backup/`, `scripts/gnome/`, `scripts/power/`; `scripts/pkglist.txt` is the package source of truth.
 - `configs/systemd/user/` defines GNOME sync units plus DPMS idle/restore/log-cleanup timers.
 - `configs/pacman/hooks/` contains pacman hooks (for example, automatic pkglist updates).
 - `docs/` holds reference notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md` (see `docs/README.md` and `docs/commands.md`).
@@ -21,6 +21,7 @@
 - `./scripts/backup/backup_themes_extensions.sh` and `./scripts/backup/restore_themes_extensions.sh` handle themes, icons, and GNOME extensions (default `backups/gnome/`).
 - `./scripts/gnome/backup_gnome_state.sh` refreshes GNOME extension/theme notes and archives assets (used by the systemd path unit).
 - `./scripts/gnome/dpms-toggle.sh` toggles display power, manages autostart apps, and cooperates with idle/restore timers.
+- `./scripts/power/measure_tlp_power.sh` measures average power draw for TLP profiles.
 
 ## Coding Style & Naming Conventions
 - Bash scripts use `#!/bin/bash`; keep `set -e` in scripts that should fail fast.
