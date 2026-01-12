@@ -3,8 +3,8 @@ Description=Run dpms-toggle on idle
 
 [Timer]
 OnBootSec=1min
-OnUnitActiveSec=1min
-AccuracySec=30s
+OnUnitActiveSec=30s
+AccuracySec=10s
 Unit=archpostinstall-dpms-idle.service
 
 [Install]
