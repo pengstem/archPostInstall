@@ -764,6 +764,11 @@ sync_off_power_profile() {
 
 dpms_restore() {
     if [ ! -f "$STATE_FILE" ]; then
+        if [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ] && is_display_on; then
+            log "No state file; always-reopen enabled, restoring anyway."
+            dpms_on
+            return 0
+        fi
         log "No state file; nothing to restore."
         return 0
     fi
