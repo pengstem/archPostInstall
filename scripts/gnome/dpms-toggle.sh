@@ -44,6 +44,7 @@ DPMS_SUSPEND_DELAY_SEC=30
 
 IDLE_DEBUG_LINES=()
 IDLE_ERROR=""
+GNOME_EVAL_AVAILABLE=""  # Cache: "yes", "no", or "" (unknown)
 
 if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
     XDG_RUNTIME_DIR="/run/user/$(id -u)"
@@ -200,15 +201,27 @@ have_gdbus() {
 gnome_eval_raw() {
     local js="$1"
     local output
+    # Return early if we already know GNOME Shell Eval is unavailable
+    if [ "$GNOME_EVAL_AVAILABLE" = "no" ]; then
+        return 1
+    fi
     if ! have_gdbus; then
+        GNOME_EVAL_AVAILABLE="no"
         return 1
     fi
     output="$(gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell \
-        --method org.gnome.Shell.Eval "$js" 2>/dev/null)" || return 1
+        --method org.gnome.Shell.Eval "$js" 2>/dev/null)" || {
+        GNOME_EVAL_AVAILABLE="no"
+        return 1
+    }
     if ! echo "$output" | grep -q "^(true,"; then
-        log "GNOME Shell Eval unavailable: $output"
+        if [ "$GNOME_EVAL_AVAILABLE" != "no" ]; then
+            log "GNOME Shell Eval unavailable (will not retry): $output"
+            GNOME_EVAL_AVAILABLE="no"
+        fi
         return 1
     fi
+    GNOME_EVAL_AVAILABLE="yes"
     printf "%s" "$output"
 }
 
@@ -810,11 +823,41 @@ sync_off_power_profile() {
 dpms_restore() {
     if [ ! -f "$STATE_FILE" ]; then
         if [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ] && is_display_on; then
-            log "No state file; always-reopen enabled, restoring anyway."
+            # Check if any app needs to be started
+            local any_need_start=0
+            local i name match run_match wm_class
+            for i in "${!DPMS_REOPEN_NAMES[@]}"; do
+                name="${DPMS_REOPEN_NAMES[$i]}"
+                match="${DPMS_KILL_MATCHES[$i]}"
+                run_match="$match"
+                if [ "${#DPMS_RUNNING_MATCHES[@]}" -gt 0 ]; then
+                    run_match="${DPMS_RUNNING_MATCHES[$i]}"
+                fi
+                wm_class=""
+                if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ]; then
+                    wm_class="${DPMS_WM_CLASSES[$i]}"
+                fi
+                if ! is_app_running "$run_match" "$wm_class"; then
+                    any_need_start=1
+                    if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+                        log "App not running: $name"
+                    fi
+                    break
+                fi
+            done
+            if [ "$any_need_start" -eq 0 ]; then
+                if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+                    log "No state file; all apps already running."
+                fi
+                return 0
+            fi
+            log "No state file; always-reopen enabled, some apps not running, restoring."
             dpms_on
             return 0
         fi
-        log "No state file; nothing to restore."
+        if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
+            log "No state file; nothing to restore."
+        fi
         return 0
     fi
     if is_display_on; then
