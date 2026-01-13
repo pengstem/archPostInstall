@@ -18,6 +18,7 @@ DPMS_RUNNING_MATCHES=()
 DPMS_WM_CLASSES=("firefox" "wechat" "qq")
 DPMS_REOPEN_COMMANDS=("firefox" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
 DPMS_REOPEN_ACTIVATE_COMMANDS=()
+DPMS_ALWAYS_REOPEN=0
 DPMS_KILL_ONLY_MATCHES=("steam")
 DPMS_KILL_ONLY_WM_CLASSES=("steam")
 DPMS_KEEP_PROCS=("kitty" "sparkle" "gnome-shell" "org.gnome.Shell")
@@ -618,7 +619,13 @@ dpms_off() {
     fi
     apply_power_profile "$tlp_target" "$ppd_target"
 
-    if [ "${#reopen_apps[@]}" -gt 0 ]; then
+    if [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ]; then
+        reopen_apps=()
+        for name in "${DPMS_REOPEN_NAMES[@]}"; do
+            reopen_apps+=("$name")
+        done
+        log "Always reopen enabled; forcing reopen list: ${reopen_apps[*]}"
+    elif [ "${#reopen_apps[@]}" -gt 0 ]; then
         log "Apps to reopen: ${reopen_apps[*]}"
     else
         log "No apps to reopen."
@@ -656,6 +663,10 @@ dpms_on() {
         ppd_target="$profile_before"
     fi
     apply_power_profile "${DPMS_TLP_PROFILE_ON:-}" "$ppd_target"
+
+    if [ -z "${REOPEN_APPS:-}" ] && [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ]; then
+        REOPEN_APPS="${DPMS_REOPEN_NAMES[*]}"
+    fi
 
     if [ -n "${REOPEN_APPS:-}" ]; then
         log "Reopen list: $REOPEN_APPS"
