@@ -846,11 +846,28 @@ get_logind_idle_seconds() {
 }
 
 get_gnome_idle_seconds() {
+    local raw ms
+    if command -v busctl >/dev/null 2>&1; then
+        raw="$(busctl --user call org.gnome.Mutter.IdleMonitor \
+            /org/gnome/Mutter/IdleMonitor/Core \
+            org.gnome.Mutter.IdleMonitor GetIdletime 2>&1)" || {
+            IDLE_ERROR="Failed to query GNOME idle time via busctl: $raw"
+            return 1
+        }
+        ms="$(echo "$raw" | awk '{print $2}')"
+        if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
+            IDLE_ERROR="Failed to parse idle time from: $raw"
+            return 1
+        fi
+        append_idle_debug "Idle raw (busctl): $raw"
+        echo $((ms / 1000))
+        return 0
+    fi
+
     if ! command -v gdbus >/dev/null 2>&1; then
         return 1
     fi
 
-    local raw
     raw="$(gdbus call --session --dest org.gnome.Mutter.IdleMonitor \
         --object-path /org/gnome/Mutter/IdleMonitor/Core \
         --method org.gnome.Mutter.IdleMonitor.GetIdletime 2>&1)" || {
@@ -858,7 +875,6 @@ get_gnome_idle_seconds() {
         return 1
     }
 
-    local ms
     ms="$(echo "$raw" | sed -E 's/.*uint64[[:space:]]+([0-9]+).*/\\1/')"
     if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
         ms="$(echo "$raw" | sed -E 's/[^0-9]*([0-9]+).*/\\1/')"
