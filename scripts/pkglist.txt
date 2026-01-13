@@ -1,4 +1,4 @@
-# Package list generated on Tue Jan 13 06:47:46 PM CST 2026
+# Package list generated on Tue Jan 13 11:18:15 PM CST 2026
 7zip
 amd-ucode
 base
@@ -25,6 +25,7 @@ fcitx5-qt
 fcitx5-rime
 fd
 firefox
+flameshot
 fuse2
 fzf
 gdb
@@ -72,6 +73,7 @@ nvidia-open-dkms
 nvidia-utils
 os-prober
 perf
+perl-image-exiftool
 powertop
 qimgv-debug
 qpdf
@@ -107,6 +109,7 @@ ventoy-bin
 vim
 visual-studio-code-bin
 wl-clipboard
+wmctrl
 xdg-user-dirs
 yay
 yazi
