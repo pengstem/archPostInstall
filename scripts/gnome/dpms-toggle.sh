@@ -58,6 +58,29 @@ if [ -f "$CONFIG_FILE" ]; then
     . "$CONFIG_FILE"
 fi
 
+ensure_display_env() {
+    if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+        XDG_RUNTIME_DIR="/run/user/$(id -u)"
+        export XDG_RUNTIME_DIR
+    fi
+    if [ -z "${WAYLAND_DISPLAY:-}" ] && [ -d "$XDG_RUNTIME_DIR" ]; then
+        local socket
+        socket="$(find "$XDG_RUNTIME_DIR" -maxdepth 1 -type s -name 'wayland-*' 2>/dev/null | head -n 1)"
+        if [ -n "$socket" ]; then
+            WAYLAND_DISPLAY="$(basename "$socket")"
+            export WAYLAND_DISPLAY
+        fi
+    fi
+    if [ -z "${DISPLAY:-}" ] && [ -S /tmp/.X11-unix/X0 ]; then
+        DISPLAY=":0"
+        export DISPLAY
+    fi
+    if [ -z "${XAUTHORITY:-}" ] && [ -n "${DISPLAY:-}" ] && [ -f "$HOME/.Xauthority" ]; then
+        XAUTHORITY="$HOME/.Xauthority"
+        export XAUTHORITY
+    fi
+}
+
 require_cmd() {
     if ! command -v "$1" >/dev/null 2>&1; then
         echo "Error: Required command not found: $1" >&2
@@ -462,6 +485,7 @@ run_command() {
     if [ -z "$cmd" ]; then
         return 0
     fi
+    ensure_display_env
     if [[ "$cmd" == gtk-launch* ]] && ! command -v gtk-launch >/dev/null 2>&1; then
         local target
         target="$(echo "$cmd" | awk '{print $2}')"
