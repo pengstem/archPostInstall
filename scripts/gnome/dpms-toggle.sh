@@ -45,6 +45,14 @@ DPMS_SUSPEND_DELAY_SEC=30
 IDLE_DEBUG_LINES=()
 IDLE_ERROR=""
 
+if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+    XDG_RUNTIME_DIR="/run/user/$(id -u)"
+    export XDG_RUNTIME_DIR
+fi
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -S "$XDG_RUNTIME_DIR/bus" ]; then
+    export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+fi
+
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
     . "$CONFIG_FILE"
@@ -845,7 +853,10 @@ get_gnome_idle_seconds() {
     local raw
     raw="$(gdbus call --session --dest org.gnome.Mutter.IdleMonitor \
         --object-path /org/gnome/Mutter/IdleMonitor/Core \
-        --method org.gnome.Mutter.IdleMonitor.GetIdletime 2>/dev/null)" || return 1
+        --method org.gnome.Mutter.IdleMonitor.GetIdletime 2>&1)" || {
+        IDLE_ERROR="Failed to query GNOME idle time: $raw"
+        return 1
+    }
 
     local ms
     ms="$(echo "$raw" | sed -E 's/.*uint64[[:space:]]+([0-9]+).*/\\1/')"
