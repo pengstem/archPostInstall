@@ -1,4 +1,4 @@
-# Package list generated on Mon Jan 12 11:35:24 PM CST 2026
+# Package list generated on Tue Jan 13 06:47:46 PM CST 2026
 7zip
 amd-ucode
 base
@@ -41,6 +41,7 @@ gnome-tweaks
 google-chrome
 grub
 grub-btrfs
+helix
 inotify-tools
 kitty
 lazygit
@@ -70,8 +71,10 @@ npm
 nvidia-open-dkms
 nvidia-utils
 os-prober
+perf
 powertop
 qimgv-debug
+qpdf
 resvg
 ripgrep
 rustup
