@@ -134,10 +134,22 @@ acquire_lock() {
     mkdir -p "$STATE_DIR"
     if command -v flock >/dev/null 2>&1; then
         exec 9>"$LOCK_FILE"
-        if ! flock -n 9; then
+        if flock -n 9; then
+            return 0
+        fi
+        local other
+        other="$(pgrep -f -u "$USER" "dpms-toggle" | grep -v "^$$$" || true)"
+        if [ -n "$other" ]; then
             log "Another dpms-toggle instance is running; skipping."
             exit 0
         fi
+        log "Lock file busy without dpms-toggle process; using fallback lock."
+        exec 9>&-
+        if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+            log "Another dpms-toggle instance is running; skipping."
+            exit 0
+        fi
+        trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
         return 0
     fi
 
