@@ -455,7 +455,7 @@ run_command() {
         log "Warning: command not executable: $first"
     fi
     log "Executing: $cmd"
-    nohup bash -c "$cmd" >/dev/null 2>&1 &
+    nohup bash -c "exec 9>&-; $cmd" >/dev/null 2>&1 &
 }
 
 is_app_running() {
@@ -637,6 +637,7 @@ dpms_off() {
         if command -v systemctl >/dev/null 2>&1; then
             log "Scheduling suspend in ${DPMS_SUSPEND_DELAY_SEC}s..."
             (
+                exec 9>&-
                 sleep "$DPMS_SUSPEND_DELAY_SEC"
                 if ! is_display_on && ! has_ssh_session; then
                     systemctl suspend || true
