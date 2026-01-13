@@ -138,7 +138,7 @@ acquire_lock() {
             return 0
         fi
         local other
-        other="$(pgrep -f -u "$USER" "dpms-toggle" | grep -v "^$$$" || true)"
+        other="$(ps -u "$USER" -o pid=,command= | awk '$2 ~ /dpms-toggle/ {print $1}' | grep -v "^$$$" || true)"
         if [ -n "$other" ]; then
             log "Another dpms-toggle instance is running; skipping."
             exit 0
