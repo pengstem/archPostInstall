@@ -1,4 +1,4 @@
-# Package list generated on Mon Jan 12 04:52:00 PM CST 2026
+# Package list generated on Mon Jan 12 11:35:24 PM CST 2026
 7zip
 amd-ucode
 base
@@ -36,7 +36,6 @@ gnome-browser-connector
 gnome-control-center
 gnome-keyring
 gnome-shell
-gnome-shell-extension-vitals
 gnome-themes-extra
 gnome-tweaks
 google-chrome
@@ -91,6 +90,8 @@ tealdeer
 telegram-desktop
 thefuck
 tlp
+tlp-pd
+tlp-rdw
 tmux
 tokei
 ttf-dejavu
