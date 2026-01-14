@@ -269,10 +269,19 @@ get_dpms_mode() {
 }
 
 set_dpms_mode() {
+    local mode="$1"
+    log "Setting PowerSaveMode to $mode (0=on, 1=standby, 2=suspend, 3=off)"
     if ! busctl --user set-property org.gnome.Mutter.DisplayConfig \
-        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode i "$1"; then
-        log "Error: failed to set PowerSaveMode to $1"
+        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode i "$mode"; then
+        log "Error: failed to set PowerSaveMode to $mode"
         return 1
+    fi
+    # Verify the mode was set correctly
+    local actual
+    actual="$(busctl --user get-property org.gnome.Mutter.DisplayConfig \
+        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode 2>/dev/null | awk '{print $2}')"
+    if [ "$actual" != "$mode" ]; then
+        log "Warning: PowerSaveMode set to $mode but actual is $actual"
     fi
 }
 
@@ -434,20 +443,30 @@ match_candidates() {
 
 is_running_match() {
     local match="$1"
-    local cand
+    local cand pid cmdline
     while IFS= read -r cand; do
-        if pgrep -f -i "$cand" >/dev/null 2>&1; then
-            return 0
-        fi
+        while read -r pid; do
+            # Exclude pgrep/grep and this script from matches
+            cmdline="$(ps -p "$pid" -o args= 2>/dev/null)" || continue
+            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle'; then
+                return 0
+            fi
+        done < <(pgrep -f -i "$cand" 2>/dev/null)
     done < <(match_candidates "$match")
     return 1
 }
 
 list_running_match() {
     local match="$1"
-    local cand
+    local cand pid cmdline
     while IFS= read -r cand; do
-        pgrep -af -i "$cand" 2>/dev/null || true
+        while read -r pid; do
+            cmdline="$(ps -p "$pid" -o args= 2>/dev/null)" || continue
+            # Exclude pgrep/grep and this script from output
+            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle'; then
+                echo "$pid $cmdline"
+            fi
+        done < <(pgrep -f -i "$cand" 2>/dev/null)
     done < <(match_candidates "$match")
 }
 
