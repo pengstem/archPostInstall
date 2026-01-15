@@ -446,9 +446,9 @@ is_running_match() {
     local cand pid cmdline
     while IFS= read -r cand; do
         while read -r pid; do
-            # Exclude pgrep/grep and this script from matches
+            # Exclude pgrep/grep, this script, and shell wrappers from matches
             cmdline="$(ps -p "$pid" -o args= 2>/dev/null)" || continue
-            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle'; then
+            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle|nohup|bash -c'; then
                 return 0
             fi
         done < <(pgrep -f -i "$cand" 2>/dev/null)
@@ -462,8 +462,8 @@ list_running_match() {
     while IFS= read -r cand; do
         while read -r pid; do
             cmdline="$(ps -p "$pid" -o args= 2>/dev/null)" || continue
-            # Exclude pgrep/grep and this script from output
-            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle'; then
+            # Exclude pgrep/grep, this script, and shell wrappers from output
+            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle|nohup|bash -c'; then
                 echo "$pid $cmdline"
             fi
         done < <(pgrep -f -i "$cand" 2>/dev/null)
