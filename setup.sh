@@ -133,6 +133,7 @@ create_link "$CONFIGS_DIR/gitconfig"        "$HOME/.gitconfig"              "Git
 # Terminals
 create_link "$CONFIGS_DIR/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "Kitty"
 create_link "$CONFIGS_DIR/ghostty"          "$HOME/.config/ghostty"         "Ghostty"
+create_link "$CONFIGS_DIR/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua" "WezTerm"
 
 # Editors
 create_link "$CONFIGS_DIR/nvim"             "$HOME/.config/nvim"            "Neovim"

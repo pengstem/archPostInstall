@@ -5,6 +5,7 @@
 | configs/p10k.zsh | ~/.p10k.zsh | user config |
 | configs/gitconfig | ~/.gitconfig | user config |
 | configs/kitty/kitty.conf | ~/.config/kitty/kitty.conf | user config |
+| configs/wezterm/wezterm.lua | ~/.config/wezterm/wezterm.lua | user config |
 | configs/ghostty | ~/.config/ghostty | user config |
 | configs/nvim | ~/.config/nvim | user config |
 | configs/zed | ~/.config/zed | user config |
