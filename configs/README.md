@@ -11,6 +11,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `nvim/`, `zed/` editor configs
 - `rime/` schema and dictionaries (live `user.yaml` is ignored)
 - `tmux/` tmux config and helper scripts
+- `xdg-desktop-portal/`, `xdg-desktop-portal-termfilechooser/` portal configs
 - `pacman/` and `paru/` system package manager configs
 - `systemd/user/` user units (GNOME sync)
 
