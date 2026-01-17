@@ -1,0 +1,4 @@
+# ~/.config/yazi/theme.toml
+[flavor]
+dark = "dracula"
+light = "dracula"

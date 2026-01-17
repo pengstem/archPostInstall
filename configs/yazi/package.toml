@@ -1,0 +1,14 @@
+[[plugin.deps]]
+use = "yazi-rs/plugins:chmod"
+rev = "56971d0"
+hash = "8da0b15a97b5dfd13941d1ecc617ac7c"
+
+[[plugin.deps]]
+use = "yazi-rs/flavors:gruvbox-dark"
+rev = "4a1802a"
+hash = "99aa06d3014798d86001c324468d497f"
+
+[[flavor.deps]]
+use = "yazi-rs/flavors:dracula"
+rev = "4a1802a"
+hash = "7a870f143a4026a893ea3123be711e7a"

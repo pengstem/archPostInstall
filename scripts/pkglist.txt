@@ -1,4 +1,4 @@
-# Package list generated on Wed Jan 14 02:19:25 PM CST 2026
+# Package list generated on Sat Jan 17 09:13:47 PM CST 2026
 7zip
 amd-ucode
 base
@@ -61,6 +61,7 @@ man-db
 mangohud
 man-pages
 mediainfo
+minicom
 mosh
 mpv
 nautilus
@@ -76,9 +77,11 @@ nvidia-utils
 os-prober
 perf
 perl-image-exiftool
+picocom
 powertop
 qimgv-debug
 qpdf
+repo
 resvg
 ripgrep
 rustup
@@ -110,8 +113,11 @@ uv
 ventoy-bin
 vim
 visual-studio-code-bin
+wezterm
+wget
 wl-clipboard
 wmctrl
+xdg-desktop-portal-termfilechooser-hunkyburrito-git
 xdg-user-dirs
 yay
 yazi
