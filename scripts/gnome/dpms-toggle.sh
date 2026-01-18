@@ -13,9 +13,9 @@ LOCK_FILE="$STATE_DIR/dpms.lock"
 LOCK_DIR="$STATE_DIR/dpms.lock.d"
 
 DPMS_REOPEN_NAMES=("zen-browser" "wechat" "qq")
-DPMS_KILL_MATCHES=("zen-browser|zen" "WeChat.AppImage|/tmp/.mount_WeChat|WeChatAppEx|/usr/bin/wechat" "QQ.AppImage|/tmp/.mount_QQ|/usr/bin/qq|/qq")
+DPMS_KILL_MATCHES=("zen-bin|zen-browser" "WeChat.AppImage|/tmp/.mount_WeChat|WeChatAppEx|/usr/bin/wechat" "QQ.AppImage|/tmp/.mount_QQ|/usr/bin/qq|/qq")
 DPMS_RUNNING_MATCHES=()
-DPMS_WM_CLASSES=("zen-browser" "wechat" "qq")
+DPMS_WM_CLASSES=("zen" "wechat" "qq")
 DPMS_REOPEN_COMMANDS=("zen-browser" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
 DPMS_REOPEN_ACTIVATE_COMMANDS=()
 DPMS_ALWAYS_REOPEN=0
@@ -252,7 +252,28 @@ close_wm_class() {
         return 1
     fi
     local cls_lc="${cls,,}"
-    gnome_eval_raw "global.get_window_actors().filter(w => w.get_meta_window().get_wm_class().toLowerCase() === '${cls_lc}').forEach(w => w.get_meta_window().delete(global.get_current_time()));" >/dev/null
+    if gnome_eval_raw "global.get_window_actors().filter(w => w.get_meta_window().get_wm_class().toLowerCase() === '${cls_lc}').forEach(w => w.get_meta_window().delete(global.get_current_time()));" >/dev/null; then
+        return 0
+    fi
+    if command -v wmctrl >/dev/null 2>&1; then
+        ensure_display_env
+        local ids
+        ids="$(wmctrl -x -l 2>/dev/null | awk -v cls="$cls_lc" '{
+            class=tolower($4);
+            split(class, parts, ".");
+            if (class==cls || parts[1]==cls || parts[2]==cls) {
+                print $1
+            }
+        }')"
+        if [ -n "$ids" ]; then
+            while read -r id; do
+                [ -z "$id" ] && continue
+                wmctrl -i -c "$id" >/dev/null 2>&1 || true
+            done <<< "$ids"
+            return 0
+        fi
+    fi
+    return 1
 }
 
 get_dpms_mode() {
@@ -631,10 +652,14 @@ dpms_off() {
                 log "  $line"
             done < <(list_running_match "$match")
             if [ -n "$wm_class" ]; then
-                close_wm_class "$wm_class" || true
+                if close_wm_class "$wm_class"; then
+                    wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC" || true
+                fi
             fi
-            if ! kill_match "$match"; then
-                log "No matching process found for $name after check."
+            if is_app_running "$match" "$wm_class"; then
+                if ! kill_match "$match"; then
+                    log "No matching process found for $name after check."
+                fi
             fi
             if is_app_running "$match" "$wm_class"; then
                 log "Warning: $name still running after close/kill."
