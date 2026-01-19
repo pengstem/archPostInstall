@@ -19,6 +19,7 @@ DPMS_WM_CLASSES=("zen" "wechat" "qq")
 DPMS_REOPEN_COMMANDS=("zen-browser" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
 DPMS_REOPEN_ACTIVATE_COMMANDS=()
 DPMS_CLOSE_COMMANDS=()
+DPMS_FORCE_KILL_ON_CLOSE=1
 DPMS_ALWAYS_REOPEN=0
 DPMS_KILL_ONLY_MATCHES=("steam" "firefox")
 DPMS_KILL_ONLY_WM_CLASSES=("steam" "firefox")
@@ -27,6 +28,8 @@ DPMS_POWER_PROFILE_ON="balanced"
 DPMS_POWER_PROFILE_OFF="power-saver"
 DPMS_POWER_PROFILE_OFF_SSH="balanced"
 DPMS_SKIP_POWER_PROFILE=0
+DPMS_BRIGHTNESS_RESTORE=0
+DPMS_BRIGHTNESS_DEVICE=""
 DPMS_TLP_PROFILE_ON="balanced"
 DPMS_TLP_PROFILE_OFF="power-saver"
 DPMS_TLP_PROFILE_OFF_SSH="balanced"
@@ -421,6 +424,109 @@ apply_power_profile() {
     return 0
 }
 
+get_logind_session_id() {
+    local session_id="${XDG_SESSION_ID:-}"
+    if [ -n "$session_id" ]; then
+        echo "$session_id"
+        return 0
+    fi
+    if command -v loginctl >/dev/null 2>&1; then
+        session_id="$(loginctl list-sessions --no-legend 2>/dev/null | awk -v user="$USER" '$3==user {print $1; exit}')"
+        if [ -n "$session_id" ]; then
+            echo "$session_id"
+            return 0
+        fi
+    fi
+    return 1
+}
+
+get_logind_session_path() {
+    local session_id
+    session_id="$(get_logind_session_id)" || return 1
+    echo "/org/freedesktop/login1/session/_${session_id}"
+}
+
+capture_brightness() {
+    if [ "${DPMS_BRIGHTNESS_RESTORE:-0}" -ne 1 ]; then
+        return 1
+    fi
+
+    local device=""
+    local value=""
+    local out=""
+
+    if command -v brightnessctl >/dev/null 2>&1; then
+        if [ -n "${DPMS_BRIGHTNESS_DEVICE:-}" ]; then
+            out="$(brightnessctl -m -d "$DPMS_BRIGHTNESS_DEVICE" 2>/dev/null || true)"
+        else
+            out="$(brightnessctl -m 2>/dev/null | head -n 1 || true)"
+        fi
+        if [ -n "$out" ]; then
+            IFS=',' read -r device _ value _ _ <<< "$out"
+        fi
+    fi
+
+    if [ -z "$device" ]; then
+        if [ -n "${DPMS_BRIGHTNESS_DEVICE:-}" ]; then
+            device="$DPMS_BRIGHTNESS_DEVICE"
+        else
+            device="$(ls /sys/class/backlight 2>/dev/null | head -n 1 || true)"
+        fi
+        if [ -n "$device" ] && [ -r "/sys/class/backlight/$device/brightness" ]; then
+            value="$(cat "/sys/class/backlight/$device/brightness" 2>/dev/null || true)"
+        fi
+    fi
+
+    if [ -n "$device" ] && [[ "${value:-}" =~ ^[0-9]+$ ]]; then
+        BRIGHTNESS_DEVICE="$device"
+        BRIGHTNESS_VALUE="$value"
+        return 0
+    fi
+    return 1
+}
+
+restore_brightness() {
+    if [ "${DPMS_BRIGHTNESS_RESTORE:-0}" -ne 1 ]; then
+        return 0
+    fi
+    if [ -z "${BRIGHTNESS_DEVICE:-}" ] || [ -z "${BRIGHTNESS_VALUE:-}" ]; then
+        return 0
+    fi
+
+    local device="$BRIGHTNESS_DEVICE"
+    local value="$BRIGHTNESS_VALUE"
+
+    if command -v brightnessctl >/dev/null 2>&1; then
+        if brightnessctl -d "$device" set "$value" >/dev/null 2>&1; then
+            log "Restored brightness via brightnessctl: $device=$value"
+            return 0
+        fi
+    fi
+
+    if [ -w "/sys/class/backlight/$device/brightness" ]; then
+        if printf "%s" "$value" > "/sys/class/backlight/$device/brightness" 2>/dev/null; then
+            log "Restored brightness via sysfs: $device=$value"
+            return 0
+        fi
+    fi
+
+    if command -v busctl >/dev/null 2>&1; then
+        local session_path
+        session_path="$(get_logind_session_path || true)"
+        if [ -n "$session_path" ]; then
+            if busctl call org.freedesktop.login1 "$session_path" \
+                org.freedesktop.login1.Session SetBrightness "ssu" "backlight" "$device" "$value" \
+                >/dev/null 2>&1; then
+                log "Restored brightness via logind: $device=$value"
+                return 0
+            fi
+        fi
+    fi
+
+    log "Warning: failed to restore brightness for $device"
+    return 1
+}
+
 save_state() {
     local reopen_list="$1"
     local profile_before="$2"
@@ -429,6 +535,10 @@ save_state() {
     {
         echo "REOPEN_APPS=\"$reopen_list\""
         echo "POWER_PROFILE_BEFORE=\"$profile_before\""
+        if [ -n "${BRIGHTNESS_DEVICE:-}" ] && [ -n "${BRIGHTNESS_VALUE:-}" ]; then
+            echo "BRIGHTNESS_DEVICE=\"$BRIGHTNESS_DEVICE\""
+            echo "BRIGHTNESS_VALUE=\"$BRIGHTNESS_VALUE\""
+        fi
     } > "$STATE_FILE"
 }
 
@@ -642,6 +752,10 @@ dpms_off() {
         return 0
     fi
 
+    if capture_brightness; then
+        log "Saved brightness: ${BRIGHTNESS_DEVICE}=${BRIGHTNESS_VALUE}"
+    fi
+
     local i name match wm_class close_cmd
     local reopen_apps=()
 
@@ -673,7 +787,9 @@ dpms_off() {
                 fi
             fi
             if is_app_running "$match" "$wm_class"; then
-                if ! kill_match "$match"; then
+                if [ -n "$close_cmd" ] && [ "${DPMS_FORCE_KILL_ON_CLOSE:-1}" -eq 0 ]; then
+                    log "Skip force kill for $name (close command used)."
+                elif ! kill_match "$match"; then
                     log "No matching process found for $name after check."
                 fi
             fi
@@ -789,6 +905,8 @@ dpms_on() {
         fi
         apply_power_profile "${DPMS_TLP_PROFILE_ON:-}" "$ppd_target"
     fi
+
+    restore_brightness || true
 
     if [ -z "${REOPEN_APPS:-}" ] && [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ]; then
         REOPEN_APPS="${DPMS_REOPEN_NAMES[*]}"
