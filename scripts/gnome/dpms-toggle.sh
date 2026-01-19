@@ -18,6 +18,7 @@ DPMS_RUNNING_MATCHES=()
 DPMS_WM_CLASSES=("zen" "wechat" "qq")
 DPMS_REOPEN_COMMANDS=("zen-browser" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
 DPMS_REOPEN_ACTIVATE_COMMANDS=()
+DPMS_CLOSE_COMMANDS=()
 DPMS_ALWAYS_REOPEN=0
 DPMS_KILL_ONLY_MATCHES=("steam" "firefox")
 DPMS_KILL_ONLY_WM_CLASSES=("steam" "firefox")
@@ -25,6 +26,7 @@ DPMS_KEEP_PROCS=("kitty" "sparkle" "gnome-shell" "org.gnome.Shell")
 DPMS_POWER_PROFILE_ON="balanced"
 DPMS_POWER_PROFILE_OFF="power-saver"
 DPMS_POWER_PROFILE_OFF_SSH="balanced"
+DPMS_SKIP_POWER_PROFILE=0
 DPMS_TLP_PROFILE_ON="balanced"
 DPMS_TLP_PROFILE_OFF="power-saver"
 DPMS_TLP_PROFILE_OFF_SSH="balanced"
@@ -109,6 +111,11 @@ fi
 if [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -gt 0 ] && \
    [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
     echo "Error: DPMS_REOPEN_ACTIVATE_COMMANDS length must match DPMS_REOPEN_NAMES." >&2
+    exit 1
+fi
+if [ "${#DPMS_CLOSE_COMMANDS[@]}" -gt 0 ] && \
+   [ "${#DPMS_CLOSE_COMMANDS[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
+    echo "Error: DPMS_CLOSE_COMMANDS length must match DPMS_REOPEN_NAMES." >&2
     exit 1
 fi
 if [ "${#DPMS_KILL_ONLY_WM_CLASSES[@]}" -gt 0 ] && \
@@ -635,7 +642,7 @@ dpms_off() {
         return 0
     fi
 
-    local i name match wm_class
+    local i name match wm_class close_cmd
     local reopen_apps=()
 
     for i in "${!DPMS_REOPEN_NAMES[@]}"; do
@@ -651,6 +658,15 @@ dpms_off() {
             while read -r line; do
                 log "  $line"
             done < <(list_running_match "$match")
+            close_cmd=""
+            if [ "${#DPMS_CLOSE_COMMANDS[@]}" -gt 0 ]; then
+                close_cmd="${DPMS_CLOSE_COMMANDS[$i]}"
+            fi
+            if [ -n "$close_cmd" ]; then
+                log "Requesting $name to quit: $close_cmd"
+                run_command "$close_cmd"
+                wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC" || true
+            fi
             if [ -n "$wm_class" ]; then
                 if close_wm_class "$wm_class"; then
                     wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC" || true
@@ -707,18 +723,22 @@ dpms_off() {
 
     set_dpms_mode 1
 
-    local tlp_target=""
-    local ppd_target=""
-    if has_ssh_session; then
-        tlp_target="${DPMS_TLP_PROFILE_OFF_SSH:-}"
-        ppd_target="${DPMS_POWER_PROFILE_OFF_SSH:-}"
-        log "SSH session detected; using power profile: ${tlp_target:-$ppd_target}"
+    if [ "${DPMS_SKIP_POWER_PROFILE:-0}" -eq 1 ]; then
+        log "Skipping power profile switch."
     else
-        tlp_target="${DPMS_TLP_PROFILE_OFF:-}"
-        ppd_target="${DPMS_POWER_PROFILE_OFF:-}"
-        log "No SSH session; using power profile: ${tlp_target:-$ppd_target}"
+        local tlp_target=""
+        local ppd_target=""
+        if has_ssh_session; then
+            tlp_target="${DPMS_TLP_PROFILE_OFF_SSH:-}"
+            ppd_target="${DPMS_POWER_PROFILE_OFF_SSH:-}"
+            log "SSH session detected; using power profile: ${tlp_target:-$ppd_target}"
+        else
+            tlp_target="${DPMS_TLP_PROFILE_OFF:-}"
+            ppd_target="${DPMS_POWER_PROFILE_OFF:-}"
+            log "No SSH session; using power profile: ${tlp_target:-$ppd_target}"
+        fi
+        apply_power_profile "$tlp_target" "$ppd_target"
     fi
-    apply_power_profile "$tlp_target" "$ppd_target"
 
     if [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ]; then
         reopen_apps=()
@@ -759,12 +779,16 @@ dpms_on() {
 
     load_state
 
-    local profile_before="${POWER_PROFILE_BEFORE:-}"
-    local ppd_target="$DPMS_POWER_PROFILE_ON"
-    if [ -n "$profile_before" ]; then
-        ppd_target="$profile_before"
+    if [ "${DPMS_SKIP_POWER_PROFILE:-0}" -eq 1 ]; then
+        log "Skipping power profile restore."
+    else
+        local profile_before="${POWER_PROFILE_BEFORE:-}"
+        local ppd_target="$DPMS_POWER_PROFILE_ON"
+        if [ -n "$profile_before" ]; then
+            ppd_target="$profile_before"
+        fi
+        apply_power_profile "${DPMS_TLP_PROFILE_ON:-}" "$ppd_target"
     fi
-    apply_power_profile "${DPMS_TLP_PROFILE_ON:-}" "$ppd_target"
 
     if [ -z "${REOPEN_APPS:-}" ] && [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ]; then
         REOPEN_APPS="${DPMS_REOPEN_NAMES[*]}"
@@ -850,6 +874,10 @@ dpms_on() {
 }
 
 sync_off_power_profile() {
+    if [ "${DPMS_SKIP_POWER_PROFILE:-0}" -eq 1 ]; then
+        log "Skipping power profile sync."
+        return 0
+    fi
     local tlp_target=""
     local ppd_target=""
     if has_ssh_session; then
