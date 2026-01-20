@@ -9,6 +9,7 @@
 - `configs/systemd/user/` defines GNOME sync units plus DPMS idle/restore/log-cleanup timers.
 - `configs/pacman/hooks/` contains pacman hooks (for example, automatic pkglist updates).
 - `docs/` holds reference notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md` (see `docs/README.md` and `docs/commands.md`).
+- `docs/dpms-past-bugs.md` tracks DPMS pitfalls; update it when changing DPMS scripts/configs/timers.
 - `backups/` is the default archive location for GNOME themes/extensions and Firefox profiles.
 
 ## Build, Test, and Development Commands
