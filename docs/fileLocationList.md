@@ -12,6 +12,9 @@
 | configs/yazi | ~/.config/yazi | user config |
 | configs/zathura | ~/.config/zathura | user config |
 | configs/mpv | ~/.config/mpv | user config |
+| configs/neomutt | ~/.config/neomutt | user config |
+| configs/mbsyncrc | ~/.mbsyncrc | user config |
+| configs/msmtprc | ~/.msmtprc | user config |
 | configs/xdg-desktop-portal | ~/.config/xdg-desktop-portal | user config |
 | configs/xdg-desktop-portal-termfilechooser | ~/.config/xdg-desktop-portal-termfilechooser | user config |
 | configs/baidupcs | ~/.config/BaiduPCS-Go | requires pcs_config.json |

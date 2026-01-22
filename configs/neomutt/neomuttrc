@@ -1,0 +1,17 @@
+# ~/.config/neomutt/neomuttrc
+
+# --- 编码 / 基本行为 ---
+set charset      = "utf-8"
+set send_charset = "utf-8"
+
+set editor       = "nvim"
+
+set askcc         = no
+set confirmappend = no
+set move          = no
+
+# --- 拆分配置 ---
+source ~/.config/neomutt/ui.muttrc
+source ~/.config/neomutt/colors.muttrc
+source ~/.config/neomutt/macros.muttrc
+source ~/.config/neomutt/accounts/gmail.muttrc

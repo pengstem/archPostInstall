@@ -144,6 +144,9 @@ create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmu
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
 create_link "$CONFIGS_DIR/zathura"          "$HOME/.config/zathura"         "Zathura"
 create_link "$CONFIGS_DIR/mpv"              "$HOME/.config/mpv"             "mpv"
+create_link "$CONFIGS_DIR/neomutt"          "$HOME/.config/neomutt"         "NeoMutt"
+create_link "$CONFIGS_DIR/mbsyncrc"         "$HOME/.mbsyncrc"               "mbsync"
+create_link "$CONFIGS_DIR/msmtprc"          "$HOME/.msmtprc"                "msmtp"
 create_link "$CONFIGS_DIR/xdg-desktop-portal" "$HOME/.config/xdg-desktop-portal" "XDG Portal"
 create_link "$CONFIGS_DIR/xdg-desktop-portal-termfilechooser" "$HOME/.config/xdg-desktop-portal-termfilechooser" "XDG Portal Filechooser"
 if [ -f "$CONFIGS_DIR/baidupcs/pcs_config.json" ]; then

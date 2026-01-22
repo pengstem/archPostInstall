@@ -1,0 +1,84 @@
+# ~/.config/neomutt/ui.muttrc
+# 界面 / 交互相关设置
+
+##### Truecolor 开关（必须在任何 color 命令之前） #####
+set color_directcolor = yes
+
+##### 通用交互 #####
+
+set menu_scroll                    # 菜单滚动
+set use_threads
+unset strict_threads
+
+set sort     = threads
+set sort_aux = last-date-received
+
+set pager                            # 使用内置 pager
+set pager_context      = 3
+set pager_index_lines  = 10
+set pager_stop
+set wrap
+set smart_wrap
+unset markers
+
+set tilde
+set status_on_top
+
+# Header 显示控制：尽量减少噪音
+ignore *
+unignore From: To: Cc: Date: Subject: Reply-To: List-Id:
+hdr_order From: To: Cc: Date: Subject:
+
+##### Index 行格式 #####
+
+# 例子:
+#  12 N 2026-01-21 23:59  Pengsteam16          [GitHub] Some issue title...
+set date_format  = "%Y-%m-%d %H:%M"
+set index_format = "%4C %Z %{%Y-%m-%d %H:%M} %-20.20F %s"
+
+##### Statusline #####
+
+# Nerd Font / Powerline 版本
+set status_format = "%r %D [Msgs:%<M?%M/>%m%<n? New:%n>%<d? Del:%d>%<t? Tag:%t>] %> %P"
+
+# 如果这些符号乱掉，可以改用 ASCII 版：
+# set status_format = "-%r- %D [Msgs:%<M?%M/>%m%<n? New:%n>%<d? Del:%d>%<t? Tag:%t>] %> %P"
+
+##### Sidebar #####
+
+set sidebar_visible
+set sidebar_width           = 24
+unset sidebar_on_right
+
+set sidebar_short_path
+set sidebar_folder_indent
+set sidebar_component_depth = 1
+
+set sidebar_delim_chars     = "/."
+set sidebar_indent_string   = "  "
+set sidebar_divider_char    = "│"
+
+# 统计信息（配合 sidebar_format 的 %S/%N/%F）
+set mail_check_stats
+set mail_check_stats_interval = 60
+
+# 名字 + [F] + 新/总数量
+set sidebar_format = "%B%<F? [%F]>%* %<N?%N/>%S"
+set sidebar_sort   = "path"
+
+##### Pager #####
+
+set quote_regex          = "^( {0,4}[>|:#%]| {0,4}[a-zA-Z0-9]+[>|])"
+set text_flowed
+set rfc2047_parameters
+unset implicit_auto_view
+
+# 注意命令名是 auto_view，不是 auto-view
+#auto_view text/html
+auto_view application/pdf
+
+##### 其他小设置 #####
+
+unset help                 # 去掉底部 help 提示，界面更干净；刚上手可以注释掉
+set arrow_cursor = no
+set simple_search = "~f %s | ~s %s"

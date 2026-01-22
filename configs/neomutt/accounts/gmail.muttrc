@@ -1,0 +1,38 @@
+# ~/.config/neomutt/accounts/gmail.muttrc
+
+set mbox_type  = Maildir
+set folder     = "~/.mail/gmail"
+
+set spoolfile  = "+INBOX"
+set record     = "+[Gmail]/Sent Mail"
+set postponed  = "+[Gmail]/Drafts"
+set trash      = "+[Gmail]/Trash"
+
+set header_cache      = "~/.cache/neomutt/headers"
+set message_cachedir  = "~/.cache/neomutt/bodies"
+set certificate_file  = "~/.cache/neomutt/certificates"
+
+set from      = "Pengsteam16@gmail.com"
+set realname  = "Nastem"
+set use_from        = yes
+set envelope_from   = yes
+
+set sendmail  = "/usr/bin/msmtp"
+
+named-mailboxes \
+  "INBOX"    "+INBOX" \
+  "All Mail" "+[Gmail]/All Mail" \
+  "Drafts"   "+[Gmail]/Drafts" \
+  "Sent"     "+[Gmail]/Sent Mail" \
+  "Starred"  "+[Gmail]/Starred" \
+  "Spam"     "+[Gmail]/Spam" \
+  "Trash"    "+[Gmail]/Trash"
+
+mailboxes \
+  +INBOX \
+  "+[Gmail]/All Mail" \
+  "+[Gmail]/Drafts" \
+  "+[Gmail]/Sent Mail" \
+  "+[Gmail]/Starred" \
+  "+[Gmail]/Spam" \
+  "+[Gmail]/Trash"
