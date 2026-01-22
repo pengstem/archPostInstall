@@ -1,5 +1,6 @@
-# Package list generated on Sat Jan 17 09:13:47 PM CST 2026
+# Package list generated on Thu Jan 22 02:36:07 PM CST 2026
 7zip
+alacritty
 amd-ucode
 base
 base-devel
@@ -25,7 +26,6 @@ fcitx5-qt
 fcitx5-rime
 fd
 firefox
-flameshot
 fuse2
 fzf
 gdb
@@ -45,6 +45,7 @@ grub-btrfs
 helix
 heroic-games-launcher-bin
 inotify-tools
+isync
 kitty
 lazygit
 libgda6
@@ -64,7 +65,9 @@ mediainfo
 minicom
 mosh
 mpv
+msmtp
 nautilus
+neomutt
 neovim
 networkmanager
 newsboat
@@ -75,6 +78,7 @@ npm
 nvidia-open-dkms
 nvidia-utils
 os-prober
+pass
 perf
 perl-image-exiftool
 picocom
@@ -125,6 +129,8 @@ yt-dlp
 zathura
 zathura-pdf-mupdf
 zed
+zellij
+zen-browser-bin
 zoxide
 zram-generator
 zsh
