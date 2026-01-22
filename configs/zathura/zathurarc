@@ -68,8 +68,7 @@ set synctex "true"
 # =========================================================
 # Page -> image clipboard
 # =========================================================
-# Convert the current page to a PNG and place it on the clipboard.
-# Requires: mutool (mupdf-tools) + wl-copy (wl-clipboard).
-# Falls back to pdftoppm/xclip/xsel if available.
-map <C-c> exec /home/nastem/.local/bin/zathura-page-to-clipboard "$FILE" "$PAGE"
+# Convert the current page to a PNG and copy to clipboard.
+# Requires: poppler (pdftoppm) + wl-clipboard (wl-copy)
+map <C-c> exec "/home/nastem/.local/bin/zathura-page-to-clipboard $FILE $PAGE"
 set guioptions "svh"

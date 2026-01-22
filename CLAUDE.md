@@ -22,8 +22,16 @@ archpostinstall install-packages
 archpostinstall install-shell
 archpostinstall link-configs
 archpostinstall backup-gnome
+archpostinstall backup-themes
+archpostinstall restore-themes <files>
 archpostinstall backup-firefox
+archpostinstall restore-firefox <file>
+archpostinstall update-pkglist
 archpostinstall dpms-toggle
+archpostinstall dpms-off
+archpostinstall dpms-on
+archpostinstall dpms-restore
+archpostinstall measure-power
 
 # Syntax-check a script without running it
 bash -n scripts/some_script.sh
@@ -40,6 +48,8 @@ bash -n scripts/some_script.sh
 - `scripts/install/` - Package and shell tool installation
 - `scripts/backup/` - Firefox and GNOME theme/extension backup/restore
 - `scripts/gnome/` - GNOME state sync and DPMS automation
+- `scripts/power/` - TLP power measurement tools
+- `scripts/zathura/` - Zathura PDF viewer helpers
 
 **Config structure:**
 - `configs/<tool>/` - Each tool's config mirrors its target location
@@ -63,6 +73,7 @@ Existing files are backed up with timestamp suffix (`.bak_<epoch>`) before linki
 
 - `configs/baidupcs/pcs_config.json` - Ignored; copy from `.example` template locally
 - `configs/rime/user.yaml` - Ignored; changes constantly during typing
+- `configs/rime/build/`, `configs/rime/*.userdb/` - Build artifacts, may be git-ignored
 - `backups/` - Git-ignored archive output directory
 
 ## Systemd Integration
