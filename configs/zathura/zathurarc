@@ -64,4 +64,12 @@ set synctex "true"
 # map <F11> set pages-per-row 2
 # map <F9>  toggle_page_mode
 # (Mapping syntax and shortcut functions are documented.)  :contentReference[oaicite:12]{index=12}
+
+# =========================================================
+# Page -> image clipboard
+# =========================================================
+# Convert the current page to a PNG and place it on the clipboard.
+# Requires: mutool (mupdf-tools) + wl-copy (wl-clipboard).
+# Falls back to pdftoppm/xclip/xsel if available.
+map <C-c> exec sh -c 'file="$1"; page="$2"; tmp="$(mktemp -d)"; img=""; if command -v mutool >/dev/null 2>&1; then img="$tmp/page.png"; mutool draw -F png -r 150 -o "$img" "$file" "$page"; elif command -v pdftoppm >/dev/null 2>&1; then out="$tmp/page"; pdftoppm -r 150 -f "$page" -l "$page" -png "$file" "$out"; img="${out}-${page}.png"; else echo "zathura: need mutool or pdftoppm" >&2; rm -rf "$tmp"; exit 1; fi; if command -v wl-copy >/dev/null 2>&1; then wl-copy --type image/png < "$img"; elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard -t image/png -i "$img"; elif command -v xsel >/dev/null 2>&1; then xsel --clipboard --input --mime-type image/png < "$img"; else echo "zathura: need wl-copy/xclip/xsel" >&2; rm -rf "$tmp"; exit 1; fi; rm -rf "$tmp"' sh "$FILE" "$PAGE"
 set guioptions "svh"
