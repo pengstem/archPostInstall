@@ -1,6 +1,7 @@
 | Source | Target | Notes |
 | --- | --- | --- |
 | configs/tmux | ~/.config/tmux | user config |
+| configs/zellij | ~/.config/zellij | user config |
 | configs/zshrc | ~/.zshrc | user config |
 | configs/p10k.zsh | ~/.p10k.zsh | user config |
 | configs/gitconfig | ~/.gitconfig | user config |

@@ -141,6 +141,7 @@ create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed
 
 # Tools
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
+create_link "$CONFIGS_DIR/zellij"           "$HOME/.config/zellij"          "Zellij"
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
 create_link "$CONFIGS_DIR/zathura"          "$HOME/.config/zathura"         "Zathura"
 create_link "$CONFIGS_DIR/mpv"              "$HOME/.config/mpv"             "mpv"
