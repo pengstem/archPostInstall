@@ -169,6 +169,7 @@ create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostins
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
 create_link "$REPO_DIR/scripts/gnome/cleanup_dpms_logs.sh" "$HOME/.local/bin/archpostinstall-dpms-log-cleanup" "DPMS Log Cleanup"
 create_link "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$HOME/.local/bin/archpostinstall-measure-power" "Power Measure"
+create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/zathura-page-to-clipboard" "Zathura Clipboard"
 
 # Systemd (User)
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"

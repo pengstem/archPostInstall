@@ -71,5 +71,5 @@ set synctex "true"
 # Convert the current page to a PNG and place it on the clipboard.
 # Requires: mutool (mupdf-tools) + wl-copy (wl-clipboard).
 # Falls back to pdftoppm/xclip/xsel if available.
-map <C-c> exec ~/.config/zathura/page-to-clipboard.sh "$FILE" "$PAGE"
+map <C-c> exec ~/.local/bin/zathura-page-to-clipboard "$FILE" "$PAGE"
 set guioptions "svh"
