@@ -1,4 +1,4 @@
-# Package list generated on Thu Jan 22 05:44:32 PM CST 2026
+# Package list generated on Thu Jan 22 09:06:01 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -78,6 +78,7 @@ noto-fonts-extra
 npm
 nvidia-open-dkms
 nvidia-utils
+nvme-cli
 os-prober
 pass
 perf
