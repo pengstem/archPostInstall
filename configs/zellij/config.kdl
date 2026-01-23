@@ -236,6 +236,17 @@ keybinds clear-defaults=true {
                 close_on_exit true
             }
         }
+        bind "F8" {
+            Run "zsh" "-c" "paru; read -sk1 '?Press q to exit...' key; while [[ $key != 'q' ]]; do read -sk1 key; done" {
+                floating true
+                width "80%"
+                height "80%"
+                x "20%"
+                y "20%"
+                name "paru"
+                close_on_exit true
+            }
+        }
         bind "Ctrl q" { Quit; }
     }
     shared_except "locked" "move" {
