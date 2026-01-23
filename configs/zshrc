@@ -106,6 +106,9 @@ alias lt='eza --tree --level=2 --icons'
 # System Utilities
 alias st='systemctl-tui'
 
+# Mail
+alias mutt='mbsync -a && neomutt'
+
 # Global Aliases (Usage: 'command --help')
 # These pipe output into bat for syntax highlighting
 alias -g -- --h1='-h 2>&1 | bat --language=help --style=plain'
