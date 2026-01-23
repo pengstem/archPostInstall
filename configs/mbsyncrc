@@ -18,7 +18,7 @@ Subfolders Verbatim
 Channel gmail
 Far :gmail-remote:
 Near :gmail-local:
-Patterns *
+Patterns * !"[Gmail]/Trash"
 Create Near
 Expunge Both
 SyncState *
