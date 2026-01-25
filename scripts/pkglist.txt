@@ -1,4 +1,4 @@
-# Package list generated on Thu Jan 22 11:39:31 PM CST 2026
+# Package list generated on Sun Jan 25 12:30:40 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -46,6 +46,7 @@ helix
 heroic-games-launcher-bin
 inotify-tools
 isync
+jq
 kitty
 lazygit
 libgda6
