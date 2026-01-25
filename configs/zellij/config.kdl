@@ -160,7 +160,7 @@ keybinds clear-defaults=true {
         bind "Alt k" { MoveFocus "up"; }
         bind "Alt l" { MoveFocusOrTab "right"; }
         bind "Alt n" { NewPane; }
-        bind "Alt o" { MoveTab "right"; }
+        bind "Alt o" { NewTab; }
         bind "Alt p" { TogglePaneInGroup; }
         bind "Alt Shift p" { ToggleGroupMarking; }
         bind "Alt s" {
@@ -204,7 +204,7 @@ keybinds clear-defaults=true {
             }
         }
         bind "F5" {
-            Run "yazi" {
+            Run "zsh" "-c" "yazi" {
                 floating true
                 width "80%"
                 height "80%"
