@@ -364,7 +364,8 @@ plugins {
 // eg. "https://example.com/my-plugin.wasm"
 load_plugins {
     tab-renumber {
-        only_numeric "true"
+        only_numeric "false"
+        tick_seconds "0.2"
     }
 }
 web_client {

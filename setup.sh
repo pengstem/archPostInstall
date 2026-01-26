@@ -114,6 +114,35 @@ install_sudoers() {
     echo "✅ Installed"
 }
 
+build_zellij_plugins() {
+    local plugin_dir="$HOME/.config/zellij/plugins/auto-tab-rename"
+    local wasm_path="$plugin_dir/target/wasm32-wasip1/release/auto_tab_rename.wasm"
+
+    printf "  %-15s " "[Zellij Plugin]"
+
+    if [ ! -d "$plugin_dir" ]; then
+        echo "⏭️  Skipped (plugin source missing)"
+        return
+    fi
+
+    if ! command -v cargo >/dev/null 2>&1; then
+        echo "⏭️  Skipped (cargo missing)"
+        return
+    fi
+
+    if [ -f "$wasm_path" ]; then
+        echo "✅ Already built"
+        return
+    fi
+
+    echo "🔨 Building..."
+    if (cd "$plugin_dir" && cargo build --release --target wasm32-wasip1); then
+        echo "✅ Built"
+    else
+        echo "❌ Build failed (run manually in: $plugin_dir)"
+    fi
+}
+
 # --- Link Configurations ---
 
 # System Configs (Requires Sudo)
@@ -142,11 +171,13 @@ create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed
 # Tools
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
 create_link "$CONFIGS_DIR/zellij"           "$HOME/.config/zellij"          "Zellij"
+build_zellij_plugins
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
 create_link "$CONFIGS_DIR/zathura"          "$HOME/.config/zathura"         "Zathura"
 create_link "$CONFIGS_DIR/mpv"              "$HOME/.config/mpv"             "mpv"
 create_link "$CONFIGS_DIR/obs-studio/basic/profiles" "$HOME/.config/obs-studio/basic/profiles" "OBS Profiles"
 create_link "$CONFIGS_DIR/obs-studio/basic/scenes"   "$HOME/.config/obs-studio/basic/scenes"   "OBS Scenes"
+create_link "$CONFIGS_DIR/obs-studio/scripts"        "$HOME/.config/obs-studio/scripts"        "OBS Scripts"
 create_link "$CONFIGS_DIR/neomutt"          "$HOME/.config/neomutt"         "NeoMutt"
 create_link "$CONFIGS_DIR/mbsyncrc"         "$HOME/.mbsyncrc"               "mbsync"
 create_link "$CONFIGS_DIR/msmtprc"          "$HOME/.msmtprc"                "msmtp"

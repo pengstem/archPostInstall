@@ -9,7 +9,9 @@ Global keybinds (all modes except locked):
 - `Alt 1` .. `Alt 9` → jump to tab 1..9
 
 ### 2) Auto-renumber tabs after close
-A custom plugin renames tabs to match their current position **only when the tab name is empty, purely numeric, or the Zellij default `Tab #<n>`**, so your custom names are preserved.
+A custom plugin renames tabs to match their current position.
+- Default in this repo: always rename to `1 2 3 ...` (so you never see `Tab #...`)
+- Optional: preserve custom names by setting `only_numeric "true"`
 - Example: after closing tab 2, tabs become `1 2 3 ...`
 
 ### 3) Move status into a single top bar
@@ -33,14 +35,17 @@ Global keybind:
 
 ## Plugin behavior (auto-tab-rename)
 
-The plugin listens to `TabUpdate` and renames tabs by **position**.
-By default it only renames tabs with empty/numeric names (plus Zellij default `Tab #<n>`).
+The plugin renames tabs by **position**.
+- It listens to `TabUpdate`
+- It also runs on a short timer as a fallback (eg. to fix startup / plugin-cache weirdness)
 
 Configuration in `config.kdl`:
 ```
 load_plugins {
     tab-renumber {
-        only_numeric "true"   // change to "false" to always rename
+        only_numeric "false"  // set to "true" to preserve custom names
+        tick_seconds "0.2"    // optional
+        // max_tabs "30"      // optional
         // prefix "T"          // optional prefix, e.g. T1, T2...
     }
 }
