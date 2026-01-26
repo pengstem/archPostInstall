@@ -33,11 +33,13 @@ impl ZellijPlugin for State {
 
 fn renumber_tabs(tabs: &[TabInfo], prefix: &str, only_numeric: bool) {
     for tab in tabs {
-        let desired = format!("{}{}", prefix, tab.position);
+        // `tab.position` is 0-indexed, but Zellij UI / keybinds are 1-indexed.
+        let display_position = tab.position.saturating_add(1);
+        let desired = format!("{}{}", prefix, display_position);
         if tab.name == desired {
             continue;
         }
-        if only_numeric && !is_numeric_or_empty(&tab.name) {
+        if only_numeric && !is_renumberable(&tab.name) {
             continue;
         }
         if let Ok(position) = u32::try_from(tab.position) {
@@ -46,9 +48,17 @@ fn renumber_tabs(tabs: &[TabInfo], prefix: &str, only_numeric: bool) {
     }
 }
 
-fn is_numeric_or_empty(name: &str) -> bool {
+fn is_renumberable(name: &str) -> bool {
     let trimmed = name.trim();
-    trimmed.is_empty() || trimmed.chars().all(|c| c.is_ascii_digit())
+    if trimmed.is_empty() || trimmed.chars().all(|c| c.is_ascii_digit()) {
+        return true;
+    }
+    // Zellij's default tab names are "Tab #<n>" - allow renumbering those too.
+    let Some(rest) = trimmed.strip_prefix("Tab #") else {
+        return false;
+    };
+    let rest = rest.trim();
+    !rest.is_empty() && rest.chars().all(|c| c.is_ascii_digit())
 }
 
 register_plugin!(State);
