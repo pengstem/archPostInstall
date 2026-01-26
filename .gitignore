@@ -8,3 +8,4 @@ backups/gnome/.icons_last_hash
 backups/gnome/.themes_last_hash
 configs/baidupcs/pcs_config.json
 configs/baidupcs/pcs_command_history.txt
+configs/obs-studio/basic/scenes/*.bak

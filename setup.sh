@@ -145,6 +145,8 @@ create_link "$CONFIGS_DIR/zellij"           "$HOME/.config/zellij"          "Zel
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
 create_link "$CONFIGS_DIR/zathura"          "$HOME/.config/zathura"         "Zathura"
 create_link "$CONFIGS_DIR/mpv"              "$HOME/.config/mpv"             "mpv"
+create_link "$CONFIGS_DIR/obs-studio/basic/profiles" "$HOME/.config/obs-studio/basic/profiles" "OBS Profiles"
+create_link "$CONFIGS_DIR/obs-studio/basic/scenes"   "$HOME/.config/obs-studio/basic/scenes"   "OBS Scenes"
 create_link "$CONFIGS_DIR/neomutt"          "$HOME/.config/neomutt"         "NeoMutt"
 create_link "$CONFIGS_DIR/mbsyncrc"         "$HOME/.mbsyncrc"               "mbsync"
 create_link "$CONFIGS_DIR/msmtprc"          "$HOME/.msmtprc"                "msmtp"
