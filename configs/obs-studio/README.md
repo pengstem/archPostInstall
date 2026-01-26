@@ -7,7 +7,7 @@ This repo tracks **OBS profiles + scene collections** (not the full `~/.config/o
 - **Recording format:** MKV (container; crash-safe)
 - **Recording encoder:** NVIDIA NVENC **AV1** (CQP 23, preset p6, multipass qres)
 - **Mic filters:** RNNoise noise suppression + limiter (-1 dB)
-- **Recording path:** `/home/nastem/Videos`
+- **Recording path:** `/home/nastem/Videos/obs`
 
 ## Notes
 

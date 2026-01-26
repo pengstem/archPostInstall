@@ -28,6 +28,7 @@
         "deinterlace_mode": 0,
         "deinterlace_field_order": 0,
         "monitoring_type": 0,
+        "private_settings": {},
         "filters": [
             {
                 "prev_ver": 536870916,
@@ -82,8 +83,7 @@
                 "monitoring_type": 0,
                 "private_settings": {}
             }
-        ],
-        "private_settings": {}
+        ]
     },
     "AuxAudioDevice1": {
         "prev_ver": 536870916,
@@ -221,8 +221,8 @@
             "id": "pipewire-screen-capture-source",
             "versioned_id": "pipewire-screen-capture-source",
             "settings": {
-                "RestoreToken": "",
-                "ShowCursor": true
+                "ShowCursor": true,
+                "RestoreToken": "e5bb489e-f4e7-4c8d-914e-dc798cd2a062"
             },
             "mixers": 0,
             "sync": 0,
