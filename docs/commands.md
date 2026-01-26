@@ -22,10 +22,6 @@ archpostinstall backup-firefox
 archpostinstall restore-firefox <archive>
 archpostinstall update-pkglist
 archpostinstall measure-power
-archpostinstall obs-autoedit <file.mkv>
-archpostinstall obs-autoedit-scan
-archpostinstall obs-autoedit-enable
-archpostinstall obs-autoedit-disable
 ```
 
 ## Direct Script Calls
@@ -44,7 +40,6 @@ Use these when you want explicit control:
 ./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle|--idle|--restore]
 ./scripts/update_pkglist.sh
 ./scripts/power/measure_tlp_power.sh
-./scripts/obs/autoedit_idle.sh [--scan] [--dry-run] [--force] [file.mkv]
 ```
 
 ## Systemd (GNOME Sync)
@@ -56,5 +51,4 @@ systemctl --user enable --now archpostinstall-gnome-sync.path
 systemctl --user enable --now archpostinstall-dpms-idle.timer
 systemctl --user enable --now archpostinstall-dpms-restore.timer
 systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer
-systemctl --user enable --now archpostinstall-obs-autoedit.path
 ```

@@ -160,7 +160,6 @@ fi
 create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
 create_link "$CONFIGS_DIR/rime"             "$HOME/.local/share/fcitx5/rime" "Fcitx5 Rime"
 create_link "$CONFIGS_DIR/archpostinstall/dpms.conf" "$HOME/.config/archpostinstall/dpms.conf" "DPMS Config"
-create_link "$CONFIGS_DIR/archpostinstall/obs-autoedit.conf" "$HOME/.config/archpostinstall/obs-autoedit.conf" "OBS Autoedit Config"
 
 # Applications
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
@@ -173,7 +172,6 @@ create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-togg
 create_link "$REPO_DIR/scripts/gnome/cleanup_dpms_logs.sh" "$HOME/.local/bin/archpostinstall-dpms-log-cleanup" "DPMS Log Cleanup"
 create_link "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$HOME/.local/bin/archpostinstall-measure-power" "Power Measure"
 create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/zathura-page-to-clipboard" "Zathura Clipboard"
-create_link "$REPO_DIR/scripts/obs/autoedit_idle.sh" "$HOME/.local/bin/archpostinstall-obs-autoedit" "OBS Autoedit"
 
 # Systemd (User)
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"
@@ -184,8 +182,6 @@ create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-restore.service" "$H
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-restore.timer"   "$HOME/.config/systemd/user/archpostinstall-dpms-restore.timer"   "DPMS Restore Timer"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.service" "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.service" "DPMS Log Cleanup Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "DPMS Log Cleanup Timer"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-obs-autoedit.service" "$HOME/.config/systemd/user/archpostinstall-obs-autoedit.service" "OBS Autoedit Service"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-obs-autoedit.path"    "$HOME/.config/systemd/user/archpostinstall-obs-autoedit.path"    "OBS Autoedit Path"
 
 echo ""
 echo "✨ Configuration linking complete!"
