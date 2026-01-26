@@ -26,6 +26,7 @@ fcitx5-material-color
 fcitx5-qt
 fcitx5-rime
 fd
+ffmpeg
 firefox
 fuse2
 fzf
@@ -88,6 +89,7 @@ perf
 perl-image-exiftool
 picocom
 powertop
+python
 qimgv-debug
 qpdf
 repo
