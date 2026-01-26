@@ -13,6 +13,8 @@
 | configs/yazi | ~/.config/yazi | user config |
 | configs/zathura | ~/.config/zathura | user config |
 | configs/mpv | ~/.config/mpv | user config |
+| configs/obs-studio/basic/profiles | ~/.config/obs-studio/basic/profiles | user config |
+| configs/obs-studio/basic/scenes | ~/.config/obs-studio/basic/scenes | user config |
 | configs/neomutt | ~/.config/neomutt | user config |
 | configs/mbsyncrc | ~/.mbsyncrc | user config |
 | configs/msmtprc | ~/.msmtprc | user config |
@@ -22,6 +24,7 @@
 | configs/fcitx5 | ~/.config/fcitx5 | user config |
 | configs/rime | ~/.local/share/fcitx5/rime | user config |
 | configs/archpostinstall/dpms.conf | ~/.config/archpostinstall/dpms.conf | user config |
+| configs/archpostinstall/obs-autoedit.conf | ~/.config/archpostinstall/obs-autoedit.conf | user config |
 | configs/tlp/99-archpostinstall.conf | /etc/tlp.d/99-archpostinstall.conf | sudo |
 | configs/sudoers.d/archpostinstall-tlp | /etc/sudoers.d/archpostinstall-tlp | sudo |
 | configs/pacman/pacman.conf | /etc/pacman.conf | sudo |
@@ -35,6 +38,8 @@
 | configs/systemd/user/archpostinstall-dpms-restore.timer | ~/.config/systemd/user/archpostinstall-dpms-restore.timer | user unit |
 | configs/systemd/user/archpostinstall-dpms-log-cleanup.service | ~/.config/systemd/user/archpostinstall-dpms-log-cleanup.service | user unit |
 | configs/systemd/user/archpostinstall-dpms-log-cleanup.timer | ~/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer | user unit |
+| configs/systemd/user/archpostinstall-obs-autoedit.service | ~/.config/systemd/user/archpostinstall-obs-autoedit.service | user unit |
+| configs/systemd/user/archpostinstall-obs-autoedit.path | ~/.config/systemd/user/archpostinstall-obs-autoedit.path | user unit |
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
 | configs/applications/WeChat.desktop | ~/.local/share/applications/WeChat.desktop | user desktop entry |
 | scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
@@ -44,4 +49,5 @@
 | scripts/gnome/cleanup_dpms_logs.sh | ~/.local/bin/archpostinstall-dpms-log-cleanup | user bin |
 | scripts/power/measure_tlp_power.sh | ~/.local/bin/archpostinstall-measure-power | user bin |
 | scripts/zathura/page-to-clipboard.sh | ~/.local/bin/zathura-page-to-clipboard | user bin |
+| scripts/obs/autoedit_idle.sh | ~/.local/bin/archpostinstall-obs-autoedit | user bin |
 | scripts/archpostinstall.sh | ~/.local/bin/archpostinstall | user bin |

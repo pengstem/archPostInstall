@@ -38,6 +38,14 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - Set `DPMS_KILL_OTHER_GUI=0` to avoid best-effort closing of non-whitelisted GUI apps.
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
 
+## OBS Auto-Edit (Trim Idle)
+- Post-processes OBS recordings by removing segments where the mic/desktop audio is silent and the video is (almost) still.
+- Configure thresholds and paths in `configs/archpostinstall/obs-autoedit.conf`.
+- Enable watcher after linking:
+  - `systemctl --user daemon-reload`
+  - `systemctl --user enable --now archpostinstall-obs-autoedit.path`
+- Output files are written under `$HOME/Videos/obs/edited/` by default.
+
 ## Package List Updates
 - Pacman hook triggers `archpostinstall-update-pkglist` after transactions.
 - Manual refresh: `./scripts/update_pkglist.sh` (writes `scripts/pkglist.txt`).

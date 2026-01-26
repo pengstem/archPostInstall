@@ -1,0 +1,9 @@
+[Unit]
+Description=Archpostinstall: Watch OBS recordings and auto-edit (trim idle)
+
+[Path]
+PathChanged=/home/nastem/Videos/obs
+Unit=archpostinstall-obs-autoedit.service
+
+[Install]
+WantedBy=default.target

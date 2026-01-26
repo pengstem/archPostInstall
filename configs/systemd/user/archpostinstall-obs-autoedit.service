@@ -1,0 +1,8 @@
+[Unit]
+Description=Archpostinstall: Auto-edit OBS recordings (trim idle)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/archpostinstall-obs-autoedit --scan
+Nice=10
+IOSchedulingClass=idle

@@ -26,6 +26,10 @@ Commands:
   restore-firefox <file>  Restore ~/.mozilla from an archive
   update-pkglist          Refresh scripts/pkglist.txt from pacman
   measure-power           Measure power draw for TLP profiles
+  obs-autoedit <file>     Trim idle segments from an OBS recording
+  obs-autoedit-scan       Scan and auto-edit new recordings
+  obs-autoedit-enable     Enable systemd watcher for auto-edit
+  obs-autoedit-disable    Disable systemd watcher for auto-edit
 EOF
 }
 
@@ -77,6 +81,19 @@ case "$cmd" in
         ;;
     measure-power)
         "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$@"
+        ;;
+    obs-autoedit)
+        "$REPO_DIR/scripts/obs/autoedit_idle.sh" "$@"
+        ;;
+    obs-autoedit-scan)
+        "$REPO_DIR/scripts/obs/autoedit_idle.sh" --scan "$@"
+        ;;
+    obs-autoedit-enable)
+        systemctl --user daemon-reload
+        systemctl --user enable --now archpostinstall-obs-autoedit.path
+        ;;
+    obs-autoedit-disable)
+        systemctl --user disable --now archpostinstall-obs-autoedit.path
         ;;
     ""|-h|--help|help)
         usage
