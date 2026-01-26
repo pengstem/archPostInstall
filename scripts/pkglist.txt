@@ -1,7 +1,8 @@
-# Package list generated on Sun Jan 25 12:30:40 PM CST 2026
+# Package list generated on Mon Jan 26 08:36:31 AM CST 2026
 7zip
 alacritty
 amd-ucode
+android-udev
 base
 base-devel
 bat
@@ -80,6 +81,7 @@ npm
 nvidia-open-dkms
 nvidia-utils
 nvme-cli
+obs-studio
 os-prober
 pass
 perf

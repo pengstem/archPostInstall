@@ -107,7 +107,7 @@ alias lt='eza --tree --level=2 --icons'
 alias st='systemctl-tui'
 
 # Mail
-alias mutt='mbsync -a && neomutt'
+alias mutt='mbsync -a &&TERM=xterm-direct neomutt'
 
 # Global Aliases (Usage: 'command --help')
 # These pipe output into bat for syntax highlighting
