@@ -114,35 +114,6 @@ install_sudoers() {
     echo "✅ Installed"
 }
 
-build_zellij_plugins() {
-    local plugin_dir="$HOME/.config/zellij/plugins/auto-tab-rename"
-    local wasm_path="$plugin_dir/target/wasm32-wasip1/release/auto_tab_rename.wasm"
-
-    printf "  %-15s " "[Zellij Plugin]"
-
-    if [ ! -d "$plugin_dir" ]; then
-        echo "⏭️  Skipped (plugin source missing)"
-        return
-    fi
-
-    if ! command -v cargo >/dev/null 2>&1; then
-        echo "⏭️  Skipped (cargo missing)"
-        return
-    fi
-
-    if [ -f "$wasm_path" ]; then
-        echo "✅ Already built"
-        return
-    fi
-
-    echo "🔨 Building..."
-    if (cd "$plugin_dir" && cargo build --release --target wasm32-wasip1); then
-        echo "✅ Built"
-    else
-        echo "❌ Build failed (run manually in: $plugin_dir)"
-    fi
-}
-
 # --- Link Configurations ---
 
 # System Configs (Requires Sudo)
@@ -161,6 +132,7 @@ create_link "$CONFIGS_DIR/gitconfig"        "$HOME/.gitconfig"              "Git
 
 # Terminals
 create_link "$CONFIGS_DIR/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "Kitty"
+create_link "$CONFIGS_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" "Alacritty"
 create_link "$CONFIGS_DIR/ghostty"          "$HOME/.config/ghostty"         "Ghostty"
 create_link "$CONFIGS_DIR/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua" "WezTerm"
 
@@ -171,7 +143,6 @@ create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed
 # Tools
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
 create_link "$CONFIGS_DIR/zellij"           "$HOME/.config/zellij"          "Zellij"
-build_zellij_plugins
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
 create_link "$CONFIGS_DIR/zathura"          "$HOME/.config/zathura"         "Zathura"
 create_link "$CONFIGS_DIR/mpv"              "$HOME/.config/mpv"             "mpv"
@@ -191,6 +162,8 @@ fi
 create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
 create_link "$CONFIGS_DIR/rime"             "$HOME/.local/share/fcitx5/rime" "Fcitx5 Rime"
 create_link "$CONFIGS_DIR/archpostinstall/dpms.conf" "$HOME/.config/archpostinstall/dpms.conf" "DPMS Config"
+create_link "$CONFIGS_DIR/bottom/bottom.toml" "$HOME/.config/bottom/bottom.toml" "bottom"
+create_link "$CONFIGS_DIR/btop/btop.conf"   "$HOME/.config/btop/btop.conf"  "btop"
 
 # Applications
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"

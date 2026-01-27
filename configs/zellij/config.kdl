@@ -352,22 +352,12 @@ plugins {
     session-manager location="zellij:session-manager"
     status-bar location="zellij:status-bar"
     strider location="zellij:strider"
-    tab-renumber location="file:/home/nastem/.config/zellij/plugins/auto-tab-rename/target/wasm32-wasip1/release/auto_tab_rename.wasm"
     tab-bar location="zellij:tab-bar"
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
 }
 
-// Plugins to load in the background when a new session starts
-// eg. "file:/path/to/my-plugin.wasm"
-// eg. "https://example.com/my-plugin.wasm"
-load_plugins {
-    tab-renumber {
-        only_numeric "false"
-        tick_seconds "0.2"
-    }
-}
 web_client {
     font "monospace"
 }
