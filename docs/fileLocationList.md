@@ -6,6 +6,7 @@
 | configs/p10k.zsh | ~/.p10k.zsh | user config |
 | configs/gitconfig | ~/.gitconfig | user config |
 | configs/kitty/kitty.conf | ~/.config/kitty/kitty.conf | user config |
+| configs/alacritty/alacritty.toml | ~/.config/alacritty/alacritty.toml | user config |
 | configs/wezterm/wezterm.lua | ~/.config/wezterm/wezterm.lua | user config |
 | configs/ghostty | ~/.config/ghostty | user config |
 | configs/nvim | ~/.config/nvim | user config |
@@ -25,6 +26,8 @@
 | configs/fcitx5 | ~/.config/fcitx5 | user config |
 | configs/rime | ~/.local/share/fcitx5/rime | user config |
 | configs/archpostinstall/dpms.conf | ~/.config/archpostinstall/dpms.conf | user config |
+| configs/bottom/bottom.toml | ~/.config/bottom/bottom.toml | user config |
+| configs/btop/btop.conf | ~/.config/btop/btop.conf | user config |
 | configs/tlp/99-archpostinstall.conf | /etc/tlp.d/99-archpostinstall.conf | sudo |
 | configs/sudoers.d/archpostinstall-tlp | /etc/sudoers.d/archpostinstall-tlp | sudo |
 | configs/pacman/pacman.conf | /etc/pacman.conf | sudo |

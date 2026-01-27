@@ -4,8 +4,10 @@ This directory contains tracked configs that are symlinked into place by `setup.
 
 ## Notable Directories
 - `applications/` user `.desktop` launchers
+- `alacritty/` Alacritty terminal config
 - `archpostinstall/` helper configs (dpms automation)
 - `baidupcs/` BaiduPCS-Go template; real `pcs_config.json` is ignored
+- `bottom/`, `btop/` system monitor configs
 - `fcitx5/` input method config
 - `ghostty/`, `kitty/`, `wezterm/`, `mpv/`, `zathura/` terminal and media/reader configs
 - `nvim/`, `zed/` editor configs
