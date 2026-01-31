@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Yazi
+Exec=/home/nastem/.local/bin/yazi-desktop %U
+Type=Application
+Icon=yazi
+Terminal=false
+StartupWMClass=yazi
+Categories=System;FileManager;Utility;
+Comment=Terminal file manager

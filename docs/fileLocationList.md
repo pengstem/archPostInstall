@@ -41,13 +41,16 @@
 | configs/systemd/user/archpostinstall-dpms-restore.timer | ~/.config/systemd/user/archpostinstall-dpms-restore.timer | user unit |
 | configs/systemd/user/archpostinstall-dpms-log-cleanup.service | ~/.config/systemd/user/archpostinstall-dpms-log-cleanup.service | user unit |
 | configs/systemd/user/archpostinstall-dpms-log-cleanup.timer | ~/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer | user unit |
+| configs/applications/google-chrome.desktop | ~/.local/share/applications/google-chrome.desktop | user desktop entry |
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
 | configs/applications/WeChat.desktop | ~/.local/share/applications/WeChat.desktop | user desktop entry |
+| configs/applications/Yazi.desktop | ~/.local/share/applications/Yazi.desktop | user desktop entry |
 | scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
 | scripts/gnome/backup_gnome_state.sh | ~/.local/bin/archpostinstall-gnome-sync | user bin |
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
 | scripts/gnome/dpms-toggle.sh | /usr/local/bin/dpms-toggle | sudo |
 | scripts/gnome/cleanup_dpms_logs.sh | ~/.local/bin/archpostinstall-dpms-log-cleanup | user bin |
+| scripts/launchers/yazi-desktop.sh | ~/.local/bin/yazi-desktop | user bin |
 | scripts/power/measure_tlp_power.sh | ~/.local/bin/archpostinstall-measure-power | user bin |
 | scripts/zathura/page-to-clipboard.sh | ~/.local/bin/zathura-page-to-clipboard | user bin |
 | scripts/archpostinstall.sh | ~/.local/bin/archpostinstall | user bin |

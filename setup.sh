@@ -166,7 +166,9 @@ create_link "$CONFIGS_DIR/bottom/bottom.toml" "$HOME/.config/bottom/bottom.toml"
 create_link "$CONFIGS_DIR/btop/btop.conf"   "$HOME/.config/btop/btop.conf"  "btop"
 
 # Applications
+create_link "$CONFIGS_DIR/applications/google-chrome.desktop" "$HOME/.local/share/applications/google-chrome.desktop" "Chrome (Custom)"
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
+create_link "$CONFIGS_DIR/applications/Yazi.desktop"  "$HOME/.local/share/applications/Yazi.desktop"  "Yazi"
 create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/applications/WeChat.desktop" "WeChat"
 
 # Bin (User)
@@ -175,6 +177,7 @@ create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostins
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
 create_link "$REPO_DIR/scripts/gnome/cleanup_dpms_logs.sh" "$HOME/.local/bin/archpostinstall-dpms-log-cleanup" "DPMS Log Cleanup"
 create_link "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$HOME/.local/bin/archpostinstall-measure-power" "Power Measure"
+create_link "$REPO_DIR/scripts/launchers/yazi-desktop.sh" "$HOME/.local/bin/yazi-desktop" "Yazi Desktop"
 create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/zathura-page-to-clipboard" "Zathura Clipboard"
 
 # Systemd (User)
