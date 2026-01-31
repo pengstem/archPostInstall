@@ -168,7 +168,7 @@ create_link "$CONFIGS_DIR/btop/btop.conf"   "$HOME/.config/btop/btop.conf"  "bto
 # Applications
 create_link "$CONFIGS_DIR/applications/google-chrome.desktop" "$HOME/.local/share/applications/google-chrome.desktop" "Chrome (Custom)"
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
-create_link "$CONFIGS_DIR/applications/Yazi.desktop"  "$HOME/.local/share/applications/Yazi.desktop"  "Yazi"
+create_link "$CONFIGS_DIR/applications/yazi.desktop"  "$HOME/.local/share/applications/yazi.desktop"  "Yazi"
 create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/applications/WeChat.desktop" "WeChat"
 
 # Bin (User)

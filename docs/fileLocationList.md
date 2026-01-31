@@ -44,7 +44,7 @@
 | configs/applications/google-chrome.desktop | ~/.local/share/applications/google-chrome.desktop | user desktop entry |
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
 | configs/applications/WeChat.desktop | ~/.local/share/applications/WeChat.desktop | user desktop entry |
-| configs/applications/Yazi.desktop | ~/.local/share/applications/Yazi.desktop | user desktop entry |
+| configs/applications/yazi.desktop | ~/.local/share/applications/yazi.desktop | user desktop entry |
 | scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
 | scripts/gnome/backup_gnome_state.sh | ~/.local/bin/archpostinstall-gnome-sync | user bin |
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
