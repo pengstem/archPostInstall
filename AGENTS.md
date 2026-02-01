@@ -6,7 +6,7 @@
 - `setup.sh` symlinks tracked configs into user and system locations.
 - `configs/` stores dotfiles and application configs (zsh, git, kitty, ghostty, nvim, zed, yazi, zathura, mpv, BaiduPCS-Go, tmux, fcitx5/rime, pacman/paru, TLP, desktop entries, archpostinstall helpers). See `configs/README.md`.
 - `scripts/` is split by function: `scripts/install/`, `scripts/backup/`, `scripts/gnome/`, `scripts/power/`; `scripts/pkglist.txt` is the package source of truth.
-- `configs/systemd/user/` defines GNOME sync units plus DPMS idle/restore/log-cleanup timers.
+- `configs/systemd/user/` defines GNOME sync units plus DPMS lock monitor and log-cleanup timer.
 - `configs/pacman/hooks/` contains pacman hooks (for example, automatic pkglist updates).
 - `docs/` holds reference notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md` (see `docs/README.md` and `docs/commands.md`).
 - `docs/dpms-past-bugs.md` tracks DPMS pitfalls; update it when changing DPMS scripts/configs/timers.
@@ -21,7 +21,8 @@
 - `./scripts/backup/backup_firefox.sh` and `./scripts/backup/restore_firefox.sh` manage `~/.mozilla` backups (default `backups/firefox/`).
 - `./scripts/backup/backup_themes_extensions.sh` and `./scripts/backup/restore_themes_extensions.sh` handle themes, icons, and GNOME extensions (default `backups/gnome/`).
 - `./scripts/gnome/backup_gnome_state.sh` refreshes GNOME extension/theme notes and archives assets (used by the systemd path unit).
-- `./scripts/gnome/dpms-toggle.sh` toggles display power, manages autostart apps, and cooperates with idle/restore timers.
+- `./scripts/gnome/dpms-toggle.sh` toggles display power and manages app shutdown/restore.
+- `./scripts/gnome/dpms-lock-monitor.sh` watches lock/unlock and triggers `dpms-toggle`.
 - `./scripts/power/measure_tlp_power.sh` measures average power draw for TLP profiles.
 
 ## Coding Style & Naming Conventions
@@ -37,6 +38,7 @@
 ## Commit & Pull Request Guidelines
 - History mostly uses Conventional Commit prefixes (`feat:`, `fix:`, `chore:`), with occasional freeform messages. Prefer the prefix style and keep subjects short and imperative.
 - Auto-commit: after making changes, stage and commit them without asking; pick the most accurate Conventional Commit prefix and concise subject.
+- If the user asks for multiple commits, split by logical change and avoid staging unrelated local edits unless explicitly requested.
 - PRs should include a brief summary, affected scripts/configs, and manual verification steps (for example, "ran ./setup.sh" or "updated pkglist.txt").
 
 ## Security & Configuration Tips
@@ -44,7 +46,7 @@
 - `setup.sh` installs `/etc/tlp.d/99-archpostinstall.conf` and `/etc/sudoers.d/archpostinstall-tlp` for TLP automation.
 - Pacman hook calls `/usr/local/bin/archpostinstall-update-pkglist`, linked to `scripts/update_pkglist.sh` by `setup.sh`.
 - GNOME sync runs from `~/.local/bin/archpostinstall-gnome-sync`; enable the user unit after linking.
-- DPMS automation uses `~/.local/bin/dpms-toggle` plus systemd user timers (`archpostinstall-dpms-idle.timer`, `archpostinstall-dpms-restore.timer`, `archpostinstall-dpms-log-cleanup.timer`).
+- DPMS automation uses `~/.local/bin/dpms-toggle` plus `archpostinstall-dpms-lock-monitor.service` and the log cleanup timer.
 - `configs/baidupcs/pcs_config.json` is ignored; keep secrets there and use `pcs_config.json.example` as a template.
 - `configs/rime/user.yaml` is ignored to avoid churn from live input.
 - Backup existing dotfiles when testing changes; the scripts already create timestamped backups for symlink targets.

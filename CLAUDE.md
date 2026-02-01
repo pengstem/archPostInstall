@@ -30,7 +30,7 @@ archpostinstall update-pkglist
 archpostinstall dpms-toggle
 archpostinstall dpms-off
 archpostinstall dpms-on
-archpostinstall dpms-restore
+archpostinstall dpms-lock-monitor
 archpostinstall measure-power
 
 # Syntax-check a script without running it
@@ -54,11 +54,11 @@ bash -n scripts/some_script.sh
 **Config structure:**
 - `configs/<tool>/` - Each tool's config mirrors its target location
 - System configs (`pacman/`, `paru/`) require sudo to link
-- `configs/systemd/user/` - User systemd units for GNOME sync and DPMS timers
+- `configs/systemd/user/` - User systemd units for GNOME sync and DPMS lock monitoring
 
 **Key files:**
 - `scripts/pkglist.txt` - Package source of truth; auto-updated by pacman hook
-- `configs/archpostinstall/dpms.conf` - DPMS automation settings (apps to kill/restore, timers)
+- `configs/archpostinstall/dpms.conf` - DPMS automation settings (apps to kill/restore, power profiles)
 - `docs/fileLocationList.md` - Complete source-to-target symlink mapping
 
 ## Symlink Behavior
@@ -82,8 +82,8 @@ After running `setup.sh`, enable user units:
 ```bash
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path  # Auto-sync GNOME state
-systemctl --user enable --now archpostinstall-dpms-idle.timer  # DPMS automation
-systemctl --user enable --now archpostinstall-dpms-restore.timer
+systemctl --user enable --now archpostinstall-dpms-lock-monitor.service  # DPMS automation
+systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer
 ```
 
 ## Shell Script Conventions
