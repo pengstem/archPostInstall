@@ -1,0 +1,13 @@
+[Unit]
+Description=Monitor lock state to toggle DPMS apps/power
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/archpostinstall-dpms-lock-monitor
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

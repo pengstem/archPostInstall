@@ -57,9 +57,8 @@ Rime input method user databases (build artifacts).
 ## State Files
 
 ### DPMS State (Runtime)
-- `~/.local/state/archpostinstall/dpms.state` - Current DPMS state
-- `~/.local/state/archpostinstall/dpms.log` - DPMS activity log
-- `~/.local/state/archpostinstall/killed_apps.json` - Apps killed for restore
+- `~/.cache/archpostinstall/dpms.state` - Current DPMS state
+- `~/.cache/archpostinstall/dpms.log` - DPMS activity log
 
 ### Backup Hashes (Runtime)
 - `~/.local/state/archpostinstall/themes.hash`
@@ -82,15 +81,12 @@ GNOME config change
         └── backup_themes_extensions.sh (if hash changed)
             └── backups/gnome/*.tar.gz (created)
 
-DPMS idle timeout
-└── archpostinstall-dpms-idle.timer
-    └── dpms-toggle.sh --idle
-        ├── killed_apps.json (apps to restore)
-        ├── dpms.state (current state)
+DPMS lock/unlock
+└── archpostinstall-dpms-lock-monitor.service
+    ├── dpms-toggle.sh --off (lock)
+    │   ├── dpms.state (current state)
+    │   └── dpms.log (activity)
+    └── dpms-toggle.sh --on (unlock)
+        ├── dpms.state (cleared)
         └── dpms.log (activity)
-
-DPMS restore
-└── archpostinstall-dpms-restore.timer
-    └── dpms-toggle.sh --restore
-        └── killed_apps.json (consumed)
 ```

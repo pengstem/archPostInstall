@@ -78,26 +78,21 @@ configs/
 ### dpms.conf
 ```bash
 # App management (parallel arrays)
-APPS_TO_KILL=("app1" "app2")
-KILL_PATTERNS=("pattern1" "pattern2")
-REOPEN_COMMANDS=("cmd1" "cmd2")
-WM_CLASSES=("class1" "class2")
+DPMS_REOPEN_NAMES=("app1" "app2")
+DPMS_KILL_MATCHES=("pattern1" "pattern2")
+DPMS_REOPEN_COMMANDS=("cmd1" "cmd2")
+DPMS_WM_CLASSES=("class1" "class2")
 
 # Power profiles
-POWER_PROFILE_ON="balanced"
-POWER_PROFILE_OFF="power-saver"
-
-# Idle settings
-IDLE_TIMEOUT_MINUTES=15
-SKIP_WHEN_PLAYING_MEDIA=true
+DPMS_POWER_PROFILE_ON="balanced"
+DPMS_POWER_PROFILE_OFF="power-saver"
 
 # Logging
-LOG_VERBOSE=1
-LOG_MAX_SIZE_MB=1
+DPMS_VERBOSE=1
+DPMS_LOG_MAX_BYTES=1048576
 ```
 
 ### Systemd Units
 - `archpostinstall-gnome-sync.{path,service}` - Watch GNOME config changes
-- `archpostinstall-dpms-idle.{timer,service}` - 60s idle check
-- `archpostinstall-dpms-restore.{timer,service}` - 45s restore check
+- `archpostinstall-dpms-lock-monitor.service` - Lock/unlock watcher
 - `archpostinstall-dpms-log-cleanup.{timer,service}` - Log rotation

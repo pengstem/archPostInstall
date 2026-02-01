@@ -23,17 +23,17 @@ This folder contains reference notes and quick guidance for maintaining the Arch
   - `GNOME_BACKUP_DIR` to override backup location
   - `GNOME_SYNC_THROTTLE_SECONDS` to adjust archive frequency
 
-## DPMS Toggle and Auto-Idle
+## DPMS Toggle and Lock Hook
 - `dpms-toggle` turns the display off/on and manages app shutdown/restore.
+- `archpostinstall-dpms-lock-monitor.service` watches logind lock state and runs `dpms-toggle --off/--on` on lock/unlock.
 - Configure app lists and power profile in `configs/archpostinstall/dpms.conf`.
 - Logs are written to `~/.cache/archpostinstall/dpms.log` for troubleshooting.
 - Log cleanup is handled by `archpostinstall-dpms-log-cleanup.timer` and controlled by `DPMS_LOG_CLEANUP_DAYS`/`DPMS_LOG_CLEANUP_MAX_FILES`.
 - Steam is closed automatically by default (see `DPMS_KILL_ONLY_MATCHES`).
 - For noisy logs, set `DPMS_VERBOSE=1`; for slower apps, increase `DPMS_START_WAIT_SEC`/`DPMS_START_RETRIES`.
 - If TLP is installed, `dpms-toggle` applies profiles from `DPMS_TLP_PROFILE_*` (requires passwordless `sudo` for `tlp`).
-- Enable timers after linking:
-  - `systemctl --user enable --now archpostinstall-dpms-idle.timer`
-  - `systemctl --user enable --now archpostinstall-dpms-restore.timer`
+- Enable after linking:
+  - `systemctl --user enable --now archpostinstall-dpms-lock-monitor.service`
   - `systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer`
 - Set `DPMS_KILL_OTHER_GUI=0` to avoid best-effort closing of non-whitelisted GUI apps.
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.

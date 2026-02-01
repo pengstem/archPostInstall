@@ -48,11 +48,8 @@ archpostinstall.sh (CLI router)
 archpostinstall-gnome-sync.path     # Watches dconf/extensions/themes
 └── archpostinstall-gnome-sync.service → backup_gnome_state.sh
 
-archpostinstall-dpms-idle.timer     # Every 60s
-└── archpostinstall-dpms-idle.service → dpms-toggle.sh --idle
-
-archpostinstall-dpms-restore.timer  # Every 45s
-└── archpostinstall-dpms-restore.service → dpms-toggle.sh --restore
+archpostinstall-dpms-lock-monitor.service
+└── dpms-lock-monitor.sh → dpms-toggle.sh --off/--on
 
 archpostinstall-dpms-log-cleanup.timer
 └── archpostinstall-dpms-log-cleanup.service → cleanup_dpms_logs.sh

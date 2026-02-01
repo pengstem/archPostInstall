@@ -20,6 +20,7 @@ scripts/
 ├── gnome/
 │   ├── backup_gnome_state.sh   # Sync GNOME state to docs/
 │   ├── dpms-toggle.sh          # Display power management (1269 lines)
+│   ├── dpms-lock-monitor.sh    # Lock/unlock watcher for dpms-toggle
 │   └── cleanup_dpms_logs.sh    # Log rotation
 ├── power/
 │   └── measure_tlp_power.sh    # TLP power measurement
@@ -40,6 +41,7 @@ scripts/
 | `restore_firefox.sh` | ~50 | Firefox profile restore |
 | `backup_gnome_state.sh` | ~100 | GNOME state sync with throttle |
 | `dpms-toggle.sh` | ~1269 | Complex DPMS state machine |
+| `dpms-lock-monitor.sh` | ~90 | Logind lock watcher for DPMS |
 | `cleanup_dpms_logs.sh` | ~60 | Log rotation by age/count |
 | `update_pkglist.sh` | ~30 | Pacman hook target |
 | `measure_tlp_power.sh` | ~246 | Battery power measurement |

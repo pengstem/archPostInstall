@@ -34,8 +34,6 @@ DPMS_TLP_PROFILE_ON="balanced"
 DPMS_TLP_PROFILE_OFF="power-saver"
 DPMS_TLP_PROFILE_OFF_SSH="balanced"
 DPMS_TLP_USE_SUDO=1
-DPMS_IDLE_MINUTES=15
-DPMS_SKIP_WHEN_PLAYING=1
 DPMS_REOPEN_DELAY_SEC=2
 DPMS_START_WAIT_SEC=15
 DPMS_START_RETRIES=3
@@ -47,8 +45,6 @@ DPMS_LOG_MAX_BYTES=1048576
 DPMS_SUSPEND_IF_NO_SSH=0
 DPMS_SUSPEND_DELAY_SEC=30
 
-IDLE_DEBUG_LINES=()
-IDLE_ERROR=""
 GNOME_EVAL_AVAILABLE=""  # Cache: "yes", "no", or "" (unknown)
 
 if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
@@ -139,22 +135,6 @@ log() {
     if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
         printf "%s\n" "$msg" >&2
     fi
-}
-
-reset_idle_debug() {
-    IDLE_DEBUG_LINES=()
-    IDLE_ERROR=""
-}
-
-append_idle_debug() {
-    IDLE_DEBUG_LINES+=("$1")
-}
-
-emit_idle_debug() {
-    local line
-    for line in "${IDLE_DEBUG_LINES[@]}"; do
-        log "$line"
-    done
 }
 
 rotate_log() {
@@ -991,250 +971,13 @@ dpms_on() {
     log "Display on."
 }
 
-sync_off_power_profile() {
-    if [ "${DPMS_SKIP_POWER_PROFILE:-0}" -eq 1 ]; then
-        log "Skipping power profile sync."
-        return 0
-    fi
-    local tlp_target=""
-    local ppd_target=""
-    if has_ssh_session; then
-        tlp_target="${DPMS_TLP_PROFILE_OFF_SSH:-}"
-        ppd_target="${DPMS_POWER_PROFILE_OFF_SSH:-}"
-        log "SSH active while display off; using power profile: ${tlp_target:-$ppd_target}"
-    else
-        tlp_target="${DPMS_TLP_PROFILE_OFF:-}"
-        ppd_target="${DPMS_POWER_PROFILE_OFF:-}"
-        log "No SSH while display off; using power profile: ${tlp_target:-$ppd_target}"
-    fi
-    apply_power_profile "$tlp_target" "$ppd_target"
-}
-
-dpms_restore() {
-    if [ ! -f "$STATE_FILE" ]; then
-        if [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ] && is_display_on; then
-            # Check if any app needs to be started
-            local any_need_start=0
-            local i name match run_match wm_class
-            for i in "${!DPMS_REOPEN_NAMES[@]}"; do
-                name="${DPMS_REOPEN_NAMES[$i]}"
-                match="${DPMS_KILL_MATCHES[$i]}"
-                run_match="$match"
-                if [ "${#DPMS_RUNNING_MATCHES[@]}" -gt 0 ]; then
-                    run_match="${DPMS_RUNNING_MATCHES[$i]}"
-                fi
-                wm_class=""
-                if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ]; then
-                    wm_class="${DPMS_WM_CLASSES[$i]}"
-                fi
-                if ! is_app_running "$run_match" "$wm_class"; then
-                    any_need_start=1
-                    if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-                        log "App not running: $name"
-                    fi
-                    break
-                fi
-            done
-            if [ "$any_need_start" -eq 0 ]; then
-                if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-                    log "No state file; all apps already running."
-                fi
-                return 0
-            fi
-            log "No state file; always-reopen enabled, some apps not running, restoring."
-            dpms_on
-            return 0
-        fi
-        if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-            log "No state file; nothing to restore."
-        fi
-        return 0
-    fi
-    if is_display_on; then
-        dpms_on
-    else
-        sync_off_power_profile
-        log "Display still off; restore deferred."
-    fi
-}
-
-get_logind_idle_seconds() {
-    if ! command -v loginctl >/dev/null 2>&1; then
-        return 1
-    fi
-
-    local session_id raw hint since uptime_usec
-    session_id="${XDG_SESSION_ID:-}"
-
-    if [ -n "$session_id" ]; then
-        raw="$(loginctl show-session "$session_id" -p IdleHint -p IdleSinceHintMonotonic 2>/dev/null)" || return 1
-    else
-        raw="$(loginctl show-user "$USER" -p IdleHint -p IdleSinceHintMonotonic 2>/dev/null)" || return 1
-    fi
-
-    hint="$(echo "$raw" | awk -F= '/IdleHint=/{print $2}')"
-    since="$(echo "$raw" | awk -F= '/IdleSinceHintMonotonic=/{print $2}')"
-    if [ -z "$hint" ]; then
-        return 1
-    fi
-
-    append_idle_debug "IdleHint: $hint (IdleSinceHintMonotonic: ${since:-n/a})"
-
-    if [ "$hint" = "no" ]; then
-        echo 0
-        return 0
-    fi
-    if [ "$hint" != "yes" ]; then
-        return 1
-    fi
-
-    if ! [[ "$since" =~ ^[0-9]+$ ]] || [ "$since" -le 0 ]; then
-        return 1
-    fi
-    if [ ! -r /proc/uptime ]; then
-        return 1
-    fi
-    uptime_usec="$(awk '{printf "%d", $1*1000000}' /proc/uptime 2>/dev/null || true)"
-    if ! [[ "$uptime_usec" =~ ^[0-9]+$ ]] || [ "$uptime_usec" -lt "$since" ]; then
-        return 1
-    fi
-
-    echo $(((uptime_usec - since) / 1000000))
-}
-
-get_gnome_idle_seconds() {
-    local raw ms
-    if command -v busctl >/dev/null 2>&1; then
-        raw="$(busctl --user call org.gnome.Mutter.IdleMonitor \
-            /org/gnome/Mutter/IdleMonitor/Core \
-            org.gnome.Mutter.IdleMonitor GetIdletime 2>&1)" || {
-            IDLE_ERROR="Failed to query GNOME idle time via busctl: $raw"
-            return 1
-        }
-        ms="$(echo "$raw" | awk '{print $2}')"
-        if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
-            IDLE_ERROR="Failed to parse idle time from: $raw"
-            return 1
-        fi
-        append_idle_debug "Idle raw (busctl): $raw"
-        echo $((ms / 1000))
-        return 0
-    fi
-
-    if ! command -v gdbus >/dev/null 2>&1; then
-        return 1
-    fi
-
-    raw="$(gdbus call --session --dest org.gnome.Mutter.IdleMonitor \
-        --object-path /org/gnome/Mutter/IdleMonitor/Core \
-        --method org.gnome.Mutter.IdleMonitor.GetIdletime 2>&1)" || {
-        IDLE_ERROR="Failed to query GNOME idle time: $raw"
-        return 1
-    }
-
-    ms="$(echo "$raw" | sed -E 's/.*uint64[[:space:]]+([0-9]+).*/\\1/')"
-    if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
-        ms="$(echo "$raw" | sed -E 's/[^0-9]*([0-9]+).*/\\1/')"
-    fi
-    if ! [[ "$ms" =~ ^[0-9]+$ ]]; then
-        IDLE_ERROR="Failed to parse idle time from: $raw"
-        return 1
-    fi
-
-    append_idle_debug "Idle raw: $raw"
-
-    echo $((ms / 1000))
-}
-
-get_idle_seconds() {
-    local gnome_idle logind_idle gnome_error
-    local -a gnome_debug=()
-
-    reset_idle_debug
-    gnome_idle="$(get_gnome_idle_seconds 2>/dev/null || true)"
-    if [ -n "$gnome_idle" ]; then
-        echo "$gnome_idle"
-        return 0
-    fi
-
-    gnome_error="$IDLE_ERROR"
-    gnome_debug=("${IDLE_DEBUG_LINES[@]}")
-
-    reset_idle_debug
-    logind_idle="$(get_logind_idle_seconds 2>/dev/null || true)"
-    if [ -n "$logind_idle" ]; then
-        echo "$logind_idle"
-        return 0
-    fi
-
-    if [ -n "$gnome_error" ]; then
-        IDLE_ERROR="$gnome_error"
-        IDLE_DEBUG_LINES=("${gnome_debug[@]}")
-    fi
-    return 1
-}
-
-is_media_playing() {
-    if ! command -v playerctl >/dev/null 2>&1; then
-        return 1
-    fi
-
-    local statuses
-    statuses="$(playerctl -a status 2>/dev/null || true)"
-    if echo "$statuses" | grep -qi '^Playing$'; then
-        return 0
-    fi
-    return 1
-}
-
-dpms_idle() {
-    if ! [[ "${DPMS_IDLE_MINUTES:-}" =~ ^[0-9]+$ ]] || [ "$DPMS_IDLE_MINUTES" -le 0 ]; then
-        log "Idle timeout disabled; skipping."
-        return 0
-    fi
-
-    if ! is_display_on; then
-        if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-            log "Display already off; skipping idle check."
-        fi
-        return 0
-    fi
-
-    local idle_seconds
-    idle_seconds="$(get_idle_seconds)" || {
-        if [ -n "${IDLE_ERROR:-}" ]; then
-            log "$IDLE_ERROR"
-        fi
-        if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-            emit_idle_debug
-        fi
-        log "Idle monitor unavailable; skipping."
-        return 0
-    }
-
-    local threshold=$((DPMS_IDLE_MINUTES * 60))
-    if [ "${DPMS_VERBOSE:-1}" -ge 2 ]; then
-        emit_idle_debug
-        log "Idle: ${idle_seconds}s (threshold: ${threshold}s)"
-    fi
-    if [ "$idle_seconds" -ge "$threshold" ]; then
-        if [ "${DPMS_SKIP_WHEN_PLAYING:-0}" -eq 1 ] && is_media_playing; then
-            log "Media is playing; skipping display off."
-            return 0
-        fi
-        dpms_off
-    fi
-}
-
 usage() {
     cat <<EOF
-Usage: dpms-toggle [--on|--off|--toggle|--idle|--restore]
+Usage: dpms-toggle [--on|--off|--toggle]
 
 --toggle   Toggle display power (default)
 --off      Force display off
 --on       Force display on and restore apps
---idle     Turn off display if currently on (used by idle timer)
---restore  Restore apps if display is on and state exists
 EOF
 }
 
@@ -1244,12 +987,6 @@ case "${1:-}" in
         ;;
     --on)
         dpms_on
-        ;;
-    --idle)
-        dpms_idle
-        ;;
-    --restore)
-        dpms_restore
         ;;
     --toggle|"")
         if is_display_on; then

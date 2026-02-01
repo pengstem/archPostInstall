@@ -175,6 +175,7 @@ create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/appli
 create_link "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$HOME/.local/bin/archpostinstall-gnome-sync" "Gnome Sync Bin"
 create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostinstall" "Archpostinstall Bin"
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
+create_link "$REPO_DIR/scripts/gnome/dpms-lock-monitor.sh" "$HOME/.local/bin/archpostinstall-dpms-lock-monitor" "DPMS Lock Monitor"
 create_link "$REPO_DIR/scripts/gnome/cleanup_dpms_logs.sh" "$HOME/.local/bin/archpostinstall-dpms-log-cleanup" "DPMS Log Cleanup"
 create_link "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$HOME/.local/bin/archpostinstall-measure-power" "Power Measure"
 create_link "$REPO_DIR/scripts/launchers/yazi-desktop.sh" "$HOME/.local/bin/yazi-desktop" "Yazi Desktop"
@@ -183,10 +184,7 @@ create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/z
 # Systemd (User)
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.path"    "$HOME/.config/systemd/user/archpostinstall-gnome-sync.path"    "Gnome Sync Path"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-idle.service"  "$HOME/.config/systemd/user/archpostinstall-dpms-idle.service"  "DPMS Idle Service"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-idle.timer"    "$HOME/.config/systemd/user/archpostinstall-dpms-idle.timer"    "DPMS Idle Timer"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-restore.service" "$HOME/.config/systemd/user/archpostinstall-dpms-restore.service" "DPMS Restore Service"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-restore.timer"   "$HOME/.config/systemd/user/archpostinstall-dpms-restore.timer"   "DPMS Restore Timer"
+create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-lock-monitor.service" "$HOME/.config/systemd/user/archpostinstall-dpms-lock-monitor.service" "DPMS Lock Monitor Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.service" "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.service" "DPMS Log Cleanup Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "DPMS Log Cleanup Timer"
 

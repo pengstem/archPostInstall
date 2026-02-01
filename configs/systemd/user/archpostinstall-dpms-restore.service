@@ -1,6 +1,0 @@
-[Unit]
-Description=Restore apps when display turns on
-
-[Service]
-Type=oneshot
-ExecStart=%h/.local/bin/dpms-toggle --restore

@@ -14,7 +14,7 @@ archpostinstall link-configs
 archpostinstall dpms-toggle
 archpostinstall dpms-off
 archpostinstall dpms-on
-archpostinstall dpms-restore
+archpostinstall dpms-lock-monitor
 archpostinstall backup-gnome
 archpostinstall backup-themes
 archpostinstall restore-themes <archives...>
@@ -37,7 +37,8 @@ Use these when you want explicit control:
 ./scripts/backup/backup_firefox.sh [output_dir]
 ./scripts/backup/restore_firefox.sh <archive>
 ./scripts/gnome/backup_gnome_state.sh
-./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle|--idle|--restore]
+./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle]
+./scripts/gnome/dpms-lock-monitor.sh
 ./scripts/update_pkglist.sh
 ./scripts/power/measure_tlp_power.sh
 ```
@@ -48,7 +49,6 @@ Enable automatic GNOME sync after linking:
 ```
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path
-systemctl --user enable --now archpostinstall-dpms-idle.timer
-systemctl --user enable --now archpostinstall-dpms-restore.timer
+systemctl --user enable --now archpostinstall-dpms-lock-monitor.service
 systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer
 ```
