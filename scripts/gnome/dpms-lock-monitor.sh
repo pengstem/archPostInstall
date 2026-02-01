@@ -5,40 +5,28 @@ set -euo pipefail
 SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
+# Source shared library
+. "$SCRIPT_DIR/dpms-common.sh"
+
+# Setup runtime environment
+setup_runtime_env
+
 LOG_TAG="dpms-lock-monitor"
 
 log() {
-    local ts
-    ts="$(date '+%Y-%m-%d %H:%M:%S')"
-    printf "%s [%s] %s\n" "$ts" "$LOG_TAG" "$*" >&2
+    dpms_log "$LOG_TAG" "$@"
 }
 
-require_cmd() {
-    if ! command -v "$1" >/dev/null 2>&1; then
-        log "Error: required command not found: $1"
-        exit 1
-    fi
-}
-
-get_session_id() {
-    local session_id="${XDG_SESSION_ID:-}"
-    if [ -n "$session_id" ]; then
-        echo "$session_id"
-        return 0
-    fi
-    if command -v loginctl >/dev/null 2>&1; then
-        session_id="$(loginctl list-sessions --no-legend 2>/dev/null | awk -v user="$USER" '$3==user {print $1; exit}')"
-        if [ -n "$session_id" ]; then
-            echo "$session_id"
-            return 0
-        fi
-    fi
-    return 1
-}
+# get_session_id is now provided by dpms-common.sh
+# require_cmd is now provided by dpms-common.sh
 
 get_session_path() {
     local session_id="$1"
-    loginctl show-session "$session_id" -p Path --value 2>/dev/null || true
+    # loginctl show-session -p Path may return empty on some systemd versions
+    # Use D-Bus GetSession method instead
+    busctl call org.freedesktop.login1 /org/freedesktop/login1 \
+        org.freedesktop.login1.Manager GetSession s "$session_id" 2>/dev/null | \
+        sed -n 's/^o "\(.*\)"$/\1/p'
 }
 
 get_locked_hint() {
@@ -85,5 +73,6 @@ monitor_lock_state() {
 
 require_cmd gdbus
 require_cmd loginctl
+require_cmd busctl
 
 monitor_lock_state

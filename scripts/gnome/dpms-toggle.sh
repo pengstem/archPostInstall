@@ -5,6 +5,9 @@ set -euo pipefail
 SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
+# Source shared library
+. "$SCRIPT_DIR/dpms-common.sh"
+
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/archpostinstall/dpms.conf"
 STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall"
 STATE_FILE="$STATE_DIR/dpms.state"
@@ -12,18 +15,21 @@ TLP_STATE_FILE="$STATE_DIR/tlp.profile"
 LOCK_FILE="$STATE_DIR/dpms.lock"
 LOCK_DIR="$STATE_DIR/dpms.lock.d"
 
-DPMS_REOPEN_NAMES=("zen-browser" "wechat" "qq")
-DPMS_KILL_MATCHES=("zen-bin|zen-browser" "WeChat.AppImage|/tmp/.mount_WeChat|WeChatAppEx|/usr/bin/wechat" "QQ.AppImage|/tmp/.mount_QQ|/usr/bin/qq|/qq")
+# Declare arrays as empty - config file is required
+DPMS_REOPEN_NAMES=()
+DPMS_KILL_MATCHES=()
 DPMS_RUNNING_MATCHES=()
-DPMS_WM_CLASSES=("zen" "wechat" "qq")
-DPMS_REOPEN_COMMANDS=("zen-browser" "/home/nastem/Applications/WeChat.AppImage" "/home/nastem/Applications/QQ.AppImage")
+DPMS_WM_CLASSES=()
+DPMS_REOPEN_COMMANDS=()
 DPMS_REOPEN_ACTIVATE_COMMANDS=()
 DPMS_CLOSE_COMMANDS=()
+DPMS_KILL_ONLY_MATCHES=()
+DPMS_KILL_ONLY_WM_CLASSES=()
+DPMS_KEEP_PROCS=()
+
+# Scalar defaults (safe to keep)
 DPMS_FORCE_KILL_ON_CLOSE=1
 DPMS_ALWAYS_REOPEN=0
-DPMS_KILL_ONLY_MATCHES=("steam" "firefox")
-DPMS_KILL_ONLY_WM_CLASSES=("steam" "firefox")
-DPMS_KEEP_PROCS=("kitty" "sparkle" "gnome-shell" "org.gnome.Shell")
 DPMS_POWER_PROFILE_ON="balanced"
 DPMS_POWER_PROFILE_OFF="power-saver"
 DPMS_POWER_PROFILE_OFF_SSH="balanced"
@@ -47,24 +53,20 @@ DPMS_SUSPEND_DELAY_SEC=30
 
 GNOME_EVAL_AVAILABLE=""  # Cache: "yes", "no", or "" (unknown)
 
-if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
-    XDG_RUNTIME_DIR="/run/user/$(id -u)"
-    export XDG_RUNTIME_DIR
-fi
-if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -S "$XDG_RUNTIME_DIR/bus" ]; then
-    export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
-fi
+# Setup runtime environment using shared library
+setup_runtime_env
 
-if [ -f "$CONFIG_FILE" ]; then
-    # shellcheck source=/dev/null
-    . "$CONFIG_FILE"
+# Require config file
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Error: Config file not found: $CONFIG_FILE" >&2
+    echo "Copy from configs/archpostinstall/dpms.conf and customize." >&2
+    exit 1
 fi
+# shellcheck source=/dev/null
+. "$CONFIG_FILE"
 
 ensure_display_env() {
-    if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
-        XDG_RUNTIME_DIR="/run/user/$(id -u)"
-        export XDG_RUNTIME_DIR
-    fi
+    # XDG_RUNTIME_DIR already set by setup_runtime_env() from dpms-common.sh
     if [ -z "${WAYLAND_DISPLAY:-}" ] && [ -d "$XDG_RUNTIME_DIR" ]; then
         local socket
         socket="$(find "$XDG_RUNTIME_DIR" -maxdepth 1 -type s -name 'wayland-*' 2>/dev/null | head -n 1)"
@@ -83,45 +85,25 @@ ensure_display_env() {
     fi
 }
 
-require_cmd() {
-    if ! command -v "$1" >/dev/null 2>&1; then
-        echo "Error: Required command not found: $1" >&2
-        exit 1
-    fi
-}
-
 require_cmd busctl
 
-if [ "${#DPMS_REOPEN_NAMES[@]}" -ne "${#DPMS_KILL_MATCHES[@]}" ] || \
-   [ "${#DPMS_REOPEN_NAMES[@]}" -ne "${#DPMS_REOPEN_COMMANDS[@]}" ]; then
-    echo "Error: dpms.conf arrays must have the same length." >&2
+# Validate required arrays are populated
+if [ "${#DPMS_REOPEN_NAMES[@]}" -eq 0 ]; then
+    echo "Error: DPMS_REOPEN_NAMES is empty. Check $CONFIG_FILE" >&2
     exit 1
 fi
-if [ "${#DPMS_RUNNING_MATCHES[@]}" -gt 0 ] && \
-   [ "${#DPMS_RUNNING_MATCHES[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
-    echo "Error: DPMS_RUNNING_MATCHES length must match DPMS_REOPEN_NAMES." >&2
-    exit 1
-fi
-if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ] && \
-   [ "${#DPMS_WM_CLASSES[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
-    echo "Error: DPMS_WM_CLASSES length must match DPMS_REOPEN_NAMES." >&2
-    exit 1
-fi
-if [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -gt 0 ] && \
-   [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
-    echo "Error: DPMS_REOPEN_ACTIVATE_COMMANDS length must match DPMS_REOPEN_NAMES." >&2
-    exit 1
-fi
-if [ "${#DPMS_CLOSE_COMMANDS[@]}" -gt 0 ] && \
-   [ "${#DPMS_CLOSE_COMMANDS[@]}" -ne "${#DPMS_REOPEN_NAMES[@]}" ]; then
-    echo "Error: DPMS_CLOSE_COMMANDS length must match DPMS_REOPEN_NAMES." >&2
-    exit 1
-fi
-if [ "${#DPMS_KILL_ONLY_WM_CLASSES[@]}" -gt 0 ] && \
-   [ "${#DPMS_KILL_ONLY_WM_CLASSES[@]}" -ne "${#DPMS_KILL_ONLY_MATCHES[@]}" ]; then
-    echo "Error: DPMS_KILL_ONLY_WM_CLASSES length must match DPMS_KILL_ONLY_MATCHES." >&2
-    exit 1
-fi
+
+# Validate parallel arrays using shared library function
+validate_parallel_arrays "DPMS_REOPEN_NAMES" "${#DPMS_REOPEN_NAMES[@]}" \
+    "DPMS_KILL_MATCHES" "${#DPMS_KILL_MATCHES[@]}" \
+    "DPMS_REOPEN_COMMANDS" "${#DPMS_REOPEN_COMMANDS[@]}" \
+    "DPMS_RUNNING_MATCHES" "${#DPMS_RUNNING_MATCHES[@]}" \
+    "DPMS_WM_CLASSES" "${#DPMS_WM_CLASSES[@]}" \
+    "DPMS_REOPEN_ACTIVATE_COMMANDS" "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" \
+    "DPMS_CLOSE_COMMANDS" "${#DPMS_CLOSE_COMMANDS[@]}"
+
+validate_parallel_arrays "DPMS_KILL_ONLY_MATCHES" "${#DPMS_KILL_ONLY_MATCHES[@]}" \
+    "DPMS_KILL_ONLY_WM_CLASSES" "${#DPMS_KILL_ONLY_WM_CLASSES[@]}"
 
 log() {
     local ts msg
@@ -156,25 +138,13 @@ acquire_lock() {
     mkdir -p "$STATE_DIR"
     if command -v flock >/dev/null 2>&1; then
         exec 9>"$LOCK_FILE"
-        if flock -n 9; then
-            return 0
-        fi
-        local other
-        other="$(ps -u "$USER" -o pid=,command= | awk '$2 ~ /dpms-toggle/ {print $1}' | grep -v "^$$$" || true)"
-        if [ -n "$other" ]; then
-            log "Another dpms-toggle instance is running; skipping."
+        if ! flock -n 9; then
+            log "Another dpms-toggle instance is running (flock busy); skipping."
             exit 0
         fi
-        log "Lock file busy without dpms-toggle process; using fallback lock."
-        exec 9>&-
-        if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-            log "Another dpms-toggle instance is running; skipping."
-            exit 0
-        fi
-        trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
         return 0
     fi
-
+    # Fallback to mkdir lock only when flock is unavailable
     if ! mkdir "$LOCK_DIR" 2>/dev/null; then
         log "Another dpms-toggle instance is running; skipping."
         exit 0
@@ -404,25 +374,9 @@ apply_power_profile() {
     return 0
 }
 
-get_logind_session_id() {
-    local session_id="${XDG_SESSION_ID:-}"
-    if [ -n "$session_id" ]; then
-        echo "$session_id"
-        return 0
-    fi
-    if command -v loginctl >/dev/null 2>&1; then
-        session_id="$(loginctl list-sessions --no-legend 2>/dev/null | awk -v user="$USER" '$3==user {print $1; exit}')"
-        if [ -n "$session_id" ]; then
-            echo "$session_id"
-            return 0
-        fi
-    fi
-    return 1
-}
-
 get_logind_session_path() {
     local session_id
-    session_id="$(get_logind_session_id)" || return 1
+    session_id="$(get_session_id)" || return 1
     echo "/org/freedesktop/login1/session/_${session_id}"
 }
 
@@ -559,33 +513,40 @@ match_candidates() {
     fi
 }
 
-is_running_match() {
+# Unified function for finding running processes matching a pattern
+# Usage: find_running_match <match> [mode]
+#   mode: "check" (default) - returns 0 if found, 1 if not
+#         "list" - outputs "pid cmdline" for each match
+find_running_match() {
     local match="$1"
-    local cand pid cmdline
+    local mode="${2:-check}"
+    local cand pid cmdline found=1
+
     while IFS= read -r cand; do
+        [ -z "$cand" ] && continue
         while read -r pid; do
-            # Exclude pgrep/grep, this script, and shell wrappers from matches
+            [ -z "$pid" ] && continue
             cmdline="$(ps -p "$pid" -o args= 2>/dev/null)" || continue
-            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle|nohup|bash -c'; then
-                return 0
+            # Exclude pgrep/grep, this script, and shell wrappers
+            if echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle|nohup|bash -c'; then
+                continue
             fi
+            if [ "$mode" = "list" ]; then
+                echo "$pid $cmdline"
+            fi
+            found=0
         done < <(pgrep -f -i "$cand" 2>/dev/null)
     done < <(match_candidates "$match")
-    return 1
+
+    return $found
+}
+
+is_running_match() {
+    find_running_match "$1" "check"
 }
 
 list_running_match() {
-    local match="$1"
-    local cand pid cmdline
-    while IFS= read -r cand; do
-        while read -r pid; do
-            cmdline="$(ps -p "$pid" -o args= 2>/dev/null)" || continue
-            # Exclude pgrep/grep, this script, and shell wrappers from output
-            if ! echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle|nohup|bash -c'; then
-                echo "$pid $cmdline"
-            fi
-        done < <(pgrep -f -i "$cand" 2>/dev/null)
-    done < <(match_candidates "$match")
+    find_running_match "$1" "list"
 }
 
 wait_for_exit() {
@@ -706,12 +667,14 @@ maybe_log_other_gui() {
         fi
 
         local keep=0
-        for keep_name in "${DPMS_KEEP_PROCS[@]}"; do
-            if [ "${keep_name,,}" = "${cls,,}" ]; then
-                keep=1
-                break
-            fi
-        done
+        if [ "${#DPMS_KEEP_PROCS[@]}" -gt 0 ]; then
+            for keep_name in "${DPMS_KEEP_PROCS[@]}"; do
+                if [ "${keep_name,,}" = "${cls,,}" ]; then
+                    keep=1
+                    break
+                fi
+            done
+        fi
         if [ "${cls,,}" = "org.gnome.shell" ] || [ "${cls,,}" = "gnome-shell" ]; then
             keep=1
         fi
@@ -817,7 +780,26 @@ dpms_off() {
         log "Power profile before: $profile_before"
     fi
 
-    set_dpms_mode 1
+    # Prepare reopen list before saving state
+    if [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ]; then
+        reopen_apps=()
+        for name in "${DPMS_REOPEN_NAMES[@]}"; do
+            reopen_apps+=("$name")
+        done
+        log "Always reopen enabled; forcing reopen list: ${reopen_apps[*]}"
+    elif [ "${#reopen_apps[@]}" -gt 0 ]; then
+        log "Apps to reopen: ${reopen_apps[*]}"
+    else
+        log "No apps to reopen."
+    fi
+
+    # Save state BEFORE attempting DPMS change to prevent data loss on failure
+    save_state "${reopen_apps[*]}" "$profile_before"
+
+    # Attempt DPMS change - don't exit on failure since state is already saved
+    if ! set_dpms_mode 1; then
+        log "Warning: Failed to set DPMS mode, but state saved for recovery."
+    fi
 
     if [ "${DPMS_SKIP_POWER_PROFILE:-0}" -eq 1 ]; then
         log "Skipping power profile switch."
@@ -836,18 +818,6 @@ dpms_off() {
         apply_power_profile "$tlp_target" "$ppd_target"
     fi
 
-    if [ "${DPMS_ALWAYS_REOPEN:-0}" -eq 1 ]; then
-        reopen_apps=()
-        for name in "${DPMS_REOPEN_NAMES[@]}"; do
-            reopen_apps+=("$name")
-        done
-        log "Always reopen enabled; forcing reopen list: ${reopen_apps[*]}"
-    elif [ "${#reopen_apps[@]}" -gt 0 ]; then
-        log "Apps to reopen: ${reopen_apps[*]}"
-    else
-        log "No apps to reopen."
-    fi
-    save_state "${reopen_apps[*]}" "$profile_before"
     log "Display off."
 
     if [ "$DPMS_SUSPEND_IF_NO_SSH" -eq 1 ] && ! has_ssh_session; then
