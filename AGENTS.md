@@ -38,7 +38,7 @@
 ## Commit & Pull Request Guidelines
 - History mostly uses Conventional Commit prefixes (`feat:`, `fix:`, `chore:`), with occasional freeform messages. Prefer the prefix style and keep subjects short and imperative.
 - Auto-commit: after making changes, stage and commit them without asking; pick the most accurate Conventional Commit prefix and concise subject.
-- If the user asks for multiple commits, split by logical change and avoid staging unrelated local edits unless explicitly requested.
+- Prefer small, atomic commits; if changes naturally separate (e.g., code vs docs), split proactively. Avoid staging unrelated local edits unless explicitly requested.
 - PRs should include a brief summary, affected scripts/configs, and manual verification steps (for example, "ran ./setup.sh" or "updated pkglist.txt").
 
 ## Security & Configuration Tips
