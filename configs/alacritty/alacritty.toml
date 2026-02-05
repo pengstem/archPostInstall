@@ -5,3 +5,6 @@ size = 14.0
 [window]
 opacity = 0.8
 decorations = "None"
+
+[shell]
+program = "zellij"
