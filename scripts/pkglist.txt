@@ -1,4 +1,4 @@
-# Package list generated on Sat Jan 31 07:08:07 PM CST 2026
+# Package list generated on Thu Feb 05 12:40:03 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -9,6 +9,7 @@ bat
 bibata-cursor-theme-bin
 bluez-utils
 bottom
+browsh
 btop
 btrfs-assistant
 btrfs-progs
@@ -96,6 +97,8 @@ qpdf
 repo
 resvg
 ripgrep
+rsync
+rustdesk-bin
 rustup
 sassc
 scrcpy
@@ -125,6 +128,7 @@ uv
 ventoy-bin
 vim
 visual-studio-code-bin
+wemeet-bin
 wezterm
 wget
 wl-clipboard
