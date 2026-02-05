@@ -5,6 +5,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 ## Where to Look
 - `docs/fileLocationList.md` is the source-to-target mapping for symlinked configs.
 - `docs/gnome-extensions.md` and `docs/gnome-appearrance.md` are updated by the GNOME sync script.
+- `docs/bug-history.md` tracks notable config issues and fixes.
 - `docs/thoughts.md` is a freeform notes file for future changes.
 - `docs/commands.md` lists common commands and the unified CLI.
 
