@@ -9,3 +9,4 @@ appindicatorsupport@rgcjonas.gmail.com
 dash-to-dock@micxgx.gmail.com
 advanced-alt-tab@G-dH.github.com
 Vitals@CoreCoding.com
+clipboard-indicator@tudmotu.com
