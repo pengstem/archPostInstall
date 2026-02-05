@@ -9,6 +9,7 @@
 - `configs/systemd/user/` defines GNOME sync units plus DPMS lock monitor and log-cleanup timer.
 - `configs/pacman/hooks/` contains pacman hooks (for example, automatic pkglist updates).
 - `docs/` holds reference notes like `gnome-appearrance.md`, `gnome-extensions.md`, and `thoughts.md` (see `docs/README.md` and `docs/commands.md`).
+- `docs/bug-history.md` tracks general (non-DPMS) config issues and fixes; append entries here instead of creating new history files.
 - `docs/dpms-past-bugs.md` tracks DPMS pitfalls; update it when changing DPMS scripts/configs/timers.
 - `backups/` is the default archive location for GNOME themes/extensions and Firefox profiles.
 
@@ -38,6 +39,11 @@
 ## Testing Guidelines
 - No automated test suite. Validate changes by running scripts in a safe environment (VM or fresh install) and verifying symlinks and config targets.
 - For script-only edits, run `bash -n <script>` locally to check syntax before execution.
+
+## Bug History
+- When a bug is fixed or the user asks to record one, add a dated entry to `docs/bug-history.md`.
+- For DPMS-related issues, record in `docs/dpms-past-bugs.md` instead.
+- Do not create new bug-history files without explicit user approval.
 
 ## Commit & Pull Request Guidelines
 - History mostly uses Conventional Commit prefixes (`feat:`, `fix:`, `chore:`), with occasional freeform messages. Prefer the prefix style and keep subjects short and imperative.
