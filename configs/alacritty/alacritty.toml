@@ -6,5 +6,5 @@ size = 14.0
 opacity = 0.8
 decorations = "None"
 
-[shell]
-program = "zellij"
+[terminal]
+shell = { program = "zellij" }
