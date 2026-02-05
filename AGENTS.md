@@ -31,6 +31,10 @@
 - Keep configs under `configs/<tool>/...` mirroring target paths (see `docs/fileLocationList.md`).
 - Use `.desktop` naming for application launchers in `configs/applications/`.
 
+## Research & Change Policy
+- Before changing any configs or scripts, consult the latest official documentation and at least one reputable community reference for real-world behavior notes.
+- If docs or behavior vary by version, call out the exact version and date used to validate the change.
+
 ## Testing Guidelines
 - No automated test suite. Validate changes by running scripts in a safe environment (VM or fresh install) and verifying symlinks and config targets.
 - For script-only edits, run `bash -n <script>` locally to check syntax before execution.
