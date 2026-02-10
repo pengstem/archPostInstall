@@ -3,6 +3,7 @@
 | configs/tmux | ~/.config/tmux | user config |
 | configs/zellij | ~/.config/zellij | user config |
 | configs/zshrc | ~/.zshrc | user config |
+| configs/zsh | ~/.config/zsh | user config |
 | configs/p10k.zsh | ~/.p10k.zsh | user config |
 | configs/gitconfig | ~/.gitconfig | user config |
 | configs/kitty/kitty.conf | ~/.config/kitty/kitty.conf | user config |

@@ -127,6 +127,7 @@ install_sudoers "$CONFIGS_DIR/sudoers.d/archpostinstall-tlp" "/etc/sudoers.d/arc
 
 # Shell
 create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"
+create_link "$CONFIGS_DIR/zsh"              "$HOME/.config/zsh"             "Zsh Modules"
 create_link "$CONFIGS_DIR/p10k.zsh"         "$HOME/.p10k.zsh"               "P10k Config"
 create_link "$CONFIGS_DIR/gitconfig"        "$HOME/.gitconfig"              "Gitconfig"
 

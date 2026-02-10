@@ -33,6 +33,7 @@ configs/
 ├── zathura/           # PDF viewer
 ├── zed/               # Editor
 ├── zellij/            # Terminal multiplexer
+├── zsh/               # Modular Zsh config snippets
 └── zshrc              # Zsh config
 ```
 
@@ -42,6 +43,7 @@ configs/
 | Source | Target |
 |--------|--------|
 | `zshrc` | `~/.zshrc` |
+| `zsh/` | `~/.config/zsh/` |
 | `p10k.zsh` | `~/.p10k.zsh` |
 | `gitconfig` | `~/.gitconfig` |
 | `kitty/` | `~/.config/kitty/` |
