@@ -1,4 +1,4 @@
-# Package list generated on Thu Feb 05 12:40:03 PM CST 2026
+# Package list generated on Tue Feb 10 04:40:42 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -13,6 +13,7 @@ browsh
 btop
 btrfs-assistant
 btrfs-progs
+dictd
 dkms
 docker
 docker-compose
@@ -45,7 +46,6 @@ gnome-tweaks
 google-chrome
 grub
 grub-btrfs
-helix
 heroic-games-launcher-bin
 inotify-tools
 isync
@@ -113,6 +113,7 @@ tailscale
 tcpdump
 tealdeer
 telegram-desktop
+television
 thefuck
 tlp
 tlp-pd
@@ -128,11 +129,13 @@ uv
 ventoy-bin
 vim
 visual-studio-code-bin
-wemeet-bin
 wezterm
 wget
 wl-clipboard
 wmctrl
+wordnet-common
+wordnet-dictd
+wordnet-progs
 xdg-desktop-portal-termfilechooser-hunkyburrito-git
 xdg-user-dirs
 yay
