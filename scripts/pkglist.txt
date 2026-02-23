@@ -1,8 +1,9 @@
-# Package list generated on Tue Feb 10 04:40:42 PM CST 2026
+# Package list generated on Mon Feb 23 11:07:48 AM CST 2026
 7zip
 alacritty
 amd-ucode
 android-udev
+aria2
 base
 base-devel
 bat
@@ -13,8 +14,10 @@ browsh
 btop
 btrfs-assistant
 btrfs-progs
+cmatrix
 dictd
 dkms
+dnsmasq
 docker
 docker-compose
 dust
@@ -57,6 +60,7 @@ libgda6
 libreoffice-fresh
 librime
 libva-nvidia-driver
+libvirt
 linux-firmware
 linux-lts
 linux-lts-headers
@@ -92,6 +96,7 @@ perf
 perl-image-exiftool
 picocom
 powertop
+qemu-desktop
 qimgv-debug
 qpdf
 repo
@@ -128,6 +133,8 @@ ttf-maplemono-nf-cn-unhinted
 uv
 ventoy-bin
 vim
+virt-install
+virt-manager
 visual-studio-code-bin
 wezterm
 wget
