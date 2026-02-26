@@ -6,7 +6,7 @@ just-perfection-desktop@just-perfection
 user-theme@gnome-shell-extensions.gcampax.github.com
 copyous@boerdereinar.dev
 appindicatorsupport@rgcjonas.gmail.com
-dash-to-dock@micxgx.gmail.com
 advanced-alt-tab@G-dH.github.com
 Vitals@CoreCoding.com
 clipboard-indicator@tudmotu.com
+dash-to-dock@micxgx.gmail.com
