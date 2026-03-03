@@ -9,4 +9,5 @@ appindicatorsupport@rgcjonas.gmail.com
 advanced-alt-tab@G-dH.github.com
 Vitals@CoreCoding.com
 clipboard-indicator@tudmotu.com
+course-table@pengstem
 dash-to-dock@micxgx.gmail.com

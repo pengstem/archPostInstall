@@ -1,4 +1,4 @@
-# Package list generated on Thu Feb 26 10:21:54 PM CST 2026
+# Package list generated on Wed Mar 04 12:25:36 AM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -50,6 +50,7 @@ google-chrome
 grub
 grub-btrfs
 heroic-games-launcher-bin
+hyperfine
 inotify-tools
 isync
 jdk21-openjdk
@@ -89,7 +90,10 @@ npm
 nvidia-open-dkms
 nvidia-utils
 nvme-cli
+nvtop
 obs-studio
+ollama
+ollama-cuda
 os-prober
 pass
 perf
@@ -103,7 +107,6 @@ repo
 resvg
 ripgrep
 rsync
-rustdesk-bin
 rustup
 sassc
 scrcpy
