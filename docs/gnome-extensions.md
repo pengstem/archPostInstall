@@ -1,7 +1,6 @@
 lockscreen-extension@pratap.fastmail.fm
 BingWallpaper@ineffable-gmail.com
 blur-my-shell@aunetx
-hidetopbar@mathieu.bidon.ca
 just-perfection-desktop@just-perfection
 user-theme@gnome-shell-extensions.gcampax.github.com
 copyous@boerdereinar.dev
@@ -11,3 +10,4 @@ Vitals@CoreCoding.com
 clipboard-indicator@tudmotu.com
 course-table@pengstem
 dash-to-dock@micxgx.gmail.com
+hidetopbar@mathieu.bidon.ca

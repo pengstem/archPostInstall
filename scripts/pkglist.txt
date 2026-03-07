@@ -1,4 +1,4 @@
-# Package list generated on Wed Mar 04 12:25:36 AM CST 2026
+# Package list generated on Sat Mar 07 12:39:23 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -10,7 +10,6 @@ bat
 bibata-cursor-theme-bin
 bluez-utils
 bottom
-browsh
 btop
 btrfs-assistant
 btrfs-progs
@@ -20,6 +19,7 @@ dkms
 dnsmasq
 docker
 docker-compose
+dune
 dust
 efibootmgr
 exfat-utils
@@ -49,10 +49,12 @@ gnome-tweaks
 google-chrome
 grub
 grub-btrfs
+gtkwave
 heroic-games-launcher-bin
 hyperfine
 inotify-tools
 isync
+iverilog
 jdk21-openjdk
 jq
 kitty
@@ -83,6 +85,7 @@ neomutt
 neovim
 networkmanager
 newsboat
+nmap
 noto-fonts-cjk
 noto-fonts-emoji
 noto-fonts-extra
@@ -92,8 +95,10 @@ nvidia-utils
 nvme-cli
 nvtop
 obs-studio
+ocaml-findlib
 ollama
 ollama-cuda
+opam
 os-prober
 pass
 perf
