@@ -11,6 +11,13 @@ if [[ -s "$BUN_INSTALL/_bun" ]]; then
     source "$BUN_INSTALL/_bun"
 fi
 
+# opam shell integration.
+OPAM_INIT_ZSH="${OPAMROOT:-$HOME/.opam}/opam-init/init.zsh"
+if [[ -r "$OPAM_INIT_ZSH" ]]; then
+    source "$OPAM_INIT_ZSH" >/dev/null 2>&1
+fi
+unset OPAM_INIT_ZSH
+
 # Zoxide: replace cd with smart jump.
 if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init zsh --cmd cd)"
