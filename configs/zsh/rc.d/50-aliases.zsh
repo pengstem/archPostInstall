@@ -13,3 +13,6 @@ alias mutt='mbsync -a && TERM=xterm-direct neomutt'
 # Global aliases for highlighted help output.
 alias -g -- --h1='-h 2>&1 | bat --language=help --style=plain'
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
+
+# wayland copy
+alias copy="wl-copy"
