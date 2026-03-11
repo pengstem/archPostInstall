@@ -226,7 +226,7 @@ keybinds clear-defaults=true {
             }
         }
         bind "F7" {
-            Run "zsh" "-c" "if command -v bunx >/dev/null 2>&1; then bunx @ccusage/codex@latest && bunx ccusage; elif command -v npx >/dev/null 2>&1; then npx @ccusage/codex@latest && npx ccusage@latest; else echo 'Missing bunx or npx (install bun or npm)'; fi; read -sk1 '?Press Space to exit...' key; while [[ $key != ' ' ]]; do read -sk1 key; done" {
+            Run "bash" "-lc" "if command -v bunx >/dev/null 2>&1; then bunx @ccusage/codex@latest && bunx ccusage; elif command -v npx >/dev/null 2>&1; then npx @ccusage/codex@latest && npx ccusage@latest; else echo 'Missing bunx or npx (install bun or npm)'; fi; read -rsn1 -p 'Press Space to exit...' key; while [[ $key != ' ' ]]; do read -rsn1 key; done; echo" {
                 floating true
                 width "80%"
                 height "80%"
