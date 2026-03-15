@@ -1,5 +1,4 @@
 lockscreen-extension@pratap.fastmail.fm
-BingWallpaper@ineffable-gmail.com
 blur-my-shell@aunetx
 just-perfection-desktop@just-perfection
 user-theme@gnome-shell-extensions.gcampax.github.com
@@ -11,5 +10,5 @@ clipboard-indicator@tudmotu.com
 course-table@pengstem
 hidetopbar@mathieu.bidon.ca
 native-screenshot-copy-mode@nastem.github.com
-dash-to-dock@micxgx.gmail.com
 gnome-fuzzy-app-search@gnome-shell-extensions.Czarlie.gitlab.com
+BingWallpaper@ineffable-gmail.com

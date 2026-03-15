@@ -1,4 +1,4 @@
-# Package list generated on Mon Mar 09 09:57:19 PM CST 2026
+# Package list generated on Sun Mar 15 09:34:42 AM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -22,6 +22,7 @@ docker-compose
 dune
 dust
 efibootmgr
+ethtool
 exfat-utils
 eza
 fastfetch
@@ -31,7 +32,9 @@ fcitx5-gtk
 fcitx5-material-color
 fcitx5-qt
 fcitx5-rime
+fcitx5-vinput-bin
 fd
+fio
 firefox
 fuse2
 fzf
@@ -60,6 +63,8 @@ jq
 kitty
 lazygit
 libgda6
+libgpiod
+libgpod
 libreoffice-fresh
 librime
 libva-nvidia-driver
@@ -121,6 +126,7 @@ starship
 steam
 strace
 sudo
+sysstat
 systemctl-tui
 tailscale
 tcpdump
@@ -144,6 +150,7 @@ vim
 virt-install
 virt-manager
 visual-studio-code-bin
+wemeet-bin
 wezterm
 wget
 wl-clipboard
