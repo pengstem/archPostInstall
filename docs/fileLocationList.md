@@ -7,6 +7,7 @@
 | configs/p10k.zsh | ~/.p10k.zsh | user config |
 | configs/gitconfig | ~/.gitconfig | user config |
 | configs/kitty/kitty.conf | ~/.config/kitty/kitty.conf | user config |
+| configs/kitty/nastem-signature.png | ~/.config/kitty/nastem-signature.png | kitty watermark asset |
 | configs/alacritty/alacritty.toml | ~/.config/alacritty/alacritty.toml | user config |
 | configs/wezterm/wezterm.lua | ~/.config/wezterm/wezterm.lua | user config |
 | configs/ghostty | ~/.config/ghostty | user config |

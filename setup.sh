@@ -133,6 +133,7 @@ create_link "$CONFIGS_DIR/gitconfig"        "$HOME/.gitconfig"              "Git
 
 # Terminals
 create_link "$CONFIGS_DIR/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "Kitty"
+create_link "$CONFIGS_DIR/kitty/nastem-signature.png" "$HOME/.config/kitty/nastem-signature.png" "Kitty Sig"
 create_link "$CONFIGS_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" "Alacritty"
 create_link "$CONFIGS_DIR/ghostty"          "$HOME/.config/ghostty"         "Ghostty"
 create_link "$CONFIGS_DIR/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua" "WezTerm"
