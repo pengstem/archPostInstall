@@ -1,4 +1,4 @@
-# Package list generated on Sun Mar 15 08:13:49 PM CST 2026
+# Package list generated on Tue Mar 17 12:00:42 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -14,6 +14,7 @@ btop
 btrfs-assistant
 btrfs-progs
 cmatrix
+compsize
 dictd
 dkms
 dnsmasq
@@ -105,10 +106,13 @@ ollama
 ollama-cuda
 opam
 os-prober
+pacman-contrib
 pass
 perf
 perl-image-exiftool
 picocom
+pnpm
+postgresql
 powertop
 qemu-desktop
 qimgv-debug
