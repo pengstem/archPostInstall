@@ -1,9 +1,10 @@
-# Package list generated on Tue Mar 17 12:00:42 PM CST 2026
+# Package list generated on Tue Mar 17 10:02:18 PM CST 2026
 7zip
 alacritty
 amd-ucode
 android-udev
 aria2
+baidupcs-go
 base
 base-devel
 bat
