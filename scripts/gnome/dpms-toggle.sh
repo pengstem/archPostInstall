@@ -489,26 +489,29 @@ clear_state() {
 
 match_candidates() {
     local match="$1"
-    local base
-    local segment
+    local base segment
     local -a segments=()
-    base="$(basename "$match")"
+    local -A emitted=()
+
     printf "%s\n" "$match"
+    emitted["$match"]=1
 
     if [[ "$match" == *"|"* ]] && ! [[ "$match" =~ [\(\)\[\]\{\}] ]]; then
         IFS='|' read -r -a segments <<< "$match"
         for segment in "${segments[@]}"; do
             if [[ "$segment" == *"/"* ]]; then
                 base="$(basename "$segment")"
-                if [ "$base" != "$segment" ]; then
+                if [ "$base" != "$segment" ] && [ -z "${emitted[$base]+x}" ]; then
                     printf "%s\n" "$base"
+                    emitted["$base"]=1
                 fi
             fi
         done
         return 0
     fi
 
-    if [ "$base" != "$match" ]; then
+    base="$(basename "$match")"
+    if [ "$base" != "$match" ] && [ -z "${emitted[$base]+x}" ]; then
         printf "%s\n" "$base"
     fi
 }
@@ -521,17 +524,26 @@ find_running_match() {
     local match="$1"
     local mode="${2:-check}"
     local cand pid cmdline found=1
+    local -A seen_pids=()
 
     while IFS= read -r cand; do
         [ -z "$cand" ] && continue
         while read -r pid; do
             [ -z "$pid" ] && continue
+            # Skip if we already processed this PID
+            if [ -n "${seen_pids[$pid]+x}" ]; then
+                continue
+            fi
+            seen_pids[$pid]=1
             cmdline="$(ps -p "$pid" -o args= 2>/dev/null)" || continue
             # Exclude pgrep/grep, this script, and shell wrappers
             if echo "$cmdline" | grep -qE 'pgrep|grep|dpms-toggle|nohup|bash -c'; then
                 continue
             fi
             if [ "$mode" = "list" ]; then
+                if [ "${#cmdline}" -gt 120 ]; then
+                    cmdline="${cmdline:0:120}..."
+                fi
                 echo "$pid $cmdline"
             fi
             found=0
@@ -565,16 +577,28 @@ wait_for_exit() {
 
 kill_match() {
     local match="$1"
-    local cand
     local stopped=0
 
-    while IFS= read -r cand; do
-        if pgrep -f -i "$cand" >/dev/null 2>&1; then
-            log "Sending TERM to match: $cand"
-            pkill -TERM -f -i "$cand" || true
-            stopped=1
-        fi
-    done < <(match_candidates "$match")
+    # Primary: use the full regex pattern (covers all pipe-separated alternatives)
+    if pgrep -f -i "$match" >/dev/null 2>&1; then
+        log "Sending TERM to match: $match"
+        pkill -TERM -f -i "$match" || true
+        stopped=1
+    fi
+
+    # Fallback: only try individual segment basenames if the full pattern missed
+    if [ "$stopped" -eq 0 ]; then
+        local cand
+        while IFS= read -r cand; do
+            [ -z "$cand" ] && continue
+            [ "$cand" = "$match" ] && continue
+            if pgrep -f -i "$cand" >/dev/null 2>&1; then
+                log "Sending TERM to fallback match: $cand"
+                pkill -TERM -f -i "$cand" || true
+                stopped=1
+            fi
+        done < <(match_candidates "$match")
+    fi
 
     if [ "$stopped" -eq 0 ]; then
         return 1
@@ -582,8 +606,12 @@ kill_match() {
 
     if ! wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC"; then
         log "Force killing match: $match"
+        pkill -KILL -f -i "$match" || true
+        local cand
         while IFS= read -r cand; do
-            pkill -KILL -f -i "$cand" || true
+            [ -z "$cand" ] && continue
+            [ "$cand" = "$match" ] && continue
+            pkill -KILL -f -i "$cand" >/dev/null 2>&1 || true
         done < <(match_candidates "$match")
         wait_for_exit "$match" 2 || true
     fi
@@ -641,6 +669,8 @@ wait_for_app_start() {
 }
 
 maybe_log_other_gui() {
+    local -a handled_classes=("$@")
+
     if ! have_gdbus; then
         if [ "$DPMS_KILL_OTHER_GUI" -eq 1 ]; then
             log "gdbus not available; skipping other GUI shutdown."
@@ -666,6 +696,20 @@ maybe_log_other_gui() {
             continue
         fi
 
+        # Skip classes already handled by per-app and kill-only loops
+        local handled=0
+        if [ "${#handled_classes[@]}" -gt 0 ]; then
+            for hcls in "${handled_classes[@]}"; do
+                if [ "${hcls,,}" = "${cls,,}" ]; then
+                    handled=1
+                    break
+                fi
+            done
+        fi
+        if [ "$handled" -eq 1 ]; then
+            continue
+        fi
+
         local keep=0
         if [ "${#DPMS_KEEP_PROCS[@]}" -gt 0 ]; then
             for keep_name in "${DPMS_KEEP_PROCS[@]}"; do
@@ -684,9 +728,69 @@ maybe_log_other_gui() {
 
         log "Stopping GUI app (best-effort): $cls"
         close_wm_class "$cls" || true
-        pkill -TERM -x "$cls" >/dev/null 2>&1 || true
         pkill -TERM -f -i "$cls" >/dev/null 2>&1 || true
     done
+}
+
+stop_single_app() {
+    local name="$1"
+    local match="$2"
+    local wm_class="$3"
+    local close_cmd="$4"
+    local status_file="$5"
+
+    if is_app_running "$match" "$wm_class"; then
+        printf "%s\n" "$name" >> "$status_file"
+        log "Stopping $name (match: $match, class: ${wm_class:-none})"
+        while read -r line; do
+            log "  $line"
+        done < <(list_running_match "$match")
+        if [ -n "$close_cmd" ]; then
+            log "Requesting $name to quit: $close_cmd"
+            run_command "$close_cmd"
+            wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC" || true
+        fi
+        if [ -n "$wm_class" ]; then
+            if close_wm_class "$wm_class"; then
+                wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC" || true
+            fi
+        fi
+        if is_app_running "$match" "$wm_class"; then
+            if [ -n "$close_cmd" ] && [ "${DPMS_FORCE_KILL_ON_CLOSE:-1}" -eq 0 ]; then
+                log "Skip force kill for $name (close command used)."
+            elif ! kill_match "$match"; then
+                log "No matching process found for $name after check."
+            fi
+        fi
+        if is_app_running "$match" "$wm_class"; then
+            log "Warning: $name still running after close/kill."
+            while read -r line; do
+                log "  $line"
+            done < <(list_running_match "$match")
+        else
+            log "$name stopped."
+        fi
+    else
+        log "Not running: $name (match: $match, class: ${wm_class:-none})"
+    fi
+}
+
+stop_kill_only_app() {
+    local match="$1"
+    local wm_class="$2"
+
+    if is_app_running "$match" "$wm_class"; then
+        log "Stopping (no reopen): $match"
+        if [ -n "$wm_class" ]; then
+            close_wm_class "$wm_class" || true
+        fi
+        kill_match "$match" || true
+        if is_app_running "$match" "$wm_class"; then
+            log "Warning: still running: $match"
+        else
+            log "Stopped: $match"
+        fi
+    fi
 }
 
 dpms_off() {
@@ -700,7 +804,10 @@ dpms_off() {
     fi
 
     local i name match wm_class close_cmd
-    local reopen_apps=()
+    local -a handled_classes=()
+    local -a pids=()
+    local status_file
+    status_file="$(mktemp "$STATE_DIR/dpms-reopen.XXXXXX")"
 
     for i in "${!DPMS_REOPEN_NAMES[@]}"; do
         name="${DPMS_REOPEN_NAMES[$i]}"
@@ -709,47 +816,31 @@ dpms_off() {
         if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ]; then
             wm_class="${DPMS_WM_CLASSES[$i]}"
         fi
-        if is_app_running "$match" "$wm_class"; then
-            reopen_apps+=("$name")
-            log "Stopping $name (match: $match, class: ${wm_class:-none})"
-            while read -r line; do
-                log "  $line"
-            done < <(list_running_match "$match")
-            close_cmd=""
-            if [ "${#DPMS_CLOSE_COMMANDS[@]}" -gt 0 ]; then
-                close_cmd="${DPMS_CLOSE_COMMANDS[$i]}"
-            fi
-            if [ -n "$close_cmd" ]; then
-                log "Requesting $name to quit: $close_cmd"
-                run_command "$close_cmd"
-                wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC" || true
-            fi
-            if [ -n "$wm_class" ]; then
-                if close_wm_class "$wm_class"; then
-                    wait_for_exit "$match" "$DPMS_KILL_WAIT_SEC" || true
-                fi
-            fi
-            if is_app_running "$match" "$wm_class"; then
-                if [ -n "$close_cmd" ] && [ "${DPMS_FORCE_KILL_ON_CLOSE:-1}" -eq 0 ]; then
-                    log "Skip force kill for $name (close command used)."
-                elif ! kill_match "$match"; then
-                    log "No matching process found for $name after check."
-                fi
-            fi
-            if is_app_running "$match" "$wm_class"; then
-                log "Warning: $name still running after close/kill."
-                while read -r line; do
-                    log "  $line"
-                done < <(list_running_match "$match")
-            else
-                log "$name stopped."
-            fi
-        else
-            log "Not running: $name (match: $match, class: ${wm_class:-none})"
+        if [ -n "$wm_class" ]; then
+            handled_classes+=("$wm_class")
         fi
+        close_cmd=""
+        if [ "${#DPMS_CLOSE_COMMANDS[@]}" -gt 0 ]; then
+            close_cmd="${DPMS_CLOSE_COMMANDS[$i]}"
+        fi
+        stop_single_app "$name" "$match" "$wm_class" "$close_cmd" "$status_file" &
+        pids+=($!)
     done
 
+    for pid in "${pids[@]}"; do
+        wait "$pid" || true
+    done
+
+    local reopen_apps=()
+    if [ -f "$status_file" ]; then
+        while IFS= read -r name; do
+            [ -n "$name" ] && reopen_apps+=("$name")
+        done < "$status_file"
+    fi
+    rm -f "$status_file"
+
     if [ "${#DPMS_KILL_ONLY_MATCHES[@]}" -gt 0 ]; then
+        pids=()
         local j extra_match extra_class
         for j in "${!DPMS_KILL_ONLY_MATCHES[@]}"; do
             extra_match="${DPMS_KILL_ONLY_MATCHES[$j]}"
@@ -757,22 +848,18 @@ dpms_off() {
             if [ "${#DPMS_KILL_ONLY_WM_CLASSES[@]}" -gt 0 ]; then
                 extra_class="${DPMS_KILL_ONLY_WM_CLASSES[$j]}"
             fi
-            if is_app_running "$extra_match" "$extra_class"; then
-                log "Stopping (no reopen): $extra_match"
-                if [ -n "$extra_class" ]; then
-                    close_wm_class "$extra_class" || true
-                fi
-                kill_match "$extra_match" || true
-                if is_app_running "$extra_match" "$extra_class"; then
-                    log "Warning: still running: $extra_match"
-                else
-                    log "Stopped: $extra_match"
-                fi
+            if [ -n "$extra_class" ]; then
+                handled_classes+=("$extra_class")
             fi
+            stop_kill_only_app "$extra_match" "$extra_class" &
+            pids+=($!)
+        done
+        for pid in "${pids[@]}"; do
+            wait "$pid" || true
         done
     fi
 
-    maybe_log_other_gui
+    maybe_log_other_gui "${handled_classes[@]}"
 
     local profile_before
     profile_before="$(get_power_profile)"
@@ -836,6 +923,66 @@ dpms_off() {
     fi
 }
 
+start_single_app() {
+    local name="$1"
+    local idx="$2"
+
+    local cmd="${DPMS_REOPEN_COMMANDS[$idx]}"
+    local match="${DPMS_KILL_MATCHES[$idx]}"
+    local run_match="$match"
+    if [ "${#DPMS_RUNNING_MATCHES[@]}" -gt 0 ]; then
+        run_match="${DPMS_RUNNING_MATCHES[$idx]}"
+    fi
+    local activate_cmd=""
+    if [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -gt 0 ]; then
+        activate_cmd="${DPMS_REOPEN_ACTIVATE_COMMANDS[$idx]}"
+    fi
+    local wm_class=""
+    if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ]; then
+        wm_class="${DPMS_WM_CLASSES[$idx]}"
+    fi
+
+    if is_app_running "$run_match" "$wm_class"; then
+        if [ -n "$activate_cmd" ]; then
+            log "Already running; activating $name"
+            run_command "$activate_cmd"
+        else
+            log "Skip start; already running: $name"
+        fi
+        return 0
+    fi
+
+    if is_running_match "$match"; then
+        log "Cleaning leftover processes for $name before start."
+        kill_match "$match" || true
+    fi
+
+    local attempt=1
+    while [ "$attempt" -le "$DPMS_START_RETRIES" ]; do
+        log "Starting $name (attempt $attempt)..."
+        run_command "$cmd"
+        if wait_for_app_start "$run_match" "$wm_class" "$DPMS_START_WAIT_SEC"; then
+            log "$name started."
+            return 0
+        fi
+        log "Warning: $name did not start yet."
+        attempt=$((attempt + 1))
+    done
+
+    if ! is_app_running "$run_match" "$wm_class" && [ -x "$match" ] && [ "$cmd" != "$match" ]; then
+        log "Fallback start using match path: $match"
+        run_command "$match"
+        wait_for_app_start "$run_match" "$wm_class" "$DPMS_START_WAIT_SEC" || true
+    fi
+
+    if ! is_app_running "$run_match" "$wm_class"; then
+        log "Error: failed to start $name after retries."
+        while read -r line; do
+            log "  $line"
+        done < <(list_running_match "$match")
+    fi
+}
+
 dpms_on() {
     if is_display_on; then
         log "Display already on."
@@ -870,7 +1017,8 @@ dpms_on() {
             sleep "$DPMS_REOPEN_DELAY_SEC"
         fi
 
-        local i name cmd activate_cmd idx match run_match wm_class attempt
+        local i name idx
+        local -a pids=()
         for name in "${reopen_list[@]}"; do
             idx=-1
             for i in "${!DPMS_REOPEN_NAMES[@]}"; do
@@ -880,58 +1028,14 @@ dpms_on() {
                 fi
             done
             if [ "$idx" -ge 0 ]; then
-                cmd="${DPMS_REOPEN_COMMANDS[$idx]}"
-                match="${DPMS_KILL_MATCHES[$idx]}"
-                run_match="$match"
-                if [ "${#DPMS_RUNNING_MATCHES[@]}" -gt 0 ]; then
-                    run_match="${DPMS_RUNNING_MATCHES[$idx]}"
-                fi
-                activate_cmd=""
-                if [ "${#DPMS_REOPEN_ACTIVATE_COMMANDS[@]}" -gt 0 ]; then
-                    activate_cmd="${DPMS_REOPEN_ACTIVATE_COMMANDS[$idx]}"
-                fi
-                wm_class=""
-                if [ "${#DPMS_WM_CLASSES[@]}" -gt 0 ]; then
-                    wm_class="${DPMS_WM_CLASSES[$idx]}"
-                fi
-                if is_app_running "$run_match" "$wm_class"; then
-                    if [ -n "$activate_cmd" ]; then
-                        log "Already running; activating $name"
-                        run_command "$activate_cmd"
-                    else
-                        log "Skip start; already running: $name"
-                    fi
-                    continue
-                fi
-                if is_running_match "$match"; then
-                    log "Cleaning leftover processes for $name before start."
-                    kill_match "$match" || true
-                fi
-                attempt=1
-                while [ "$attempt" -le "$DPMS_START_RETRIES" ]; do
-                    log "Starting $name (attempt $attempt)..."
-                    run_command "$cmd"
-                    if wait_for_app_start "$run_match" "$wm_class" "$DPMS_START_WAIT_SEC"; then
-                        log "$name started."
-                        break
-                    fi
-                    log "Warning: $name did not start yet."
-                    attempt=$((attempt + 1))
-                done
-                if ! is_app_running "$run_match" "$wm_class" && [ -x "$match" ] && [ "$cmd" != "$match" ]; then
-                    log "Fallback start using match path: $match"
-                    run_command "$match"
-                    wait_for_app_start "$run_match" "$wm_class" "$DPMS_START_WAIT_SEC" || true
-                fi
-                if ! is_app_running "$run_match" "$wm_class"; then
-                    log "Error: failed to start $name after retries."
-                    while read -r line; do
-                        log "  $line"
-                    done < <(list_running_match "$match")
-                fi
+                start_single_app "$name" "$idx" &
+                pids+=($!)
             else
                 log "No command mapping found for $name"
             fi
+        done
+        for pid in "${pids[@]}"; do
+            wait "$pid" || true
         done
     else
         log "No apps recorded for reopen."
