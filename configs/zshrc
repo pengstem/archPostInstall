@@ -12,3 +12,6 @@ for zsh_config in "$ZSH_CONFIG_DIR"/*.zsh(N); do
 done
 
 unset ZSH_CONFIG_DIR zsh_config
+
+# bun completions
+[ -s "/home/nastem/.bun/_bun" ] && source "/home/nastem/.bun/_bun"
