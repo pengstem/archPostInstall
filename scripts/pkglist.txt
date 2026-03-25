@@ -1,4 +1,4 @@
-# Package list generated on Thu Mar 19 12:30:45 PM CST 2026
+# Package list generated on Wed Mar 25 09:16:12 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -8,6 +8,7 @@ baidupcs-go
 base
 base-devel
 bat
+bear
 bibata-cursor-theme-bin
 bluez-utils
 bottom
@@ -28,6 +29,7 @@ dust
 efibootmgr
 ethtool
 exfat-utils
+expac
 eza
 fastfetch
 fcitx5
@@ -120,11 +122,14 @@ pnpm
 postgresql
 powertop
 qemu-desktop
+qemu-system-riscv
 qimgv-debug
 qpdf
 repo
 resvg
 ripgrep
+riscv64-linux-gnu-binutils
+riscv64-linux-gnu-gcc
 rsync
 rustup
 sassc

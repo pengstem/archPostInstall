@@ -8,7 +8,6 @@ advanced-alt-tab@G-dH.github.com
 Vitals@CoreCoding.com
 clipboard-indicator@tudmotu.com
 course-table@pengstem
-hidetopbar@mathieu.bidon.ca
 native-screenshot-copy-mode@nastem.github.com
 gnome-fuzzy-app-search@gnome-shell-extensions.Czarlie.gitlab.com
 BingWallpaper@ineffable-gmail.com
