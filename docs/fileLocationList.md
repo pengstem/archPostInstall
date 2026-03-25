@@ -51,6 +51,7 @@
 | scripts/gnome/dpms-lock-monitor.sh | ~/.local/bin/archpostinstall-dpms-lock-monitor | user bin |
 | scripts/gnome/cleanup_dpms_logs.sh | ~/.local/bin/archpostinstall-dpms-log-cleanup | user bin |
 | scripts/launchers/yazi-desktop.sh | ~/.local/bin/yazi-desktop | user bin |
+| scripts/launchers/yazi-open-nautilus.sh | ~/.local/bin/yazi-open-nautilus | user bin |
 | scripts/power/measure_tlp_power.sh | ~/.local/bin/archpostinstall-measure-power | user bin |
 | scripts/zathura/page-to-clipboard.sh | ~/.local/bin/zathura-page-to-clipboard | user bin |
 | scripts/archpostinstall.sh | ~/.local/bin/archpostinstall | user bin |
