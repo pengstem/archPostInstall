@@ -2,3 +2,18 @@
 on = ["c", "m"]
 run = "plugin chmod"
 desc = "Chmod selected files"
+
+[[mgr.prepend_keymap]]
+on = ["g", "n"]
+run = """shell --orphan -- sh -c '
+target="$1"
+
+if [ -z "$target" ]; then
+    exec nautilus --new-window .
+elif [ -d "$target" ]; then
+    exec nautilus --new-window "$target"
+else
+    exec nautilus --new-window --select "$target"
+fi
+' sh "%h""""
+desc = "Open current location in GNOME Files"
