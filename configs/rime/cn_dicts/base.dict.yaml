@@ -33255,7 +33255,7 @@ sort: by_weight
 炒币	chao bi	319
 # 超碧	chao bi	0
 抄笔记	chao bi ji	83
-朝比奈	chao bi nai	29
+朝比奈	zhao bi nai	29
 超编	chao bian	36
 超标	chao biao	1743
 抄表	chao biao	134
@@ -56352,6 +56352,7 @@ sort: by_weight
 地鳖	di bie	2
 敌兵	di bing	151
 帝昺	di bing	5
+低波	di bo	31
 地波	di bo	13
 狄波拉	di bo la	24
 底部	di bu	5613
@@ -61364,6 +61365,7 @@ sort: by_weight
 掉不了	diao bu liao	17
 钓不了	diao bu liao	2
 吊不起	diao bu qi	4
+调不通	diao bu tong	38
 钓不着	diao bu zhao	3
 凋残	diao can	15
 吊舱	diao cang	44
@@ -64413,6 +64415,7 @@ sort: by_weight
 # 东寨	dong zhai	0
 东寨港	dong zhai gang	2
 东站	dong zhan	98
+动账	dong zhang	100
 冻胀	dong zhang	4
 东张	dong zhang	3
 东张西望	dong zhang xi wang	177
@@ -80920,6 +80923,7 @@ sort: by_weight
 付出真心	fu chu zhen xin	50
 赋初值	fu chu zhi	12
 富川	fu chuan	7
+浮窗	fu chuang	78
 富春	fu chun	94
 # 福春	fu chun	0
 富春鸡	fu chun ji	1
@@ -92011,6 +92015,7 @@ sort: by_weight
 共谋	gong mou	174
 共谋发展	gong mou fa zhan	8
 公亩	gong mu	4
+公母	gong mu	53
 公墓	gong mu	305
 公募	gong mu	2209
 共募集	gong mu ji	4
@@ -99767,6 +99772,7 @@ sort: by_weight
 锅饼	guo bing	4
 国柄	guo bing	7
 果擘洞庭橘	guo bo dong ting ju	2
+国补	guo bu	22
 裹布	guo bu	3
 # 过埠	guo bu	0
 果不出	guo bu chu	5
@@ -114307,6 +114313,7 @@ sort: by_weight
 花鸟画家	hua niao hua jia	7
 花鸟市场	hua niao shi chang	82
 花鸟鱼虫	hua niao yu chong	53
+花鸟鱼市	hua niao yu shi	53
 华宁县	hua ning xian	1
 化脓	hua nong	263
 花农	hua nong	75
@@ -122545,6 +122552,7 @@ sort: by_weight
 集会游行	ji hui you xing	9
 忌讳之禁	ji hui zhi jin	1
 机会主义	ji hui zhu yi	151
+记混	ji hun	87
 击昏	ji hun	38
 激活	ji huo	5258
 集火	ji huo	605
@@ -157996,6 +158004,8 @@ sort: by_weight
 涝的涝死	lao de lao si	74
 劳德鲁普	lao de lu pu	37
 老得	lao dei	130
+老灯	lao deng	100
+老登	lao deng	100
 老弟	lao di	482
 老底	lao di	233
 牢底	lao di	111
@@ -159821,7 +159831,7 @@ sort: by_weight
 冷饭	leng fan	346
 冷粉	leng fen	7
 冷风	leng feng	509
-冷锋	leng feng	562
+冷锋	leng feng	56
 # 冷峰	leng feng	0
 冷风机	leng feng ji	11
 冷敷	leng fu	234
@@ -162106,6 +162116,7 @@ sort: by_weight
 离线	li xian	2104
 历险	li xian	258
 立宪	li xian	194
+理线	li xian	100
 立显	li xian	25
 立现	li xian	68
 离弦	li xian	52
@@ -170622,6 +170633,7 @@ sort: by_weight
 芦丁	lu ding	17
 鲁定公	lu ding gong	8
 鹿鼎记	lu ding ji	462
+芦丁鸡	lu ding ji	100
 芦丁片	lu ding pian	4
 泸定桥	lu ding qiao	59
 泸定县	lu ding xian	4
@@ -175853,6 +175865,7 @@ sort: by_weight
 满身是汗	man shen shi han	11
 蔓生	man sheng	29
 曼声	man sheng	2
+慢生活	man sheng huo	1
 慢声细语	man sheng xi yu	6
 蔓生植物	man sheng zhi wu	6
 满是	man shi	2091
@@ -190909,6 +190922,7 @@ sort: by_weight
 你老是	ni lao shi	67
 你老子	ni lao zi	32
 腻了	ni le	586
+匿了	ni le	100
 拟了	ni le	30
 尼勒克	ni le ke	6
 尼勒克县	ni le ke xian	6
@@ -204040,6 +204054,7 @@ sort: by_weight
 气死我	qi si wo	22
 气死我了	qi si wo le	369
 七艘	qi sou	10
+起送	qi song	23
 起诉	qi su	5940
 泣诉	qi su	17
 栖宿	qi su	1
@@ -244929,6 +244944,8 @@ sort: by_weight
 爽脆	shuang cui	243
 双脆锅巴	shuang cui guo ba	1
 双打	shuang da	509
+霜打	shuang da	100
+霜打菜	shuang da cai	100
 双打比赛	shuang da bi sai	22
 双达标	shuang da biao	4
 双带	shuang dai	4
@@ -249799,7 +249816,8 @@ sort: by_weight
 松坂庆子	song ban qing zi	7
 松绑	song bang	237
 送报	song bao	13
-怂包	song bao	111
+𪨊包	song bao	111
+怂包	song bao	100
 送报员	song bao yuan	2
 松北	song bei	2
 松北区	song bei qu	6
@@ -250168,7 +250186,7 @@ sort: by_weight
 送人	song ren	1343
 宋人	song ren	523
 松仁	song ren	38
-怂人	song ren	55
+𪨊人	song ren	55
 松仁糕	song ren gao	2
 松任谷由实	song ren gu you shi	15
 送人情	song ren qing	11
@@ -257316,6 +257334,7 @@ sort: by_weight
 堂嫂	tang sao	34
 搪塞	tang se	524
 汤色	tang se	338
+糖色	tang se	117
 唐僧	tang seng	1525
 唐僧取经	tang seng qu jing	41
 唐僧肉	tang seng rou	69
@@ -261685,10 +261704,12 @@ sort: by_weight
 跳不了	tiao bu liao	28
 挑不了	tiao bu liao	4
 挑不起	tiao bu qi	12
+调不通	tiao bu tong	38
 挑不完	tiao bu wan	4
 跳不远	tiao bu yuan	2
 挑菜	tiao cai	18
 调参	tiao can	525
+调仓	tiao cang	301
 跳槽	tiao cao	7096
 跳操	tiao cao	314
 跳槽者	tiao cao zhe	16
@@ -262150,6 +262171,7 @@ sort: by_weight
 调停人	tiao ting ren	9
 调停者	tiao ting zhe	20
 跳痛	tiao tong	30
+调通	tiao tong	38
 跳投	tiao tou	1028
 挑头	tiao tou	50
 挑土	tiao tu	5
@@ -269183,6 +269205,7 @@ sort: by_weight
 挖苦	wa ku	429
 挖苦嘲讽	wa ku chao feng	10
 挖矿	wa kuang	1421
+瓦剌	wa la	228
 哇啦	wa la	78
 瓦拉	wa la	158
 哇啦哇啦	wa la wa la	59
@@ -297914,7 +297937,7 @@ sort: by_weight
 写进	xie jin	1416
 泄劲	xie jin	6
 谢晋	xie jin	73
-# 谢缙	xie jin	0
+谢缙	xie jin	102
 协进会	xie jin hui	6
 写进来	xie jin lai	17
 写进去	xie jin qu	232
@@ -335650,7 +335673,7 @@ sort: by_weight
 与整体	yu zheng ti	194
 俞正燮	yu zheng xie	2
 与政治	yu zheng zhi	469
-与之	yu zhi	6312
+与之	yu zhi	631
 欲知	yu zhi	110
 预知	yu zhi	726
 谕旨	yu zhi	57
@@ -348764,7 +348787,7 @@ sort: by_weight
 这好	zhe hao	16
 这号	zhe hao	168
 这好比	zhe hao bi	150
-这和	zhe he	5854
+这和	zhe he	585
 折合	zhe he	982
 这盒	zhe he	79
 折合人民币	zhe he ren min bi	547
@@ -375788,3 +375811,6 @@ sort: by_weight
 氟化合物	fu hua he wu	34
 空间频率	kong jian pin lv	30
 机读	ji du	30
+均订	junding	38
+万订	wan ding	12
+千订	qian ding	3
