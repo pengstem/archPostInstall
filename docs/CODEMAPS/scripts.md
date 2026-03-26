@@ -19,9 +19,9 @@ scripts/
 │   └── restore_firefox.sh            # Restore Firefox config
 ├── gnome/
 │   ├── backup_gnome_state.sh   # Sync GNOME state to docs/
-│   ├── dpms-toggle.sh          # Display power management (1269 lines)
-│   ├── dpms-lock-monitor.sh    # Lock/unlock watcher for dpms-toggle
-│   └── cleanup_dpms_logs.sh    # Log rotation
+│   ├── dpms-common.sh          # DPMS config + logging helpers
+│   ├── dpms-toggle.sh          # Display power and app orchestration
+│   └── dpms-lock-monitor.sh    # Lock/unlock watcher for dpms-toggle
 ├── power/
 │   └── measure_tlp_power.sh    # TLP power measurement
 └── zathura/
@@ -40,11 +40,11 @@ scripts/
 | `backup_firefox.sh` | ~40 | Firefox profile backup |
 | `restore_firefox.sh` | ~50 | Firefox profile restore |
 | `backup_gnome_state.sh` | ~100 | GNOME state sync with throttle |
-| `dpms-toggle.sh` | ~1269 | Complex DPMS state machine |
-| `dpms-lock-monitor.sh` | ~90 | Logind lock watcher for DPMS |
-| `cleanup_dpms_logs.sh` | ~60 | Log rotation by age/count |
+| `dpms-common.sh` | ~366 | DPMS config DSL, validation, logging, locking |
+| `dpms-toggle.sh` | ~482 | Linear DPMS off/on flow with power switching |
+| `dpms-lock-monitor.sh` | ~78 | Logind lock watcher for DPMS |
 | `update_pkglist.sh` | ~30 | Pacman hook target |
-| `measure_tlp_power.sh` | ~246 | Battery power measurement |
+| `measure_tlp_power.sh` | ~244 | Battery power measurement |
 | `page-to-clipboard.sh` | ~30 | Zathura helper |
 
 ## Key Functions
@@ -60,8 +60,6 @@ scripts/
 - `install_plugin()` - Clone zsh plugin if missing
 
 ### dpms-toggle.sh
-- 60+ functions for DPMS state machine
-- App kill/restore management
-- Power profile switching
-- Brightness control
-- Logging with rotation
+- Explicit app stop/start flow from `dpms.conf`
+- Power profile switching through TLP or power-profiles-daemon
+- Bounded in-process log rotation

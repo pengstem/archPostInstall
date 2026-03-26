@@ -27,16 +27,15 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 ## DPMS Toggle and Lock Hook
 - `dpms-toggle` turns the display off/on and manages app shutdown/restore.
 - `archpostinstall-dpms-lock-monitor.service` watches logind lock state and runs `dpms-toggle --off/--on` on lock/unlock.
-- Configure app lists and power profile in `configs/archpostinstall/dpms.conf`.
+- Configure app behavior in `configs/archpostinstall/dpms.conf` with `dpms_defaults`, `dpms_app`, and `dpms_kill_only`.
 - Logs are written to `~/.cache/archpostinstall/dpms.log` for troubleshooting.
-- Log cleanup is handled by `archpostinstall-dpms-log-cleanup.timer` and controlled by `DPMS_LOG_CLEANUP_DAYS`/`DPMS_LOG_CLEANUP_MAX_FILES`.
-- Steam is closed automatically by default (see `DPMS_KILL_ONLY_MATCHES`).
-- For noisy logs, set `DPMS_VERBOSE=1`; for slower apps, increase `DPMS_START_WAIT_SEC`/`DPMS_START_RETRIES`.
-- If TLP is installed, `dpms-toggle` applies profiles from `DPMS_TLP_PROFILE_*` (requires passwordless `sudo` for `tlp`).
+- Log rotation is bounded inside `dpms-toggle` via `DPMS_LOG_MAX_BYTES` and `DPMS_LOG_KEEP`.
+- Steam and Firefox are closed automatically by default via `dpms_kill_only`.
+- `zen-browser`, `wechat`, and `qq` are configured as `--policy always`; `kitty` is `--policy on_only`.
+- For noisy logs, lower `DPMS_VERBOSE`; for slower apps, increase `DPMS_START_WAIT_SEC` / `DPMS_START_RETRIES`.
+- If TLP or power-profiles-daemon is installed, `dpms-toggle` applies profiles from `DPMS_PROFILE_*` using the selected backend.
 - Enable after linking:
   - `systemctl --user enable --now archpostinstall-dpms-lock-monitor.service`
-  - `systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer`
-- Set `DPMS_KILL_OTHER_GUI=0` to avoid best-effort closing of non-whitelisted GUI apps.
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
 
 ## Package List Updates

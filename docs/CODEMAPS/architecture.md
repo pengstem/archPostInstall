@@ -50,9 +50,6 @@ archpostinstall-gnome-sync.path     # Watches dconf/extensions/themes
 
 archpostinstall-dpms-lock-monitor.service
 └── dpms-lock-monitor.sh → dpms-toggle.sh --off/--on
-
-archpostinstall-dpms-log-cleanup.timer
-└── archpostinstall-dpms-log-cleanup.service → cleanup_dpms_logs.sh
 ```
 
 ## Pacman Hook
@@ -69,4 +66,4 @@ archpostinstall-dpms-log-cleanup.timer
 - Symlink with `.bak_<epoch>` backup
 - Hash-based change detection for backups
 - Throttled GNOME sync (1800s default)
-- Configuration-driven DPMS via `dpms.conf`
+- Configuration-driven DPMS via helper DSL in `dpms.conf`

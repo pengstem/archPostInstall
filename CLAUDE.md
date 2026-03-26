@@ -58,7 +58,7 @@ bash -n scripts/some_script.sh
 
 **Key files:**
 - `scripts/pkglist.txt` - Package source of truth; auto-updated by pacman hook
-- `configs/archpostinstall/dpms.conf` - DPMS automation settings (apps to kill/restore, power profiles)
+- `configs/archpostinstall/dpms.conf` - DPMS automation DSL (`dpms_defaults`, `dpms_app`, `dpms_kill_only`)
 - `docs/fileLocationList.md` - Complete source-to-target symlink mapping
 
 ## Symlink Behavior
@@ -83,7 +83,6 @@ After running `setup.sh`, enable user units:
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path  # Auto-sync GNOME state
 systemctl --user enable --now archpostinstall-dpms-lock-monitor.service  # DPMS automation
-systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer
 ```
 
 ## Shell Script Conventions

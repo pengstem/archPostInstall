@@ -38,8 +38,6 @@
 | configs/systemd/user/archpostinstall-gnome-sync.service | ~/.config/systemd/user/archpostinstall-gnome-sync.service | user unit |
 | configs/systemd/user/archpostinstall-gnome-sync.path | ~/.config/systemd/user/archpostinstall-gnome-sync.path | user unit |
 | configs/systemd/user/archpostinstall-dpms-lock-monitor.service | ~/.config/systemd/user/archpostinstall-dpms-lock-monitor.service | user unit |
-| configs/systemd/user/archpostinstall-dpms-log-cleanup.service | ~/.config/systemd/user/archpostinstall-dpms-log-cleanup.service | user unit |
-| configs/systemd/user/archpostinstall-dpms-log-cleanup.timer | ~/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer | user unit |
 | configs/applications/google-chrome.desktop | ~/.local/share/applications/google-chrome.desktop | user desktop entry |
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
 | configs/applications/WeChat.desktop | ~/.local/share/applications/WeChat.desktop | user desktop entry |
@@ -49,7 +47,6 @@
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
 | scripts/gnome/dpms-toggle.sh | /usr/local/bin/dpms-toggle | sudo |
 | scripts/gnome/dpms-lock-monitor.sh | ~/.local/bin/archpostinstall-dpms-lock-monitor | user bin |
-| scripts/gnome/cleanup_dpms_logs.sh | ~/.local/bin/archpostinstall-dpms-log-cleanup | user bin |
 | scripts/launchers/yazi-desktop.sh | ~/.local/bin/yazi-desktop | user bin |
 | scripts/launchers/yazi-open-nautilus.sh | ~/.local/bin/yazi-open-nautilus | user bin |
 | scripts/power/measure_tlp_power.sh | ~/.local/bin/archpostinstall-measure-power | user bin |

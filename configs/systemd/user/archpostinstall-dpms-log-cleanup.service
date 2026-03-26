@@ -1,6 +1,0 @@
-[Unit]
-Description=Cleanup dpms-toggle log archives
-
-[Service]
-Type=oneshot
-ExecStart=%h/.local/bin/archpostinstall-dpms-log-cleanup

@@ -57,8 +57,8 @@ Rime input method user databases (build artifacts).
 ## State Files
 
 ### DPMS State (Runtime)
-- `~/.cache/archpostinstall/dpms.state` - Current DPMS state
-- `~/.cache/archpostinstall/dpms.log` - DPMS activity log
+- `~/.cache/archpostinstall/dpms.state` - Plain-text reopen queue (one app id per line)
+- `~/.cache/archpostinstall/dpms.log` - DPMS activity log with `.1`, `.2`, ... archives
 
 ### Backup Hashes (Runtime)
 - `~/.local/state/archpostinstall/themes.hash`

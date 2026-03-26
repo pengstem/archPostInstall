@@ -50,5 +50,4 @@ Enable automatic GNOME sync after linking:
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path
 systemctl --user enable --now archpostinstall-dpms-lock-monitor.service
-systemctl --user enable --now archpostinstall-dpms-log-cleanup.timer
 ```

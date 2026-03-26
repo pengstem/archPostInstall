@@ -58,6 +58,37 @@ create_link() {
     echo "✅ Linked"
 }
 
+remove_obsolete_link() {
+    local dest="$1"
+    local expected_src="$2"
+    local name="$3"
+
+    printf "  %-15s " "[$name]"
+
+    if [ -L "$dest" ] && [ "$(readlink "$dest" 2>/dev/null || true)" = "$expected_src" ]; then
+        rm -f "$dest"
+        echo "🧹 Removed obsolete link"
+        return
+    fi
+
+    echo "⏭️  Not present"
+}
+
+remove_obsolete_symlink() {
+    local dest="$1"
+    local name="$2"
+
+    printf "  %-15s " "[$name]"
+
+    if [ -L "$dest" ]; then
+        rm -f "$dest"
+        echo "🧹 Removed obsolete symlink"
+        return
+    fi
+
+    echo "⏭️  Not present"
+}
+
 # Function to create symlink with sudo (for /etc files)
 create_sudo_link() {
     local src="$1"
@@ -178,18 +209,21 @@ create_link "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$HOME/.local/bin/ar
 create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostinstall" "Archpostinstall Bin"
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
 create_link "$REPO_DIR/scripts/gnome/dpms-lock-monitor.sh" "$HOME/.local/bin/archpostinstall-dpms-lock-monitor" "DPMS Lock Monitor"
-create_link "$REPO_DIR/scripts/gnome/cleanup_dpms_logs.sh" "$HOME/.local/bin/archpostinstall-dpms-log-cleanup" "DPMS Log Cleanup"
 create_link "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$HOME/.local/bin/archpostinstall-measure-power" "Power Measure"
 create_link "$REPO_DIR/scripts/launchers/yazi-desktop.sh" "$HOME/.local/bin/yazi-desktop" "Yazi Desktop"
 create_link "$REPO_DIR/scripts/launchers/yazi-open-nautilus.sh" "$HOME/.local/bin/yazi-open-nautilus" "Yazi Nautilus"
 create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/zathura-page-to-clipboard" "Zathura Clipboard"
 
+# Bin cleanup (obsolete)
+remove_obsolete_link "$HOME/.local/bin/archpostinstall-dpms-log-cleanup" "$REPO_DIR/scripts/gnome/cleanup_dpms_logs.sh" "DPMS Log Cleanup"
+
 # Systemd (User)
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.path"    "$HOME/.config/systemd/user/archpostinstall-gnome-sync.path"    "Gnome Sync Path"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-lock-monitor.service" "$HOME/.config/systemd/user/archpostinstall-dpms-lock-monitor.service" "DPMS Lock Monitor Service"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.service" "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.service" "DPMS Log Cleanup Service"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer"   "DPMS Log Cleanup Timer"
+remove_obsolete_link "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.service" "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.service" "DPMS Log Cleanup Service"
+remove_obsolete_link "$HOME/.config/systemd/user/archpostinstall-dpms-log-cleanup.timer" "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-log-cleanup.timer" "DPMS Log Cleanup Timer"
+remove_obsolete_symlink "$HOME/.config/systemd/user/default.target.wants/archpostinstall-dpms-log-cleanup.timer" "DPMS Timer Enable"
 
 echo ""
 echo "✨ Configuration linking complete!"

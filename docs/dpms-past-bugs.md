@@ -1,5 +1,12 @@
 # DPMS Past Bug List
 
+## Simplification Pass (2026-03-26)
+
+- Replaced the parallel-array config with `dpms_defaults`, `dpms_app`, and `dpms_kill_only`.
+- Collapsed the old multi-branch DPMS state machine into a linear off/on flow.
+- Removed brightness restore, generic GUI sweeping, app activation commands, suspend-on-lock, and the log cleanup timer/service.
+- Runtime state is now a plain-text reopen queue instead of sourced shell variables.
+
 ## Fixed Bugs (2026-02-01)
 
 - ~~Lock fallback after `flock` can run concurrently if `ps` misses the other instance; treat a busy `flock` as authoritative.~~
@@ -16,12 +23,11 @@
 
 ## Known Issues (Not Fixed)
 
-- `zen` shutdown relies on `pkill` matching the correct process name; a mismatch can leave the browser running or force-kill the wrong process.
-  **Note:** This is a configuration issue, not a code bug. Users should verify their `DPMS_KILL_MATCHES` patterns match actual process names.
+- `zen` shutdown still relies on the configured `--match` regex catching the right process name; a mismatch can leave the browser running or force-kill the wrong process.
+  **Note:** This is a configuration issue, not a code bug. Users should verify their `dpms_app --match ...` regex matches the actual process name.
 
 ## Refactoring Notes
 
 - Created `dpms-common.sh` shared library with common functions
-- Consolidated `is_running_match()` and `list_running_match()` into `find_running_match()`
 - Removed duplicate `require_cmd()` and `get_session_id()` functions
-- Updated `dpms-lock-monitor.sh` and `cleanup_dpms_logs.sh` to use shared library
+- Updated `dpms-lock-monitor.sh` to use shared library

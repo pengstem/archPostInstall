@@ -79,22 +79,11 @@ configs/
 
 ### dpms.conf
 ```bash
-# App management (parallel arrays)
-DPMS_REOPEN_NAMES=("app1" "app2")
-DPMS_KILL_MATCHES=("pattern1" "pattern2")
-DPMS_REOPEN_COMMANDS=("cmd1" "cmd2")
-DPMS_WM_CLASSES=("class1" "class2")
-
-# Power profiles
-DPMS_POWER_PROFILE_ON="balanced"
-DPMS_POWER_PROFILE_OFF="power-saver"
-
-# Logging
-DPMS_VERBOSE=1
-DPMS_LOG_MAX_BYTES=1048576
+dpms_defaults --profile-on balanced --profile-off power-saver --log-keep 3
+dpms_app --name zen-browser --match 'zen-bin|zen-browser' --start 'zen-browser' --policy always
+dpms_kill_only --name steam --match 'steam'
 ```
 
 ### Systemd Units
 - `archpostinstall-gnome-sync.{path,service}` - Watch GNOME config changes
 - `archpostinstall-dpms-lock-monitor.service` - Lock/unlock watcher
-- `archpostinstall-dpms-log-cleanup.{timer,service}` - Log rotation
