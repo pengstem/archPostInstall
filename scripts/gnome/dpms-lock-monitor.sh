@@ -8,13 +8,15 @@ SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 # Source shared library
 . "$SCRIPT_DIR/dpms-common.sh"
 
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/archpostinstall/dpms.conf"
+
 # Setup runtime environment
 setup_runtime_env
-
-LOG_TAG="dpms-lock-monitor"
+load_dpms_config "$CONFIG_FILE" optional 0
+dpms_init_log "dpms-lock-monitor"
 
 log() {
-    dpms_log "$LOG_TAG" "$@"
+    dpms_log "$@"
 }
 
 # get_session_id is now provided by dpms-common.sh

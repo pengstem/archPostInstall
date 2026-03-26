@@ -192,13 +192,22 @@ ensure_app_started() {
 }
 
 write_state() {
+    local tmp_file
+
+    if [ "$#" -eq 0 ]; then
+        clear_state
+        return 0
+    fi
+
     mkdir -p "$STATE_DIR"
-    : > "$STATE_FILE"
+    tmp_file="$(mktemp "$STATE_DIR/dpms.state.XXXXXX")"
 
     while [ "$#" -gt 0 ]; do
-        printf "%s\n" "$1" >> "$STATE_FILE"
+        printf "%s\n" "$1" >> "$tmp_file"
         shift
     done
+
+    mv "$tmp_file" "$STATE_FILE"
 }
 
 read_state() {
@@ -270,61 +279,6 @@ has_ssh_session() {
     return 1
 }
 
-resolve_power_backend() {
-    case "$DPMS_POWER_BACKEND" in
-        tlp)
-            if command -v tlpctl >/dev/null 2>&1; then
-                printf "tlpctl\n"
-            elif command -v tlp >/dev/null 2>&1; then
-                printf "tlp\n"
-            else
-                printf "none\n"
-            fi
-            ;;
-        ppd)
-            if command -v powerprofilesctl >/dev/null 2>&1; then
-                printf "ppd\n"
-            else
-                printf "none\n"
-            fi
-            ;;
-        auto)
-            if command -v tlpctl >/dev/null 2>&1; then
-                printf "tlpctl\n"
-            elif command -v tlp >/dev/null 2>&1; then
-                printf "tlp\n"
-            elif command -v powerprofilesctl >/dev/null 2>&1; then
-                printf "ppd\n"
-            else
-                printf "none\n"
-            fi
-            ;;
-    esac
-}
-
-set_tlp_profile() {
-    local profile="$1"
-
-    if command -v tlpctl >/dev/null 2>&1; then
-        tlpctl set "$profile" >/dev/null 2>&1
-        return $?
-    fi
-
-    if ! command -v tlp >/dev/null 2>&1; then
-        return 1
-    fi
-
-    if [ "${DPMS_TLP_USE_SUDO:-1}" -eq 1 ]; then
-        if ! command -v sudo >/dev/null 2>&1; then
-            return 1
-        fi
-        sudo -n tlp "$profile" >/dev/null 2>&1
-        return $?
-    fi
-
-    tlp "$profile" >/dev/null 2>&1
-}
-
 apply_power_profile() {
     local profile="$1"
     local backend
@@ -333,11 +287,11 @@ apply_power_profile() {
         return 0
     fi
 
-    backend="$(resolve_power_backend)"
+    backend="$(dpms_resolve_power_backend)"
     case "$backend" in
         tlpctl|tlp)
             dpms_log "Switching power profile via TLP: $profile"
-            if ! set_tlp_profile "$profile"; then
+            if ! dpms_set_tlp_profile "$profile"; then
                 dpms_log "Warning: failed to set TLP profile: $profile"
             fi
             ;;

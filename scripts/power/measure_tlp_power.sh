@@ -37,33 +37,20 @@ if ! [[ "$MEASURE_SECONDS" =~ ^[0-9]+$ ]] || \
     exit 1
 fi
 
-have_tlp() {
-    command -v tlp >/dev/null 2>&1
-}
-
-run_tlp_profile() {
-    local profile="$1"
-
-    if [ "${DPMS_TLP_USE_SUDO:-1}" -eq 1 ]; then
-        if command -v sudo >/dev/null 2>&1 && sudo -n tlp "$profile" >/dev/null 2>&1; then
-            return 0
-        fi
-        dpms_log "sudo tlp $profile not permitted; cannot switch profile."
-        return 1
-    fi
-
-    tlp "$profile" >/dev/null 2>&1
-}
-
 set_profile() {
     local profile="$1"
 
-    if [ -z "$profile" ] || ! have_tlp; then
+    if [ -z "$profile" ] || ! dpms_have_tlp; then
         return 1
     fi
 
     dpms_log "Switching TLP profile: $profile"
-    run_tlp_profile "$profile"
+    if ! dpms_set_tlp_profile "$profile"; then
+        dpms_log "Failed to switch TLP profile: $profile"
+        return 1
+    fi
+
+    return 0
 }
 
 is_effectively_zero() {
@@ -222,8 +209,8 @@ measure_profile() {
     printf "%s: %s W (profile: %s, source: %s)\n" "$label" "$avg" "$profile" "$source"
 }
 
-if ! have_tlp; then
-    dpms_log "tlp not found; cannot measure."
+if ! dpms_have_tlp; then
+    dpms_log "TLP backend not found; cannot measure."
     exit 1
 fi
 

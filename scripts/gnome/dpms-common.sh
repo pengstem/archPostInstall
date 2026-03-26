@@ -55,6 +55,7 @@ reset_dpms_config() {
     DPMS_APPS=()
     DPMS_KILL_ONLY_APPS=()
     DPMS_POWER_BACKEND="auto"
+    DPMS_POWER_BACKEND_RESOLVED=""
     DPMS_PROFILE_ON="balanced"
     DPMS_PROFILE_OFF="power-saver"
     DPMS_PROFILE_OFF_SSH="balanced"
@@ -340,6 +341,72 @@ dpms_log() {
     if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
         printf "%s\n" "$msg" >&2
     fi
+}
+
+dpms_have_tlp() {
+    command -v tlpctl >/dev/null 2>&1 || command -v tlp >/dev/null 2>&1
+}
+
+dpms_resolve_power_backend() {
+    if [ -n "${DPMS_POWER_BACKEND_RESOLVED:-}" ]; then
+        printf "%s\n" "$DPMS_POWER_BACKEND_RESOLVED"
+        return 0
+    fi
+
+    case "$DPMS_POWER_BACKEND" in
+        tlp)
+            if command -v tlpctl >/dev/null 2>&1; then
+                DPMS_POWER_BACKEND_RESOLVED="tlpctl"
+            elif command -v tlp >/dev/null 2>&1; then
+                DPMS_POWER_BACKEND_RESOLVED="tlp"
+            else
+                DPMS_POWER_BACKEND_RESOLVED="none"
+            fi
+            ;;
+        ppd)
+            if command -v powerprofilesctl >/dev/null 2>&1; then
+                DPMS_POWER_BACKEND_RESOLVED="ppd"
+            else
+                DPMS_POWER_BACKEND_RESOLVED="none"
+            fi
+            ;;
+        auto)
+            if command -v tlpctl >/dev/null 2>&1; then
+                DPMS_POWER_BACKEND_RESOLVED="tlpctl"
+            elif command -v tlp >/dev/null 2>&1; then
+                DPMS_POWER_BACKEND_RESOLVED="tlp"
+            elif command -v powerprofilesctl >/dev/null 2>&1; then
+                DPMS_POWER_BACKEND_RESOLVED="ppd"
+            else
+                DPMS_POWER_BACKEND_RESOLVED="none"
+            fi
+            ;;
+    esac
+
+    printf "%s\n" "$DPMS_POWER_BACKEND_RESOLVED"
+}
+
+dpms_set_tlp_profile() {
+    local profile="$1"
+
+    if command -v tlpctl >/dev/null 2>&1; then
+        tlpctl set "$profile" >/dev/null 2>&1
+        return $?
+    fi
+
+    if ! command -v tlp >/dev/null 2>&1; then
+        return 1
+    fi
+
+    if [ "${DPMS_TLP_USE_SUDO:-1}" -eq 1 ]; then
+        if ! command -v sudo >/dev/null 2>&1; then
+            return 1
+        fi
+        sudo -n tlp "$profile" >/dev/null 2>&1
+        return $?
+    fi
+
+    tlp "$profile" >/dev/null 2>&1
 }
 
 acquire_lock() {
