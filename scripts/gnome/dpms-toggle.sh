@@ -48,20 +48,6 @@ read_kill_only_record() {
     IFS="$DPMS_RECORD_SEP" read -r KILL_NAME KILL_MATCH <<< "$record"
 }
 
-append_unique() {
-    local -n ref="$1"
-    local item="$2"
-    local existing
-
-    for existing in "${ref[@]}"; do
-        if [ "$existing" = "$item" ]; then
-            return 0
-        fi
-    done
-
-    ref+=("$item")
-}
-
 is_match_running() {
     local match="$1"
     pgrep -f -i -- "$match" >/dev/null 2>&1
@@ -173,7 +159,6 @@ ensure_app_started() {
     local attempt=1
 
     if is_match_running "$match"; then
-        dpms_log "Already running: $name"
         return 0
     fi
 
@@ -210,17 +195,20 @@ write_state() {
     mv "$tmp_file" "$STATE_FILE"
 }
 
-read_state() {
+read_state_map() {
     local -n ref="$1"
+    local key
 
-    ref=()
+    for key in "${!ref[@]}"; do
+        unset "ref[$key]"
+    done
     if [ ! -f "$STATE_FILE" ]; then
         return 0
     fi
 
     while IFS= read -r line; do
         if [ -n "$line" ]; then
-            append_unique ref "$line"
+            ref["$line"]=1
         fi
     done < "$STATE_FILE"
 }
@@ -307,39 +295,6 @@ apply_power_profile() {
     esac
 }
 
-find_app_record() {
-    local target_name="$1"
-    local record
-
-    for record in "${DPMS_APPS[@]}"; do
-        read_app_record "$record"
-        if [ "$APP_NAME" = "$target_name" ]; then
-            printf "%s\n" "$record"
-            return 0
-        fi
-    done
-
-    return 1
-}
-
-collect_restore_targets() {
-    local -n ref="$1"
-    local -a recorded=()
-    local record
-
-    read_state recorded
-    ref=("${recorded[@]}")
-
-    for record in "${DPMS_APPS[@]}"; do
-        read_app_record "$record"
-        case "$APP_POLICY" in
-            always|on_only)
-                append_unique ref "$APP_NAME"
-                ;;
-        esac
-    done
-}
-
 dpms_off() {
     local -a recorded_running=()
     local record
@@ -356,11 +311,9 @@ dpms_off() {
         fi
         if is_match_running "$APP_MATCH"; then
             if [ "$APP_POLICY" = "running" ]; then
-                append_unique recorded_running "$APP_NAME"
+                recorded_running+=("$APP_NAME")
             fi
             stop_app "$APP_NAME" "$APP_MATCH" "$APP_STOP" || true
-        else
-            dpms_log "Not running: $APP_NAME"
         fi
     done
 
@@ -388,8 +341,8 @@ dpms_off() {
 }
 
 dpms_on() {
-    local -a restore_targets=()
-    local record name
+    local -A recorded_running=()
+    local record should_restore
 
     if ! is_display_on; then
         set_display_mode 0 || true
@@ -398,20 +351,30 @@ dpms_on() {
     fi
 
     apply_power_profile "$DPMS_PROFILE_ON"
-    collect_restore_targets restore_targets
 
-    if [ "$DPMS_REOPEN_DELAY_SEC" -gt 0 ] && [ "${#restore_targets[@]}" -gt 0 ]; then
+    read_state_map recorded_running
+
+    if [ "$DPMS_REOPEN_DELAY_SEC" -gt 0 ] && [ "${#DPMS_APPS[@]}" -gt 0 ]; then
         sleep "$DPMS_REOPEN_DELAY_SEC"
     fi
 
-    for name in "${restore_targets[@]}"; do
-        record="$(find_app_record "$name" || true)"
-        if [ -z "$record" ]; then
-            dpms_log "Skipping unknown app in state: $name"
-            continue
-        fi
+    for record in "${DPMS_APPS[@]}"; do
         read_app_record "$record"
-        ensure_app_started "$APP_NAME" "$APP_MATCH" "$APP_START" || true
+        should_restore=0
+        case "$APP_POLICY" in
+            always|on_only)
+                should_restore=1
+                ;;
+            running)
+                if [ -n "${recorded_running[$APP_NAME]+x}" ]; then
+                    should_restore=1
+                fi
+                ;;
+        esac
+
+        if [ "$should_restore" -eq 1 ]; then
+            ensure_app_started "$APP_NAME" "$APP_MATCH" "$APP_START" || true
+        fi
     done
 
     clear_state
