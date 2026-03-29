@@ -12,4 +12,4 @@ native-screenshot-copy-mode@nastem.github.com
 gnome-fuzzy-app-search@gnome-shell-extensions.Czarlie.gitlab.com
 BingWallpaper@ineffable-gmail.com
 codexbar-gnome
-dash-to-dock@micxgx.gmail.com
+hidetopbar@mathieu.bidon.ca
