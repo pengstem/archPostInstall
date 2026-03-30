@@ -1,4 +1,4 @@
-# Package list generated on Sun Mar 29 05:43:30 PM CST 2026
+# Package list generated on Mon Mar 30 12:30:12 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -131,6 +131,8 @@ ripgrep
 riscv64-linux-gnu-binutils
 riscv64-linux-gnu-gcc
 rsync
+rustrover
+rustrover-jre
 rustup
 sassc
 scrcpy
