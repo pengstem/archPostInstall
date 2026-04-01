@@ -1,4 +1,4 @@
-# Package list generated on Mon Mar 30 12:30:12 PM CST 2026
+# Package list generated on Wed Apr 01 09:13:33 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -96,7 +96,6 @@ nautilus
 neomutt
 neovim
 networkmanager
-newsboat
 nlohmann-json
 nmap
 noto-fonts-cjk
@@ -135,6 +134,7 @@ rustrover
 rustrover-jre
 rustup
 sassc
+scc
 scrcpy
 sparkle-bin
 spotify-launcher
@@ -160,6 +160,8 @@ ttf-jetbrains-mono
 ttf-jetbrains-mono-nerd
 ttf-liberation
 ttf-maplemono-nf-cn-unhinted
+ttf-ms-fonts
+ttf-wps-fonts
 uv
 ventoy-bin
 vim
@@ -174,6 +176,10 @@ wmctrl
 wordnet-common
 wordnet-dictd
 wordnet-progs
+wps-office-cn
+wps-office-fonts
+wps-office-mime-cn
+wps-office-mui-zh-cn
 xdg-desktop-portal-termfilechooser-hunkyburrito-git
 xdg-user-dirs
 yay
@@ -184,6 +190,7 @@ zathura-pdf-mupdf
 zed
 zellij
 zen-browser-bin
+zimfw
 zoxide
 zram-generator
 zsh
