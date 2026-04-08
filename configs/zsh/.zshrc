@@ -1,5 +1,4 @@
-# Load modular Zsh config files from ~/.config/zsh/rc.d in lexical order.
-# This file intentionally stays small to keep bootstrap and debugging simple.
+# Compatibility entrypoint for shells that still inherit ZDOTDIR=~/.config/zsh.
 
 if [[ $- != *i* ]]; then
     return

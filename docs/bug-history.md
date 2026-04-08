@@ -15,3 +15,7 @@ This file tracks notable configuration issues, their root causes, and the fixes 
 ## 2026-03-25
 - Yazi `g n`: opening GNOME Files from the manager could hand Nautilus a malformed doubled path such as `"/path"/"/path"`.
   Fix: replace the inline nested `shell` snippet with a dedicated launcher script at `scripts/launchers/yazi-open-nautilus.sh`, and wire it through `configs/yazi/keymap.toml` and `setup.sh`.
+
+## 2026-04-08
+- Hyde install: it injected `~/.zshenv` and extra dotfiles into the repo-backed `configs/zsh/`, which diverted Zsh away from the repo's modular startup and left the workspace dirty with generated cache files.
+  Fix: remove the Hyde-generated Zsh files, move the home-level Hyde leftovers into `~/.config/cfg_backups/*_codex_hyde_cleanup/`, and redirect Zsh history / compdump output to `~/.local/state/zsh/` and `~/.cache/zsh/`.
