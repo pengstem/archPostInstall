@@ -1,3 +1,3 @@
 Cursor Bibata-Modern-Ice
-Icons Fluent-grey-dark-grey
-legacy application Orchis-Grey-Dark-Compact
+Icons Fluent-grey-dark-grey-light
+legacy application Wallbash-Gtk

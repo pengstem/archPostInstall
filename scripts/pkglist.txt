@@ -1,4 +1,4 @@
-# Package list generated on Wed Apr 01 09:13:33 PM CST 2026
+# Package list generated on Mon Apr 20 09:19:03 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -12,6 +12,7 @@ bear
 bibata-cursor-theme-bin
 bluez-utils
 bottom
+brightnessctl
 btop
 btrfs-assistant
 btrfs-progs
@@ -59,9 +60,11 @@ gnome-tweaks
 google-chrome
 grub
 grub-btrfs
+gst-plugin-pipewire
 gtkwave
 heroic-games-launcher-bin
 hyperfine
+imagemagick
 inotify-tools
 isync
 iverilog
@@ -92,10 +95,12 @@ mosh
 mpv
 msmtp
 mupdf-tools
+musl-riscv64
 nautilus
 neomutt
 neovim
 networkmanager
+network-manager-applet
 nlohmann-json
 nmap
 noto-fonts-cjk
@@ -113,10 +118,15 @@ ollama-cuda
 opam
 os-prober
 pacman-contrib
+pamixer
+parallel
 pass
+pavucontrol
 perf
 perl-image-exiftool
 picocom
+pipewire-alsa
+playerctl
 pnpm
 postgresql
 powertop
@@ -127,6 +137,7 @@ qpdf
 repo
 resvg
 ripgrep
+riscv64-elf-gdb
 riscv64-linux-gnu-binutils
 riscv64-linux-gnu-gcc
 rsync
@@ -136,6 +147,7 @@ rustup
 sassc
 scc
 scrcpy
+silicon
 sparkle-bin
 spotify-launcher
 starship
@@ -162,6 +174,7 @@ ttf-liberation
 ttf-maplemono-nf-cn-unhinted
 ttf-ms-fonts
 ttf-wps-fonts
+udiskie
 uv
 ventoy-bin
 vim
@@ -195,4 +208,5 @@ zoxide
 zram-generator
 zsh
 zsh-autosuggestions
+zsh-completions
 zsh-syntax-highlighting

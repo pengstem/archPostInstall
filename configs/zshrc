@@ -16,3 +16,6 @@ unset ZSH_CONFIG_DIR zsh_config
 if [[ -s "$HOME/.bun/_bun" ]] && (( ${+functions[compdef]} )); then
     source "$HOME/.bun/_bun"
 fi
+
+# bun completions
+[ -s "/home/nastem/.bun/_bun" ] && source "/home/nastem/.bun/_bun"
