@@ -79,7 +79,7 @@ configs/
 
 ### dpms.conf
 ```bash
-dpms_defaults --profile-on balanced --profile-off power-saver --log-keep 3
+dpms_defaults --verbose 2 --log-keep 3 --reopen-delay 2
 dpms_app --name zen-browser --match 'zen-bin|zen-browser' --start 'zen-browser' --policy always
 dpms_kill_only --name steam --match 'steam'
 ```

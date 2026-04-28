@@ -33,7 +33,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - Steam and Firefox are closed automatically by default via `dpms_kill_only`.
 - `zen-browser`, `wechat`, and `qq` are configured as `--policy always`; `kitty` is `--policy on_only`.
 - For noisy logs, lower `DPMS_VERBOSE`; for slower apps, increase `DPMS_START_WAIT_SEC` / `DPMS_START_RETRIES`.
-- If TLP or power-profiles-daemon is installed, `dpms-toggle` applies profiles from `DPMS_PROFILE_*` using the selected backend.
+- `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
 - Enable after linking:
   - `systemctl --user enable --now archpostinstall-dpms-lock-monitor.service`
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
@@ -44,7 +44,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 
 ## TLP Power Management
 - TLP overrides live in `configs/tlp/99-archpostinstall.conf` and are linked to `/etc/tlp.d/99-archpostinstall.conf`.
-- `setup.sh` also installs `configs/sudoers.d/archpostinstall-tlp` so `dpms-toggle` can switch TLP profiles without prompts.
+- `setup.sh` also installs `configs/sudoers.d/archpostinstall-tlp` for promptless TLP profile commands used by power measurement tooling.
 - Power measurements can be taken with `./scripts/power/measure_tlp_power.sh` (or `archpostinstall measure-power`).
 
 ## BaiduPCS-Go

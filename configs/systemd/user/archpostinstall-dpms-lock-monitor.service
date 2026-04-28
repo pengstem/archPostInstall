@@ -1,5 +1,5 @@
 [Unit]
-Description=Monitor lock state to toggle DPMS apps/power
+Description=Monitor lock state to toggle DPMS display and apps
 After=graphical-session.target
 PartOf=graphical-session.target
 

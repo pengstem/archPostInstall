@@ -1,5 +1,14 @@
 # DPMS Past Bug List
 
+## Behavior Change (2026-04-28)
+
+- Removed power profile switching from `dpms-toggle.sh`; the DPMS path now only turns the display off/on and manages configured apps.
+- Removed `--power-backend`, `--profile-on`, `--profile-off`, `--profile-off-ssh`, `--switch-power`, and `--tlp-use-sudo` from the tracked `dpms.conf` defaults.
+- Kept TLP helper functions in `dpms-common.sh` because `scripts/power/measure_tlp_power.sh` still uses them for explicit measurements.
+- Validation references used on 2026-04-28:
+  - power-profiles-daemon D-Bus API reference: profile switching is exposed through `org.freedesktop.UPower.PowerProfiles` for OS/desktop environment power profile control.
+  - ArchWiki TLP / power management notes, fetched 2026-04-28 (Power management revision 870839 / last edited 2026-04-10): power policy is handled by dedicated userspace tools and desktop power components.
+
 ## Simplification Pass (2026-03-26)
 
 - Replaced the parallel-array config with `dpms_defaults`, `dpms_app`, and `dpms_kill_only`.

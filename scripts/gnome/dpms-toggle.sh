@@ -251,50 +251,6 @@ set_display_mode() {
     return 0
 }
 
-has_ssh_session() {
-    if command -v ss >/dev/null 2>&1; then
-        if ss -Htn state established '( sport = :22 )' 2>/dev/null | grep -q .; then
-            return 0
-        fi
-    fi
-
-    if command -v who >/dev/null 2>&1; then
-        if who | awk '{print $NF}' | grep -E '\([^)]*\)' | grep -v '(:0)' | grep -q .; then
-            return 0
-        fi
-    fi
-
-    return 1
-}
-
-apply_power_profile() {
-    local profile="$1"
-    local backend
-
-    if [ "${DPMS_SWITCH_POWER:-1}" -ne 1 ] || [ -z "$profile" ]; then
-        return 0
-    fi
-
-    backend="$(dpms_resolve_power_backend)"
-    case "$backend" in
-        tlpctl|tlp)
-            dpms_log "Switching power profile via TLP: $profile"
-            if ! dpms_set_tlp_profile "$profile"; then
-                dpms_log "Warning: failed to set TLP profile: $profile"
-            fi
-            ;;
-        ppd)
-            dpms_log "Switching power profile via powerprofilesctl: $profile"
-            if ! powerprofilesctl set "$profile" >/dev/null 2>&1; then
-                dpms_log "Warning: failed to set power profile: $profile"
-            fi
-            ;;
-        none)
-            dpms_log "No supported power backend found; skipping profile switch."
-            ;;
-    esac
-}
-
 dpms_off() {
     local -a recorded_running=()
     local record
@@ -331,12 +287,6 @@ dpms_off() {
         dpms_log "Warning: display state save failed; continuing."
     fi
 
-    if has_ssh_session; then
-        apply_power_profile "$DPMS_PROFILE_OFF_SSH"
-    else
-        apply_power_profile "$DPMS_PROFILE_OFF"
-    fi
-
     dpms_log "Display off."
 }
 
@@ -349,8 +299,6 @@ dpms_on() {
     else
         dpms_log "Display already on."
     fi
-
-    apply_power_profile "$DPMS_PROFILE_ON"
 
     read_state_map recorded_running
 

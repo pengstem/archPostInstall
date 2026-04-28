@@ -4,7 +4,7 @@
 
 ## Overview
 
-Arch Linux post-install automation: packages, dotfiles symlinks, GNOME state tracking, DPMS power management.
+Arch Linux post-install automation: packages, dotfiles symlinks, GNOME state tracking, and DPMS display/app management.
 
 ## Entry Points
 
