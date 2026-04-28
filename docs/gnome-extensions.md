@@ -1,4 +1,3 @@
-advanced-alt-tab@G-dH.github.com
 appindicatorsupport@rgcjonas.gmail.com
 BingWallpaper@ineffable-gmail.com
 blur-my-shell@aunetx

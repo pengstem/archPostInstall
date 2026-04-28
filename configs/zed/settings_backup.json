@@ -7,6 +7,11 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
   "agent": {
     "default_profile": "write",
     "model_parameters": [],
@@ -14,7 +19,6 @@
       "provider": "zed.dev",
       "model": "claude-sonnet-4"
     },
-    "version": "2"
   },
   "features": {
     "edit_prediction_provider": "zed"
@@ -27,8 +31,8 @@
   "ui_font_size": 16,
   "buffer_font_size": 16,
   "theme": {
-    "mode": "system",
-    "light": "One Light",
+    "mode": "dark",
+    "light": "Gruvbox Light",
     "dark": "Gruvbox Dark"
   }
 }

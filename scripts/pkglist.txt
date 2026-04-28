@@ -1,4 +1,4 @@
-# Package list generated on Mon Apr 20 09:19:03 PM CST 2026
+# Package list generated on Tue Apr 28 06:04:18 PM CST 2026
 7zip
 alacritty
 amd-ucode
@@ -10,6 +10,7 @@ base-devel
 bat
 bear
 bibata-cursor-theme-bin
+biber
 bluez-utils
 bottom
 brightnessctl
@@ -48,6 +49,8 @@ fzf
 gdb
 gdm
 ghostty
+gimp
+gimp-help-en
 git
 github-cli
 gnome-browser-connector
@@ -69,6 +72,7 @@ inotify-tools
 isync
 iverilog
 jdk21-openjdk
+jpegoptim
 jq
 kitty
 lazygit
@@ -148,6 +152,7 @@ sassc
 scc
 scrcpy
 silicon
+sleuthkit
 sparkle-bin
 spotify-launcher
 starship
@@ -161,6 +166,8 @@ tcpdump
 tealdeer
 telegram-desktop
 television
+texlive-langchinese
+texlive-meta
 thefuck
 tlp
 tlp-pd
@@ -204,6 +211,7 @@ zed
 zellij
 zen-browser-bin
 zimfw
+zip
 zoxide
 zram-generator
 zsh

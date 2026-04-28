@@ -7,25 +7,43 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "project_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "dock": "left"
+  },
+  "collaboration_panel": {
+    "dock": "left"
+  },
+  "git_panel": {
+    "dock": "left"
+  },
+  "diff_view_style": "split",
+  "indent_guides": {
+    "coloring": "indent_aware",
+  },
+  "colorize_brackets": true,
+  "edit_predictions": {
+    "provider": "zed",
+  },
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
-    "dark": "Zed (Default)"
+    "dark": "Zed (Default)",
   },
   "agent": {
+    "dock": "right",
     "default_profile": "write",
     "model_parameters": [],
     "default_model": {
       "provider": "zed.dev",
-      "model": "claude-sonnet-4"
+      "model": "claude-sonnet-4",
     },
-  },
-  "features": {
-    "edit_prediction_provider": "zed"
   },
   "telemetry": {
     "metrics": false,
-    "diagnostics": false
+    "diagnostics": false,
   },
   "vim_mode": true,
   "ui_font_size": 16,
@@ -33,6 +51,6 @@
   "theme": {
     "mode": "dark",
     "light": "Gruvbox Light",
-    "dark": "Gruvbox Dark"
-  }
+    "dark": "Gruvbox Dark",
+  },
 }
