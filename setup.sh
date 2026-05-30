@@ -133,11 +133,11 @@ create_link "$CONFIGS_DIR/p10k.zsh"         "$HOME/.p10k.zsh"               "P10
 create_link "$CONFIGS_DIR/gitconfig"        "$HOME/.gitconfig"              "Gitconfig"
 
 # Terminals
-create_link "$CONFIGS_DIR/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" "Kitty"
-create_link "$CONFIGS_DIR/kitty/nastem-signature.png" "$HOME/.config/kitty/nastem-signature.png" "Kitty Sig"
+create_link "$CONFIGS_DIR/kitty"           "$HOME/.config/kitty"           "Kitty"
 create_link "$CONFIGS_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" "Alacritty"
 create_link "$CONFIGS_DIR/ghostty"          "$HOME/.config/ghostty"         "Ghostty"
 create_link "$CONFIGS_DIR/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua" "WezTerm"
+create_link "$CONFIGS_DIR/ratty/ratty.toml" "$HOME/.config/ratty/ratty.toml" "Ratty"
 
 # Editors
 create_link "$CONFIGS_DIR/nvim"             "$HOME/.config/nvim"            "Neovim"
@@ -173,6 +173,7 @@ create_link "$CONFIGS_DIR/applications/google-chrome.desktop" "$HOME/.local/shar
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
 create_link "$CONFIGS_DIR/applications/yazi.desktop"  "$HOME/.local/share/applications/yazi.desktop"  "Yazi"
 create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/applications/WeChat.desktop" "WeChat"
+create_link "$CONFIGS_DIR/applications/ratty.desktop" "$HOME/.local/share/applications/ratty.desktop" "Ratty"
 
 # Bin (User)
 create_link "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$HOME/.local/bin/archpostinstall-gnome-sync" "Gnome Sync Bin"

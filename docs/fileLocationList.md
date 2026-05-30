@@ -7,8 +7,8 @@
 | configs/zsh | ~/.config/zsh | user config |
 | configs/p10k.zsh | ~/.p10k.zsh | user config |
 | configs/gitconfig | ~/.gitconfig | user config |
-| configs/kitty/kitty.conf | ~/.config/kitty/kitty.conf | user config |
-| configs/kitty/nastem-signature.png | ~/.config/kitty/nastem-signature.png | kitty watermark asset |
+| configs/kitty | ~/.config/kitty | user config |
+| configs/ratty/ratty.toml | ~/.config/ratty/ratty.toml | user config |
 | configs/alacritty/alacritty.toml | ~/.config/alacritty/alacritty.toml | user config |
 | configs/wezterm/wezterm.lua | ~/.config/wezterm/wezterm.lua | user config |
 | configs/ghostty | ~/.config/ghostty | user config |
@@ -41,6 +41,7 @@
 | configs/systemd/user/archpostinstall-dpms-lock-monitor.service | ~/.config/systemd/user/archpostinstall-dpms-lock-monitor.service | user unit |
 | configs/applications/google-chrome.desktop | ~/.local/share/applications/google-chrome.desktop | user desktop entry |
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
+| configs/applications/ratty.desktop | ~/.local/share/applications/ratty.desktop | user desktop entry |
 | configs/applications/WeChat.desktop | ~/.local/share/applications/WeChat.desktop | user desktop entry |
 | configs/applications/yazi.desktop | ~/.local/share/applications/yazi.desktop | user desktop entry |
 | scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
