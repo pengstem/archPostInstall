@@ -62,13 +62,13 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 log_header "📦 [1/3] Installing System Packages"
 "$SCRIPTS_DIR/install/install_packages.sh"
 
-# 2. Dotfiles (before shell tools so ~/.zimrc is available for zimfw)
-log_header "🔗 [2/3] Linking Dotfiles"
-"$REPO_DIR/setup.sh"
-
-# 3. Shell
-log_header "🐚 [3/3] Setting up Shell & Tools"
+# 2. Shell
+log_header "🐚 [2/3] Setting up Shell & Tools"
 "$SCRIPTS_DIR/install/install_shell_tools.sh"
+
+# 3. Dotfiles
+log_header "🔗 [3/3] Linking Dotfiles"
+"$REPO_DIR/setup.sh"
 
 # 4. Default Shell
 log_header "⚙️  Finalizing"
