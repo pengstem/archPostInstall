@@ -5,9 +5,10 @@ clipboard-indicator@tudmotu.com
 course-table@pengstem
 dash-to-dock@micxgx.gmail.com
 gnome-fuzzy-app-search@gnome-shell-extensions.Czarlie.gitlab.com
-hidetopbar@mathieu.bidon.ca
 just-perfection-desktop@just-perfection
 lockscreen-extension@pratap.fastmail.fm
 native-screenshot-copy-mode@nastem.github.com
 user-theme@gnome-shell-extensions.gcampax.github.com
 Vitals@CoreCoding.com
+advanced-alt-tab@G-dH.github.com
+hidetopbar@mathieu.bidon.ca

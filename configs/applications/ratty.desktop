@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Name=Ratty
+GenericName=Terminal emulator
+Comment=A GPU-rendered terminal emulator
+TryExec=ratty
+Exec=ratty --config-file=%h/.config/ratty/ratty.toml
+Type=Application
+Terminal=false
+StartupNotify=true
+Icon=utilities-terminal
+Categories=System;TerminalEmulator;
+Keywords=terminal;tty;pty;gpu;
+X-TerminalArgExec=--command
+X-TerminalArgTitle=--title
+StartupWMClass=Ratty

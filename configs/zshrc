@@ -19,3 +19,8 @@ fi
 
 # bun completions
 [ -s "/home/nastem/.bun/_bun" ] && source "/home/nastem/.bun/_bun"
+export PATH="$HOME/x-tools/loongarch64-unknown-linux-musl/bin:$PATH"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/nastem/.local/bin:$PATH"

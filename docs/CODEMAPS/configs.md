@@ -7,7 +7,7 @@
 ```
 configs/
 ├── archpostinstall/    # DPMS config
-├── applications/       # Desktop entries (QQ, WeChat)
+├── applications/       # Desktop entries (QQ, WeChat, Ratty)
 ├── baidupcs/          # BaiduPCS (optional, needs manual setup)
 ├── fcitx5/            # Input method
 ├── ghostty/           # Terminal
@@ -21,6 +21,7 @@ configs/
 ├── p10k.zsh           # Powerlevel10k theme
 ├── pacman/            # System: pacman.conf + hooks
 ├── paru/              # System: paru.conf
+├── ratty/             # Terminal
 ├── rime/              # Input method (some files ignored)
 ├── sudoers.d/         # System: sudo rules
 ├── systemd/user/      # User systemd units
@@ -47,6 +48,7 @@ configs/
 | `p10k.zsh` | `~/.p10k.zsh` |
 | `gitconfig` | `~/.gitconfig` |
 | `kitty/` | `~/.config/kitty/` |
+| `ratty/` | `~/.config/ratty/` |
 | `ghostty/` | `~/.config/ghostty/` |
 | `wezterm/` | `~/.config/wezterm/` |
 | `nvim/` | `~/.config/nvim/` |

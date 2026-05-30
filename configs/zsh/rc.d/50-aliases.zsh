@@ -1,8 +1,8 @@
 # Modern replacements for standard commands (using eza).
-alias ls='eza --icons'
-alias ll='eza -l --icons --git'
-alias la='eza -la --icons --git'
-alias lt='eza --tree --level=2 --icons'
+alias ls='eza --icons --hyperlink'
+alias ll='eza -l --icons --git --hyperlink'
+alias la='eza -la --icons --git --hyperlink'
+alias lt='eza --tree --level=2 --icons --hyperlink'
 
 # System utilities.
 alias st='systemctl-tui'
@@ -16,3 +16,4 @@ alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 
 # wayland copy
 alias copy="wl-copy"
+alias paste="wl-paste"
