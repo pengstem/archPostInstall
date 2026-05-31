@@ -1,4 +1,4 @@
-# Package list generated on Sat May 30 01:52:19 PM CST 2026
+# Package list generated on Sun May 31 11:50:04 PM CST 2026
 7zip
 abduco
 alacritty
@@ -204,6 +204,8 @@ riscv64-elf-gdb
 riscv64-linux-gnu-binutils
 riscv64-linux-gnu-gcc
 rsync
+ruff
+rust-analyzer
 rustrover
 rustrover-jre
 rustup
@@ -242,6 +244,7 @@ ttf-liberation
 ttf-maplemono-nf-cn-unhinted
 ttf-ms-fonts
 ttf-wps-fonts
+ty
 udiskie
 uv
 ventoy-bin
