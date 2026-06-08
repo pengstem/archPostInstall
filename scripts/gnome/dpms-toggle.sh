@@ -5,6 +5,7 @@ set -euo pipefail
 SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
+# shellcheck source=scripts/gnome/dpms-common.sh
 . "$SCRIPT_DIR/dpms-common.sh"
 
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/archpostinstall/dpms.conf"
@@ -37,16 +38,6 @@ dpms_init_log "dpms-toggle"
 acquire_lock "$LOCK_FILE" "$LOCK_DIR"
 
 require_cmd busctl
-
-read_app_record() {
-    local record="$1"
-    IFS="$DPMS_RECORD_SEP" read -r APP_NAME APP_MATCH APP_START APP_STOP APP_POLICY <<< "$record"
-}
-
-read_kill_only_record() {
-    local record="$1"
-    IFS="$DPMS_RECORD_SEP" read -r KILL_NAME KILL_MATCH <<< "$record"
-}
 
 is_match_running() {
     local match="$1"
@@ -180,7 +171,7 @@ write_state() {
     local tmp_file
 
     if [ "$#" -eq 0 ]; then
-        clear_state
+        rm -f "$STATE_FILE"
         return 0
     fi
 
@@ -211,10 +202,6 @@ read_state_map() {
             ref["$line"]=1
         fi
     done < "$STATE_FILE"
-}
-
-clear_state() {
-    rm -f "$STATE_FILE"
 }
 
 get_display_mode() {
@@ -252,8 +239,8 @@ set_display_mode() {
 }
 
 dpms_off() {
-    local -a recorded_running=()
-    local record
+    local -a app_names_to_restore=()
+    local record app_name app_match app_stop app_policy kill_name kill_match
 
     if ! is_display_on; then
         dpms_log "Display already off."
@@ -261,27 +248,27 @@ dpms_off() {
     fi
 
     for record in "${DPMS_APPS[@]}"; do
-        read_app_record "$record"
-        if [ "$APP_POLICY" = "on_only" ]; then
+        IFS="$DPMS_RECORD_SEP" read -r app_name app_match _ app_stop app_policy <<< "$record"
+        if [ "$app_policy" = "on_only" ]; then
             continue
         fi
-        if is_match_running "$APP_MATCH"; then
-            if [ "$APP_POLICY" = "running" ]; then
-                recorded_running+=("$APP_NAME")
+        if is_match_running "$app_match"; then
+            if [ "$app_policy" = "running" ]; then
+                app_names_to_restore+=("$app_name")
             fi
-            stop_app "$APP_NAME" "$APP_MATCH" "$APP_STOP" || true
+            stop_app "$app_name" "$app_match" "$app_stop" || true
         fi
     done
 
     for record in "${DPMS_KILL_ONLY_APPS[@]}"; do
-        read_kill_only_record "$record"
-        if is_match_running "$KILL_MATCH"; then
-            dpms_log "Stopping $KILL_NAME (no reopen)"
-            kill_match "$KILL_MATCH" || true
+        IFS="$DPMS_RECORD_SEP" read -r kill_name kill_match <<< "$record"
+        if is_match_running "$kill_match"; then
+            dpms_log "Stopping $kill_name (no reopen)"
+            kill_match "$kill_match" || true
         fi
     done
 
-    write_state "${recorded_running[@]}"
+    write_state "${app_names_to_restore[@]}"
 
     if ! set_display_mode "$DISPLAY_OFF_MODE"; then
         dpms_log "Warning: display state save failed; continuing."
@@ -292,7 +279,7 @@ dpms_off() {
 
 dpms_on() {
     local -A recorded_running=()
-    local record should_restore
+    local record app_name app_match app_start app_policy should_restore
 
     if ! is_display_on; then
         set_display_mode 0 || true
@@ -307,25 +294,25 @@ dpms_on() {
     fi
 
     for record in "${DPMS_APPS[@]}"; do
-        read_app_record "$record"
+        IFS="$DPMS_RECORD_SEP" read -r app_name app_match app_start _ app_policy <<< "$record"
         should_restore=0
-        case "$APP_POLICY" in
+        case "$app_policy" in
             always|on_only)
                 should_restore=1
                 ;;
             running)
-                if [ -n "${recorded_running[$APP_NAME]+x}" ]; then
+                if [ -n "${recorded_running[$app_name]+x}" ]; then
                     should_restore=1
                 fi
                 ;;
         esac
 
         if [ "$should_restore" -eq 1 ]; then
-            ensure_app_started "$APP_NAME" "$APP_MATCH" "$APP_START" || true
+            ensure_app_started "$app_name" "$app_match" "$app_start" || true
         fi
     done
 
-    clear_state
+    rm -f "$STATE_FILE"
     dpms_log "Display on."
 }
 

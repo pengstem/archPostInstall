@@ -1,5 +1,14 @@
 # DPMS Past Bug List
 
+## Cleanup Pass (2026-06-08)
+
+- Removed the unused power-backend resolver and its stale `--power-backend` / `--switch-power` config parsing from `dpms-common.sh`.
+- Kept the TLP profile helpers and `--profile-*` defaults because `scripts/power/measure_tlp_power.sh` still uses them.
+- Removed thin one-line wrappers from the DPMS path: `dpms-lock-monitor.sh` now calls `dpms_log` directly, and `dpms-toggle.sh` parses app records locally instead of using global side-effect reader helpers.
+- Validation references used on 2026-06-08:
+  - GNU Bash Reference Manual, fetched 2026-06-08; local Bash version 5.3.12.
+  - ShellCheck SC2190 documentation, fetched 2026-06-08; local ShellCheck version 0.11.0.
+
 ## Behavior Change (2026-04-28)
 
 - Removed power profile switching from `dpms-toggle.sh`; the DPMS path now only turns the display off/on and manages configured apps.

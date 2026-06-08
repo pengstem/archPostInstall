@@ -54,12 +54,9 @@ is_non_negative_int() {
 reset_dpms_config() {
     DPMS_APPS=()
     DPMS_KILL_ONLY_APPS=()
-    DPMS_POWER_BACKEND="auto"
-    DPMS_POWER_BACKEND_RESOLVED=""
     DPMS_PROFILE_ON="balanced"
     DPMS_PROFILE_OFF="power-saver"
     DPMS_PROFILE_OFF_SSH="balanced"
-    DPMS_SWITCH_POWER=1
     DPMS_TLP_USE_SUDO=1
     DPMS_VERBOSE=1
     DPMS_LOG_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall/dpms.log"
@@ -71,6 +68,8 @@ reset_dpms_config() {
     DPMS_KILL_WAIT_SEC=6
 }
 
+# dpms_defaults is a sourced config DSL; assignments are consumed after load_dpms_config.
+# shellcheck disable=SC2034
 dpms_defaults() {
     while [ "$#" -gt 0 ]; do
         if [ "$#" -lt 2 ]; then
@@ -78,9 +77,6 @@ dpms_defaults() {
             return 1
         fi
         case "$1" in
-            --power-backend)
-                DPMS_POWER_BACKEND="$2"
-                ;;
             --profile-on)
                 DPMS_PROFILE_ON="$2"
                 ;;
@@ -89,9 +85,6 @@ dpms_defaults() {
                 ;;
             --profile-off-ssh)
                 DPMS_PROFILE_OFF_SSH="$2"
-                ;;
-            --switch-power)
-                DPMS_SWITCH_POWER="$2"
                 ;;
             --tlp-use-sudo)
                 DPMS_TLP_USE_SUDO="$2"
@@ -249,17 +242,7 @@ validate_dpms_config() {
         seen_names[$name]=1
     done
 
-    case "$DPMS_POWER_BACKEND" in
-        auto|tlp|ppd)
-            ;;
-        *)
-            echo "Error: invalid DPMS power backend '$DPMS_POWER_BACKEND'." >&2
-            return 1
-            ;;
-    esac
-
     for value_name in \
-        DPMS_SWITCH_POWER \
         DPMS_TLP_USE_SUDO \
         DPMS_VERBOSE \
         DPMS_LOG_MAX_BYTES \
@@ -345,45 +328,6 @@ dpms_log() {
 
 dpms_have_tlp() {
     command -v tlpctl >/dev/null 2>&1 || command -v tlp >/dev/null 2>&1
-}
-
-dpms_resolve_power_backend() {
-    if [ -n "${DPMS_POWER_BACKEND_RESOLVED:-}" ]; then
-        printf "%s\n" "$DPMS_POWER_BACKEND_RESOLVED"
-        return 0
-    fi
-
-    case "$DPMS_POWER_BACKEND" in
-        tlp)
-            if command -v tlpctl >/dev/null 2>&1; then
-                DPMS_POWER_BACKEND_RESOLVED="tlpctl"
-            elif command -v tlp >/dev/null 2>&1; then
-                DPMS_POWER_BACKEND_RESOLVED="tlp"
-            else
-                DPMS_POWER_BACKEND_RESOLVED="none"
-            fi
-            ;;
-        ppd)
-            if command -v powerprofilesctl >/dev/null 2>&1; then
-                DPMS_POWER_BACKEND_RESOLVED="ppd"
-            else
-                DPMS_POWER_BACKEND_RESOLVED="none"
-            fi
-            ;;
-        auto)
-            if command -v tlpctl >/dev/null 2>&1; then
-                DPMS_POWER_BACKEND_RESOLVED="tlpctl"
-            elif command -v tlp >/dev/null 2>&1; then
-                DPMS_POWER_BACKEND_RESOLVED="tlp"
-            elif command -v powerprofilesctl >/dev/null 2>&1; then
-                DPMS_POWER_BACKEND_RESOLVED="ppd"
-            else
-                DPMS_POWER_BACKEND_RESOLVED="none"
-            fi
-            ;;
-    esac
-
-    printf "%s\n" "$DPMS_POWER_BACKEND_RESOLVED"
 }
 
 dpms_set_tlp_profile() {
