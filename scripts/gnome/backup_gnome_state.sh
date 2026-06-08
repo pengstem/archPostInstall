@@ -12,14 +12,10 @@ BACKUP_DIR="${GNOME_BACKUP_DIR:-$REPO_DIR/backups/gnome}"
 THROTTLE_SECONDS="${GNOME_SYNC_THROTTLE_SECONDS:-1800}"
 STAMP_FILE="$BACKUP_DIR/.last_backup"
 
-require_cmd() {
-    if ! command -v "$1" >/dev/null 2>&1; then
-        echo "Error: Required command not found: $1"
-        exit 1
-    fi
-}
-
-require_cmd gsettings
+if ! command -v gsettings >/dev/null 2>&1; then
+    echo "Error: Required command not found: gsettings"
+    exit 1
+fi
 
 SCHEMAS="$(gsettings list-schemas)"
 
