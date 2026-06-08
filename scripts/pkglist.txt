@@ -1,7 +1,8 @@
-# Package list generated on Sun May 31 11:50:04 PM CST 2026
+# Package list generated on Mon Jun 08 09:23:21 AM CST 2026
 7zip
 abduco
 alacritty
+alma-desktop-bin
 amd-ucode
 android-udev
 aria2
@@ -12,6 +13,7 @@ bat
 bear
 bibata-cursor-theme-bin
 biber
+bind
 bluez-utils
 bottom
 brightnessctl
@@ -24,6 +26,7 @@ cli11
 cmatrix
 coin-or-cbc
 compsize
+conntrack-tools
 crosstool-ng
 cursor-bin
 dictd
@@ -81,6 +84,7 @@ gtkwave
 help2man
 heroic-games-launcher-bin
 highs
+httpie
 hyperfine
 imagemagick
 inotify-tools
@@ -112,9 +116,11 @@ man-pages
 maven
 mediainfo
 minicom
+mitmproxy
 mosh
 mpv
 msmtp
+mtr
 mupdf-tools
 musl-riscv64
 nano
@@ -122,6 +128,7 @@ nautilus
 neovim
 networkmanager
 network-manager-applet
+ngrep
 nlohmann-json
 nmap
 noto-fonts-cjk
@@ -229,6 +236,7 @@ tealdeer
 tectonic
 telegram-desktop
 television
+termshark
 texlive-langchinese
 texlive-meta
 thefuck
@@ -237,6 +245,7 @@ tlp-pd
 tlp-rdw
 tmux
 tokei
+traceroute
 ttf-dejavu
 ttf-jetbrains-mono
 ttf-jetbrains-mono-nerd
@@ -253,9 +262,13 @@ virt-install
 virt-manager
 visual-studio-code-bin
 webkit2gtk
+websocat
 wemeet-bin
 wezterm
 wget
+whois
+wireshark-cli
+wireshark-qt
 wl-clipboard
 wmctrl
 wordnet-common

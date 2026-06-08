@@ -9,7 +9,7 @@ return {
     event = { "User KittyScrollbackLaunch" },
     opts = {
       {
-        scrollback_tempfile = true,
+        scrollback_tempfile = false,
         status_window = {
           autoclose = true,
         },
