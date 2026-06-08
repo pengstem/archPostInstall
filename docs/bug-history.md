@@ -19,3 +19,7 @@ This file tracks notable configuration issues, their root causes, and the fixes 
 ## 2026-04-08
 - Hyde install: it injected `~/.zshenv` and extra dotfiles into the repo-backed `configs/zsh/`, which diverted Zsh away from the repo's modular startup and left the workspace dirty with generated cache files.
   Fix: remove the Hyde-generated Zsh files, move the home-level Hyde leftovers into `~/.config/cfg_backups/*_codex_hyde_cleanup/`, and redirect Zsh history / compdump output to `~/.local/state/zsh/` and `~/.cache/zsh/`.
+
+## 2026-06-08
+- GNOME backup pruning: `backup_themes_extensions.sh` used an unquoted glob array and `ls -t` to detect/prune archives, which was fragile and noisy under ShellCheck.
+  Fix: use `find` for existence checks and compare mtimes with `stat` before pruning older archives.

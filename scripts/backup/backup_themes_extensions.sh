@@ -51,13 +51,8 @@ hash_changed() {
 backup_exists() {
     local output_dir="$1"
     local pattern="$2"
-    local -a matches=()
 
-    shopt -s nullglob
-    matches=("$output_dir"/$pattern)
-    shopt -u nullglob
-
-    ((${#matches[@]} > 0))
+    find "$output_dir" -maxdepth 1 -type f -name "$pattern" -print -quit 2>/dev/null | grep -q .
 }
 
 prune_backups_keep_newest() {
@@ -74,8 +69,15 @@ prune_backups_keep_newest() {
         return 0
     fi
 
-    local newest
-    newest="$(ls -t "${files[@]}" | head -n 1)"
+    local newest="" newest_mtime=0 file_mtime
+    for file in "${files[@]}"; do
+        file_mtime="$(stat -c '%Y' -- "$file" 2>/dev/null || echo 0)"
+        if [ -z "$newest" ] || [ "$file_mtime" -gt "$newest_mtime" ]; then
+            newest="$file"
+            newest_mtime="$file_mtime"
+        fi
+    done
+
     for file in "${files[@]}"; do
         if [ "$file" != "$newest" ]; then
             rm -f "$file"
