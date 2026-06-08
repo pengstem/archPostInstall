@@ -92,26 +92,9 @@ function AuxFilter.readAuxTxt(txtpath)
         end
     end
     file:close()
-    -- 確認 code 能打印出來
-    -- for key, value in pairs(AuxFilter.aux_code) do
-    --     log.info(key, table.concat(value, ','))
-    -- end
-
     AuxFilter.cache = auxCodes
     return AuxFilter.cache
 end
-
--- local function getUtf8CharLength(byte)
---     if byte < 128 then
---         return 1
---     elseif byte < 224 then
---         return 2
---     elseif byte < 240 then
---         return 3
---     else
---         return 4
---     end
--- end
 
 -- 輔助函數，用於獲取表格的所有鍵
 local function table_keys(t)
