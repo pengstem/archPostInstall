@@ -172,6 +172,7 @@ create_link "$CONFIGS_DIR/applications/google-chrome.desktop" "$HOME/.local/shar
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
 create_link "$CONFIGS_DIR/applications/yazi.desktop"  "$HOME/.local/share/applications/yazi.desktop"  "Yazi"
 create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/applications/WeChat.desktop" "WeChat"
+create_link "$CONFIGS_DIR/applications/nowledge-mem.desktop" "$HOME/.local/share/applications/nowledge-mem.desktop" "Nowledge Mem"
 create_link "$CONFIGS_DIR/applications/ratty.desktop" "$HOME/.local/share/applications/ratty.desktop" "Ratty"
 
 # Bin (User)

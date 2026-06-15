@@ -42,6 +42,7 @@
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
 | configs/applications/ratty.desktop | ~/.local/share/applications/ratty.desktop | user desktop entry |
 | configs/applications/WeChat.desktop | ~/.local/share/applications/WeChat.desktop | user desktop entry |
+| configs/applications/nowledge-mem.desktop | ~/.local/share/applications/nowledge-mem.desktop | user desktop entry |
 | configs/applications/yazi.desktop | ~/.local/share/applications/yazi.desktop | user desktop entry |
 | scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
 | scripts/gnome/backup_gnome_state.sh | ~/.local/bin/archpostinstall-gnome-sync | user bin |
