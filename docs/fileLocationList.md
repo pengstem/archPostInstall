@@ -49,6 +49,7 @@
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
 | scripts/gnome/dpms-toggle.sh | /usr/local/bin/dpms-toggle | sudo |
 | scripts/gnome/dpms-lock-monitor.sh | ~/.local/bin/archpostinstall-dpms-lock-monitor | user bin |
+| scripts/launchers/nowledge-mem-desktop.sh | ~/.local/bin/nowledge-mem-desktop | user bin |
 | scripts/launchers/yazi-desktop.sh | ~/.local/bin/yazi-desktop | user bin |
 | scripts/launchers/yazi-open-nautilus.sh | ~/.local/bin/yazi-open-nautilus | user bin |
 | scripts/power/measure_tlp_power.sh | ~/.local/bin/archpostinstall-measure-power | user bin |

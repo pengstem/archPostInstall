@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Nowledge Mem
-Exec=env GDK_BACKEND=x11 /home/nastem/Applications/nowledge-mem.AppImage
-TryExec=/home/nastem/Applications/nowledge-mem.AppImage
+Exec=/home/nastem/.local/bin/nowledge-mem-desktop
+TryExec=/home/nastem/.local/bin/nowledge-mem-desktop
 Type=Application
 Terminal=false
 Categories=Utility;

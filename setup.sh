@@ -181,6 +181,7 @@ create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostins
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
 create_link "$REPO_DIR/scripts/gnome/dpms-lock-monitor.sh" "$HOME/.local/bin/archpostinstall-dpms-lock-monitor" "DPMS Lock Monitor"
 create_link "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$HOME/.local/bin/archpostinstall-measure-power" "Power Measure"
+create_link "$REPO_DIR/scripts/launchers/nowledge-mem-desktop.sh" "$HOME/.local/bin/nowledge-mem-desktop" "Nowledge Mem Bin"
 create_link "$REPO_DIR/scripts/launchers/yazi-desktop.sh" "$HOME/.local/bin/yazi-desktop" "Yazi Desktop"
 create_link "$REPO_DIR/scripts/launchers/yazi-open-nautilus.sh" "$HOME/.local/bin/yazi-open-nautilus" "Yazi Nautilus"
 create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/zathura-page-to-clipboard" "Zathura Clipboard"
