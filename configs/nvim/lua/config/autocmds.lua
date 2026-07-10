@@ -26,7 +26,14 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
     end
 
     -- If not root and file isn't writable, warn
-    if euid ~= "0" and vim.fn.filewritable(file) ~= 1 then
+    local writable = vim.fn.filewritable(file) == 1
+    if not writable and vim.fn.filereadable(file) == 0 then
+      -- New file: check if parent directory is writable
+      local dir = vim.fn.fnamemodify(file, ":h")
+      writable = vim.fn.filewritable(dir) == 2
+    end
+
+    if euid ~= "0" and not writable then
       vim.schedule(function()
         vim.notify(
           ("Likely no write permission: %s\nTip: reopen with sudo or use Suda.vim to write."):format(file),
