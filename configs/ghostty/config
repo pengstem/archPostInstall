@@ -44,11 +44,12 @@
 
 # 主题与字体
 theme = light:Nordfox,dark:Nordfox
-font-size = 12.5
+font-family = Maple Mono NF CN
+font-size = 14
 
 # 背景透明与模糊
-# 1.0=不透明；0=完全透明。先用 0.85 体验较稳妥
-background-opacity = 0.75
+# 1.0=不透明；0=完全透明。与 Kitty 保持一致
+background-opacity = 0.8
 # 开启模糊：macOS 原生支持；Linux 见下方“桌面环境说明”
 background-blur = true
 
@@ -58,6 +59,41 @@ window-padding-y = 10
 unfocused-split-opacity = 0.95
 cursor-style = bar
 cursor-opacity = 0.85
+
+# Kitty-compatible workflow
+# Validated with Ghostty 1.3.1-arch2 on 2026-07-10.
+shell-integration = zsh
+tab-inherit-working-directory = true
+split-inherit-working-directory = true
+
+# Tabs
+keybind = alt+o=new_tab
+keybind = alt+w=close_tab:this
+keybind = alt+arrow_right=next_tab
+keybind = alt+arrow_left=previous_tab
+keybind = alt+1=goto_tab:1
+keybind = alt+2=goto_tab:2
+keybind = alt+3=goto_tab:3
+keybind = alt+4=goto_tab:4
+keybind = alt+5=goto_tab:5
+keybind = alt+6=goto_tab:6
+keybind = alt+7=goto_tab:7
+keybind = alt+8=goto_tab:8
+keybind = alt+9=goto_tab:9
+
+# Splits
+keybind = alt+v=new_split:right
+keybind = alt+s=new_split:down
+keybind = alt+x=close_surface
+keybind = alt+h=goto_split:left
+keybind = alt+l=goto_split:right
+keybind = alt+k=goto_split:up
+keybind = alt+j=goto_split:down
+keybind = alt+shift+h=resize_split:left,10
+keybind = alt+shift+l=resize_split:right,10
+keybind = alt+shift+k=resize_split:up,10
+keybind = alt+shift+j=resize_split:down,10
+keybind = alt+z=toggle_split_zoom
 
 # 实用小招
 # 打开配置文件（可自己改成喜欢的组合键）
