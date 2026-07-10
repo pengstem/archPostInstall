@@ -1,11 +1,11 @@
-# Package list generated on Mon Jun 08 09:23:21 AM CST 2026
+# Package list generated on Fri Jul 10 11:08:49 AM CST 2026
 7zip
 abduco
 alacritty
-alma-desktop-bin
 amd-ucode
 android-udev
 aria2
+audacity
 baidupcs-go
 base
 base-devel
@@ -20,6 +20,7 @@ brightnessctl
 btop
 btrfs-assistant
 btrfs-progs
+cargo-flamegraph
 cc-switch-bin
 chafa
 cli11
@@ -52,8 +53,10 @@ fcitx5-qt
 fcitx5-rime
 fcitx5-vinput-bin
 fd
+feishu-bin
 fio
 firefox
+freecad
 fuse2
 fuse2fs
 fzf
@@ -93,8 +96,10 @@ iverilog
 jdk21-openjdk
 jpegoptim
 jq
+kdenlive
 kitty
 lazygit
+libdwarf
 libgda6
 libgpiod
 libgpod
@@ -117,6 +122,7 @@ maven
 mediainfo
 minicom
 mitmproxy
+mold
 mosh
 mpv
 msmtp
@@ -218,6 +224,7 @@ rustrover-jre
 rustup
 sassc
 scc
+sccache
 scrcpy
 shellcheck
 silicon
@@ -255,6 +262,7 @@ ttf-ms-fonts
 ttf-wps-fonts
 ty
 udiskie
+usbip
 uv
 ventoy-bin
 vim
@@ -278,6 +286,7 @@ wps-office-cn
 wps-office-fonts
 wps-office-mime-cn
 wps-office-mui-zh-cn
+wrangler
 xdg-desktop-portal-termfilechooser-hunkyburrito-git
 xdg-user-dirs
 yay

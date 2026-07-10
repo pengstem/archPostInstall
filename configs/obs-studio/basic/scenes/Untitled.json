@@ -1,7 +1,7 @@
 {
     "name": "Untitled",
     "DesktopAudioDevice1": {
-        "prev_ver": 536936448,
+        "prev_ver": 536936450,
         "name": "Desktop Audio",
         "uuid": "77d9073a-1df4-48ff-9590-e50a729118a8",
         "id": "pulse_output_capture",
@@ -32,7 +32,7 @@
         "private_settings": {},
         "filters": [
             {
-                "prev_ver": 536936448,
+                "prev_ver": 536936450,
                 "name": "Noise Suppression (RNNoise)",
                 "uuid": "43e5b037-6699-494c-973b-1d34cf53445f",
                 "id": "noise_suppress_filter",
@@ -58,7 +58,7 @@
                 "private_settings": {}
             },
             {
-                "prev_ver": 536936448,
+                "prev_ver": 536936450,
                 "name": "Limiter (-1 dB)",
                 "uuid": "f19ae118-1e8f-434f-801e-d4c00f1cc71c",
                 "id": "limiter_filter",
@@ -87,7 +87,7 @@
         ]
     },
     "AuxAudioDevice1": {
-        "prev_ver": 536936448,
+        "prev_ver": 536936450,
         "name": "Mic/Aux",
         "uuid": "61186258-6892-4c82-98a5-8817257dfbaa",
         "id": "pulse_input_capture",
@@ -119,7 +119,7 @@
     },
     "sources": [
         {
-            "prev_ver": 536936448,
+            "prev_ver": 536936450,
             "name": "Screen Capture (PipeWire)",
             "uuid": "cfb79a46-39d1-476c-a063-24791b011e8c",
             "id": "pipewire-screen-capture-source",
@@ -146,7 +146,7 @@
             "private_settings": {}
         },
         {
-            "prev_ver": 536936448,
+            "prev_ver": 536936450,
             "name": "Screen Capture (PipeWire) 2",
             "uuid": "be4b6a45-a521-4ade-ba69-8d536e4c27ed",
             "id": "pipewire-screen-capture-source",
@@ -172,7 +172,7 @@
             "private_settings": {}
         },
         {
-            "prev_ver": 536936448,
+            "prev_ver": 536936450,
             "name": "Scene",
             "uuid": "5e528aaa-6a18-422f-9843-bfbbb3f5f697",
             "id": "scene",
@@ -258,11 +258,11 @@
                         "group_item_backup": false,
                         "pos": {
                             "x": 0.0,
-                            "y": 0.0
+                            "y": 62.0
                         },
                         "pos_rel": {
                             "x": -1.600000023841858,
-                            "y": -1.0
+                            "y": -0.9225000143051147
                         },
                         "scale": {
                             "x": 0.667187511920929,
@@ -360,7 +360,7 @@
     "saved_projectors": [],
     "preview_locked": false,
     "scaling_enabled": false,
-    "scaling_level": -9,
+    "scaling_level": -12,
     "scaling_off_x": 0.0,
     "scaling_off_y": 0.0,
     "modules": {
