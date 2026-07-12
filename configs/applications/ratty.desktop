@@ -4,7 +4,7 @@ Name=Ratty
 GenericName=Terminal emulator
 Comment=A GPU-rendered terminal emulator
 TryExec=ratty
-Exec=ratty --config-file=%h/.config/ratty/ratty.toml
+Exec=ratty --config-file=/home/nastem/.config/ratty/ratty.toml
 Type=Application
 Terminal=false
 StartupNotify=true

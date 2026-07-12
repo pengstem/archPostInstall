@@ -1,3 +1,11 @@
 [submodule "configs/tmux/plugins/tpm"]
 	path = configs/tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+
+[submodule "configs/tmux/plugins/tmux-sensible"]
+	path = configs/tmux/plugins/tmux-sensible
+	url = https://github.com/tmux-plugins/tmux-sensible
+
+[submodule "configs/tmux/plugins/tmux-yank"]
+	path = configs/tmux/plugins/tmux-yank
+	url = https://github.com/tmux-plugins/tmux-yank
