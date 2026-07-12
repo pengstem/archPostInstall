@@ -174,6 +174,45 @@ gnome-extensions enable 插件UUID
 - `hidetopbar@mathieu.bidon.ca`：
   [Hide Top Bar](https://extensions.gnome.org/extension/545/hide-top-bar/)
 
+## GNOME 右上角控制中心样式恢复
+
+右上角控制中心属于 GNOME Shell，不是普通 GTK 应用。重装后的当前状态是
+GTK 主题 `Adwaita-dark)，而 User Themes 的 Shell 主题为空；仓库历史曾记录
+`Orchis-Grey-Dark-Compact`，因此控制中心会和之前不同。
+
+本次已按历史主题恢复：从 Orchis 官方仓库构建
+`Orchis-Grey-Dark-Compact` 到 `~/.themes`，并设置：
+
+~~~bash
+gsettings set org.gnome.shell.extensions.user-theme name 'Orchis-Grey-Dark-Compact'
+~~~
+
+如果以后重装，需要重新构建主题时执行：
+
+~~~bash
+git clone --depth 1 https://github.com/vinceliuice/Orchis-theme.git /tmp/Orchis-theme
+cd /tmp/Orchis-theme
+./install.sh -d ~/.themes -t grey -c dark -s compact --shell 48
+gsettings set org.gnome.shell.extensions.user-theme name 'Orchis-Grey-Dark-Compact'
+~~~
+
+Orchis 当前公开脚本最高声明到 GNOME Shell 48；GNOME 50 会使用兼容的 48 版
+Shell CSS，可能在后续 GNOME 更新后需要重新调整。Orchis 安装脚本还可能把
+Dash to Dock 的 `stylesheet.css` 备份为 `.bak`；如果 Dash to Dock 或 User
+Themes 报缺少该文件，恢复它：
+
+~~~bash
+cp --preserve=mode,timestamps ~/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/stylesheet.css.bak ~/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/stylesheet.css
+~~~
+
+Wayland 下不能使用旧的 Alt+F2、r 重启 Shell。主题切换后如果控制中心仍显示
+旧样式，请注销并重新登录 GNOME；不要直接结束 gnome-shell 进程。
+
+本次会话在重载主题时曾遇到一次由 Dash to Dock 缺失 stylesheet.css 引起的
+User Themes 错误；文件已经恢复，主题值也已写入。由于当前是 Wayland，最终
+Shell 状态需要下一次登录会话重新初始化；如果本次会话中
+gnome-extensions info 仍显示 State: ERROR，注销后重新登录即可验证。
+
 ## TLP 与 power-profiles-daemon：需要你选择
 
 当前系统安装了 `power-profiles-daemon`，而仓库中也包含 TLP 覆盖配置和 TLP
@@ -336,3 +375,7 @@ Access Token 已失效；先在控制台确认应用服务和资源权限，再�
   —— APP ID、Access Token 和资源 ID 环境变量。
 - [火山引擎大模型流式语音识别鉴权](https://www.volcengine.com/docs/6561/1395846?lang=zh)
   —— APP ID、Access Token、Resource ID 及 Seed 协议配置。
+- [Arch Linux orchis-theme 软件包](https://archlinux.org/packages/extra/any/orchis-theme/)
+  —— 官方仓库中的 Orchis 主题包。
+- [Orchis 官方仓库](https://github.com/vinceliuice/Orchis-theme) —— 灰色、深色、
+  紧凑变体和 GNOME Shell 构建脚本。
