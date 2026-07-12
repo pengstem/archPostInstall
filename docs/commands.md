@@ -9,6 +9,7 @@ After linking, you can use `archpostinstall` as a wrapper:
 archpostinstall --help
 archpostinstall bootstrap
 archpostinstall install-packages
+archpostinstall install-maplemono-cn
 archpostinstall install-shell
 archpostinstall link-configs
 archpostinstall dpms-toggle
@@ -31,6 +32,7 @@ Use these when you want explicit control:
 ./bootstrap.sh
 ./setup.sh
 ./scripts/install/install_packages.sh
+./scripts/install/install_maplemono_cn_font.sh
 ./scripts/install/install_shell_tools.sh
 ./scripts/backup/backup_themes_extensions.sh [output_dir]
 ./scripts/backup/restore_themes_extensions.sh <archives...>

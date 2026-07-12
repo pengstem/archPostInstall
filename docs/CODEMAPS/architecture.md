@@ -14,7 +14,7 @@ bootstrap.sh          # Full setup orchestrator
 ├── install_shell_tools.sh
 └── setup.sh          # Symlink orchestrator
 
-scripts/archpostinstall.sh  # Unified CLI (13 subcommands)
+scripts/archpostinstall.sh  # Unified CLI (14 subcommands)
 ```
 
 ## Script Call Graph
@@ -29,6 +29,7 @@ bootstrap.sh
 archpostinstall.sh (CLI router)
 ├── bootstrap         → bootstrap.sh
 ├── install-packages  → install_packages.sh
+├── install-maplemono-cn → install_maplemono_cn_font.sh
 ├── install-shell     → install_shell_tools.sh
 ├── link-configs      → setup.sh
 ├── dpms-*            → gnome/dpms-toggle.sh

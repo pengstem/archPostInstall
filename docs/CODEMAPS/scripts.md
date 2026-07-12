@@ -6,11 +6,12 @@
 
 ```
 scripts/
-├── archpostinstall.sh        # CLI router (13 subcommands)
+├── archpostinstall.sh        # CLI router (14 subcommands)
 ├── pkglist.txt               # Package source of truth
 ├── update_pkglist.sh         # Regenerates pkglist.txt
 ├── install/
 │   ├── install_packages.sh   # Paru/yay package installation
+│   ├── install_maplemono_cn_font.sh # Temporary Arch Linux CN font installer
 │   └── install_shell_tools.sh # Oh My Zsh, plugins, p10k
 ├── backup/
 │   ├── backup_themes_extensions.sh   # GNOME themes/icons/extensions
@@ -32,8 +33,9 @@ scripts/
 
 | Script | Lines | Purpose |
 |--------|-------|---------|
-| `archpostinstall.sh` | ~80 | CLI dispatcher |
+| `archpostinstall.sh` | ~93 | CLI dispatcher |
 | `install_packages.sh` | ~50 | Package installation |
+| `install_maplemono_cn_font.sh` | ~102 | Temporary Arch Linux CN Maple Mono installer |
 | `install_shell_tools.sh` | ~80 | Shell environment setup |
 | `backup_themes_extensions.sh` | ~120 | Hash-based backup with pruning |
 | `restore_themes_extensions.sh` | ~60 | Auto-detect and restore |
