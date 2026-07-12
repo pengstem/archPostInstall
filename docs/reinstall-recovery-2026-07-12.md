@@ -97,6 +97,53 @@ paru -Ss termfilechooser
 
 仓库内的 `yazi-wrapper.sh` 已经链接完成；目前未解决的是 portal 后端软件包。
 
+## GNOME 插件恢复
+
+这次审计确认：插件 UUID 清单仍在 `docs/gnome-extensions.md`，但仓库的
+`backups/gnome/` 没有任何压缩备份，当前 `~/.local/share/gnome-shell/extensions`
+目录也不存在。因此无法直接从仓库解压恢复插件文件，只能重新安装。
+
+最简单的方法是安装 GNOME 的 Extension Manager，然后根据清单搜索并安装插件：
+
+```bash
+sudo pacman -Syu --needed extension-manager gnome-shell-extensions
+extension-manager
+```
+
+清单中的常规插件包括：AppIndicator、Bing Wallpaper、Blur my Shell、Clipboard
+Indicator、Dash to Dock、Fuzzy App Search、Just Perfection、Lock Screen、User
+Themes、Vitals、Advanced Alt-Tab 和 Hide Top Bar。安装完成后，可以用下面的命令
+重新启用已经安装的插件：
+
+```bash
+gsettings set org.gnome.shell disable-user-extensions false
+while IFS= read -r uuid; do
+    [ -z "$uuid" ] || gnome-extensions enable "$uuid" 2>/dev/null || echo "未安装或不兼容：$uuid"
+done < /home/nastem/Project/archPostInstall/docs/gnome-extensions.md
+```
+
+如果你想直接从 GNOME 官方插件网站安装，可以先安装浏览器连接器：
+
+```bash
+sudo pacman -Syu --needed gnome-browser-connector
+```
+
+然后打开 [extensions.gnome.org](https://extensions.gnome.org/)，搜索清单中的
+插件并打开安装开关。GNOME 50 只应安装声明支持当前 Shell 版本的插件；旧版本
+插件不要强行加载。
+
+`course-table@pengstem` 和 `native-screenshot-copy-mode@nastem.github.com` 看起来
+是个人或定制插件，仓库中没有它们的源码或压缩包。它们需要从旧系统、备份硬盘或
+原始项目重新找回。如果找到 `.shell-extension.zip` 备份，可以这样安装：
+
+```bash
+gnome-extensions install --force /path/to/extension.shell-extension.zip
+gnome-extensions enable 插件UUID
+```
+
+安装完后注销并重新登录 GNOME；如果某个插件无法安装，先在 Extension Manager
+或 GNOME 插件网站确认它是否支持 GNOME 50。
+
 ## TLP 与 power-profiles-daemon：需要你选择
 
 当前系统安装了 `power-profiles-daemon`，而仓库中也包含 TLP 覆盖配置和 TLP
@@ -173,5 +220,9 @@ git submodule update --init --recursive
   —— 系统升级和恢复软件包列表的建议。
 - [TLP：power-profiles-daemon](https://linrunner.de/tlp/faq/ppd.html) —— TLP
   与 `power-profiles-daemon` 不应同时运行的原因。
+- [GNOME 系统管理指南：Shell 插件](https://help.gnome.org/system-admin-guide/extensions.html)
+  —— 用户插件目录和 UUID 规则。
+- [GNOME Shell Extensions](https://extensions.gnome.org/about/) —— 官方插件网站
+  和浏览器安装方式。
 - [freedesktop.org Desktop Entry Specification](https://specifications.freedesktop.org/desktop-entry/desktop-entry-spec-latest.html)
   —— `Exec`、`TryExec` 和图标路径行为。
