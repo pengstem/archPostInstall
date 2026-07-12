@@ -275,6 +275,45 @@ sudo ufw status verbose
 或 WireGuard；如果确实要做端口转发，应使用 SSH 密钥登录、关闭密码登录，并限制
 允许登录的用户和来源地址。
 
+## vinput 火山语音输入配置
+
+本次已在真实系统中完成并验证 vinput 2.3.3 的火山流式 ASR 配置：
+
+- 已安装 `doubao-stream` 提供商。
+- 活动提供商为 `provider.doubao.streaming`。
+- 已验证可用的资源 ID 是 `volc.seedasr.sauc.duration`；使用
+  `volc.bigasr.sauc.duration` 会返回 `403 Forbidden`，因为它不是本账号已开通的资源。
+- 凭据只写入 `~/.config/vinput/config.json`，文件权限为 `600`，没有写入仓库。
+- vinput 只使用火山语音服务的 APP ID 和 Access Token。火山 IAM 的 Secret Key
+  不属于这个 ASR 接口，不要把它填入 vinput。
+
+重装后需要手动恢复时，可以执行下面的命令；请将占位符替换为新凭据，不要把真实密钥提交到 Git：
+
+```bash
+vinput init
+vinput provider add doubao-stream
+vinput config set /asr/providers/1/env/VINPUT_ASR_APP_ID '"你的 APP ID"'
+vinput config set /asr/providers/1/env/VINPUT_ASR_ACCESS_TOKEN '你的 Access Token'
+vinput config set /asr/providers/1/env/VINPUT_ASR_RESOURCE_ID 'volc.seedasr.sauc.duration'
+vinput provider use doubao-stream
+systemctl --user enable --now vinput-daemon.service
+fcitx5-remote -r
+```
+
+其中 APP ID 必须写成 JSON 字符串；如果它是纯数字而没有外层双引号，vinput
+会把它当成数字并拒绝写入。可用下面的命令只检查非敏感字段和权限：
+
+```bash
+jq '{active_provider: .asr.active_provider,
+  resource_id: .asr.providers[1].env.VINPUT_ASR_RESOURCE_ID}' \
+  ~/.config/vinput/config.json
+stat -c '%a %U:%G %n' ~/.config/vinput/config.json
+```
+
+如果仍然收到 `403`，通常是火山控制台没有给该应用开通流式语音识别，或
+Access Token 已失效；先在控制台确认应用服务和资源权限，再重新生成凭据。此次
+凭据曾经直接发在聊天中，出于安全考虑建议在火山控制台轮换/撤销旧凭据后重新写入。
+
 ## 本次审计使用的参考资料
 
 - [ArchWiki：systemd](https://wiki.archlinux.org/title/Systemd) —— 用户单元和
@@ -291,3 +330,9 @@ sudo ufw status verbose
   和浏览器安装方式。
 - [freedesktop.org Desktop Entry Specification](https://specifications.freedesktop.org/desktop-entry/desktop-entry-spec-latest.html)
   —— `Exec`、`TryExec` 和图标路径行为。
+- [vinput ASR 文档](https://xifan2333.github.io/fcitx5-vinput/asr/) —— vinput 云端
+  ASR 提供商、CLI 和运行时切换。
+- [vinput Doubao streaming 提供商说明](https://github.com/xifan2333/vinput-registry/blob/main/resources/providers/doubao/streaming/README.md)
+  —— APP ID、Access Token 和资源 ID 环境变量。
+- [火山引擎大模型流式语音识别鉴权](https://www.volcengine.com/docs/6561/1395846?lang=zh)
+  —— APP ID、Access Token、Resource ID 及 Seed 协议配置。
