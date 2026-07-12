@@ -240,6 +240,41 @@ git submodule update --init --recursive
 
 在当前仓库执行前，请先确认已经保留嵌套子模块中的本地修改。
 
+## SSH 远程连接检查
+
+本次审计确认 `openssh 10.4p1-2` 已安装，`sshd` 程序存在，且
+`~/.ssh/authorized_keys` 文件存在并位于权限为 `0700` 的 `~/.ssh` 目录中。
+但是当前执行环境隔离了网络命名空间，并且无法访问 systemd，因此无法在这里
+确认 `sshd` 是否已启动、是否监听端口、局域网 IP 是什么，以及防火墙是否放行。
+
+请在真实系统中执行：
+
+```bash
+sudo sshd -t
+sudo systemctl status sshd.service
+sudo systemctl enable --now sshd.service
+sudo ss -lntp | grep -E '(:22|sshd)' || true
+ip -br address
+```
+
+如果看到 `0.0.0.0:22` 或 `[::]:22`，说明 SSH 正在监听所有网络接口；如果只看到
+`127.0.0.1:22`，其他机器不能直接连接。局域网内的另一台机器可以测试：
+
+```bash
+ssh nastem@你的局域网IP
+```
+
+如果连接失败，再检查防火墙：
+
+```bash
+sudo nft list ruleset
+sudo ufw status verbose
+```
+
+不要为了临时测试直接把 SSH 端口暴露到互联网。跨互联网连接优先使用 Tailscale
+或 WireGuard；如果确实要做端口转发，应使用 SSH 密钥登录、关闭密码登录，并限制
+允许登录的用户和来源地址。
+
 ## 本次审计使用的参考资料
 
 - [ArchWiki：systemd](https://wiki.archlinux.org/title/Systemd) —— 用户单元和
