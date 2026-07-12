@@ -144,6 +144,36 @@ gnome-extensions enable 插件UUID
 安装完后注销并重新登录 GNOME；如果某个插件无法安装，先在 Extension Manager
 或 GNOME 插件网站确认它是否支持 GNOME 50。
 
+### 12 个非自定义插件的官方页面
+
+下面这些页面都对应 `docs/gnome-extensions.md` 中的普通插件 UUID，并且审计时
+都能找到支持 GNOME 50 的可用版本：
+
+- `appindicatorsupport@rgcjonas.gmail.com`：
+  [AppIndicator and KStatusNotifierItem Support](https://extensions.gnome.org/extension/615/appindicator-support/)
+- `BingWallpaper@ineffable-gmail.com`：
+  [Bing Wallpaper](https://extensions.gnome.org/extension/1262/bing-wallpaper-changer/)
+- `blur-my-shell@aunetx`：
+  [Blur my Shell](https://extensions.gnome.org/extension/3193/blur-my-shell/)
+- `clipboard-indicator@tudmotu.com`：
+  [Clipboard Indicator](https://extensions.gnome.org/extension/779/clipboard-indicator/)
+- `dash-to-dock@micxgx.gmail.com`：
+  [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
+- `gnome-fuzzy-app-search@gnome-shell-extensions.Czarlie.gitlab.com`：
+  [GNOME Fuzzy App Search](https://extensions.gnome.org/extension/3956/gnome-fuzzy-app-search/)
+- `just-perfection-desktop@just-perfection`：
+  [Just Perfection](https://extensions.gnome.org/extension/3843/just-perfection/)
+- `lockscreen-extension@pratap.fastmail.fm`：
+  [Lockscreen Extension](https://extensions.gnome.org/extension/7472/lockscreen-extension/)
+- `user-theme@gnome-shell-extensions.gcampax.github.com`：
+  [User Themes](https://extensions.gnome.org/extension/19/user-themes/)
+- `Vitals@CoreCoding.com`：
+  [Vitals](https://extensions.gnome.org/extension/1460/vitals/)
+- `advanced-alt-tab@G-dH.github.com`：
+  [AATWS (Advanced Alt-Tab Window Switcher)](https://extensions.gnome.org/extension/4412/advanced-alttab-window-switcher/)
+- `hidetopbar@mathieu.bidon.ca`：
+  [Hide Top Bar](https://extensions.gnome.org/extension/545/hide-top-bar/)
+
 ## TLP 与 power-profiles-daemon：需要你选择
 
 当前系统安装了 `power-profiles-daemon`，而仓库中也包含 TLP 覆盖配置和 TLP
