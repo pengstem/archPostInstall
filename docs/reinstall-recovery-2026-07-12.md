@@ -1,200 +1,177 @@
-# Reinstall recovery checklist
+# 重装系统后的恢复清单
 
-Audit date: 2026-07-12 (Asia/Singapore)
+审计日期：2026-07-12（Asia/Singapore）
 
-This file records the post-reinstall audit and the actions that still need to be
-run in the real GNOME session. It is deliberately separate from the existing
-bug-history files because it is a recovery checklist, not a historical bug
-entry.
+本文档记录重装系统后的审计结果，以及仍需要在真实 GNOME 会话中执行的
+操作。它是恢复清单，不属于项目的历史 Bug 记录。
 
-## What was checked
+## 已检查的内容
 
-- The host is Arch Linux with GNOME 50.3, pacman 7.1.0.r9, paru 2.1.0, and
-  Bash 5.3.15.
-- The main home-directory links already point into this checkout, including
-  Zsh, Kitty, Neovim, Fcitx5, Rime, the desktop entries, the helper binaries,
-  and all three user systemd unit files.
-- The system links already point into this checkout for pacman, paru, the
-  pacman hook, the package-list updater, DPMS, and the TLP override.
-- The Fcitx5/Rime, terminal, media, reader, mail, and OBS configuration trees
-  are present in the repository and linked in the home directory.
-- `bash -n` validation is clean for the repository Bash scripts. ShellCheck is
-  not installed in this environment, so ShellCheck validation was not run.
-- `desktop-file-validate` accepts all tracked desktop entries; it reports only
-  existing category hints for Yazi. `systemd-analyze verify` could not return a
-  trustworthy status because this sandbox rejects the systemd user-socket
-  credential operations.
-- `configs/baidupcs/pcs_config.json` exists locally and is ignored by Git. Its
-  permissions were tightened to `0600` without reading its contents.
-- `.gitmodules` was repaired so all three tracked tmux gitlinks can be
-  initialized from a fresh clone.
-- `configs/applications/ratty.desktop` was corrected to use a valid absolute
-  config path; `%h` is not a freedesktop desktop-entry field code.
+- 主机运行 Arch Linux、GNOME 50.3、pacman 7.1.0.r9、paru 2.1.0 和 Bash
+  5.3.15。
+- 主要用户目录链接已经指向此仓库，包括 Zsh、Kitty、Neovim、Fcitx5、Rime、
+  桌面启动器、辅助脚本和三个 user systemd 单元文件。
+- pacman、paru、pacman hook、软件包列表更新器、DPMS 和 TLP 配置的系统链接
+  也已经指向此仓库。
+- Fcitx5/Rime、终端、媒体播放器、文档阅读器、邮件和 OBS 配置目录都存在，
+  并且已经链接到用户目录。
+- 仓库中的 Bash 脚本均通过 `bash -n` 语法检查。当前环境没有安装
+  ShellCheck，因此未进行 ShellCheck 检查。
+- `configs/baidupcs/pcs_config.json` 在本地存在且被 Git 忽略。没有读取其内容，
+  只将权限收紧为 `0600`。
+- 已修复 `.gitmodules`，三个已被 Git 跟踪的 tmux gitlink 现在都可以从新克隆
+  的仓库初始化。
+- 已修复 `configs/applications/ratty.desktop`，改用有效的绝对配置路径；`%h`
+  不是 freedesktop 桌面条目支持的字段代码。
+- 所有已跟踪的桌面启动器都通过 `desktop-file-validate` 检查。Yazi 只报告了
+  已存在的分类提示。`systemd-analyze verify` 无法返回可靠状态，因为当前
+  沙箱拒绝 systemd 用户 socket 的凭据操作。
 
-## Why the remaining setup could not be run here
+## 为什么无法在这里完成剩余配置
 
-This execution environment blocks privilege escalation. The exact checks were:
+当前执行环境禁止提权。检查时得到的确切错误是：
 
-```text
+~~~
 sudo: /etc/sudo.conf is owned by uid 65534, should be 0
 sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
-```
+~~~
 
-Therefore I did not run `setup.sh`, install packages, write `/etc/sudoers.d`,
-or enable system services from this environment. Those operations need the real
-installed system and a normal user session. I also could not query
-`systemctl --user` because the user D-Bus is unavailable to this execution
-environment.
+因此我没有在此环境中运行 `setup.sh`、安装软件包、写入
+`/etc/sudoers.d` 或启用系统服务。这些操作需要真实安装系统和正常的用户会话。
+此外，当前环境无法访问用户 D-Bus，所以无法查询 `systemctl --user` 的状态。
 
-## Run on the real installed system
+## 在真实系统中执行
 
-Run these as the normal user, from the repository root:
+请使用普通用户，在仓库根目录执行：
 
-```bash
+~~~
 cd /home/nastem/Project/archPostInstall
 sudo -v
 ./setup.sh
 sudo visudo -cf /etc/sudoers.d/archpostinstall-tlp
-```
+~~~
 
-`setup.sh` is idempotent for correctly linked targets. It will install the TLP
-sudoers file and refresh system links; it will not create the missing Nowledge
-Mem launcher described below.
+对于已经正确建立的链接，`setup.sh` 是幂等的。它会安装 TLP sudoers 文件并
+刷新系统链接，但不会创建下面提到的缺失 Nowledge Mem 启动脚本。
 
-Then, inside the logged-in GNOME session:
+然后在已经登录的 GNOME 图形会话中执行：
 
-```bash
+~~~
 mkdir -p ~/.local/share/gnome-shell/extensions ~/.themes ~/.local/share/icons
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path
 systemctl --user enable --now archpostinstall-dpms-lock-monitor.service
 systemctl --user --no-pager status archpostinstall-gnome-sync.path
 systemctl --user --no-pager status archpostinstall-dpms-lock-monitor.service
-```
+~~~
 
-If the user bus is not available, log into the graphical GNOME session first;
-do not run these commands with `sudo`.
+如果用户 bus 不可用，请先登录 GNOME 图形会话；不要给这些命令加 `sudo`。
 
-## Packages still missing for tracked configurations
+## 跟踪配置仍缺少的软件包
 
-The current `scripts/pkglist.txt` is a fresh, user-generated package snapshot
-and is intentionally preserved. It is missing packages for several tracked
-configuration trees. The older untracked `scripts/pkglist_1.txt` is not safe to
-feed directly to pacman: it contains packages listed in `unwanted_packages.txt`
-and also contains the literal `qemu-*` wildcard.
+当前的 `scripts/pkglist.txt` 是重装后生成的用户软件包快照，我已保留它原样。
+但它缺少多个已跟踪配置所需的软件包。旧的未跟踪文件
+`scripts/pkglist_1.txt` 不能直接交给 pacman，因为它包含
+`unwanted_packages.txt` 中标记为不需要的软件包，还包含字面量通配符
+`qemu-*`。
 
-After a normal full upgrade, install the official-repository packages that
-correspond to tracked configs:
+完成正常的系统升级后，可以安装与仓库配置对应的官方仓库软件包：
 
-```bash
-sudo pacman -Syu --needed \
-  fcitx5 fcitx5-rime fcitx5-configtool fcitx5-gtk fcitx5-qt \
-  ghostty mpv tmux zellij zathura zathura-pdf-mupdf \
-  obs-studio isync msmtp neomutt bottom wezterm \
-  ratty baidupcs-go zed
-```
+~~~
+sudo pacman -Syu --needed fcitx5 fcitx5-rime fcitx5-configtool fcitx5-gtk fcitx5-qt ghostty mpv tmux zellij zathura zathura-pdf-mupdf obs-studio isync msmtp neomutt bottom wezterm ratty baidupcs-go zed
+~~~
 
-The package names above were verified against the configured Arch repository
-metadata on 2026-07-12. The package manager may present a current transaction
-plan; review it before accepting. Do not run a package-removal command based on
-`unwanted_packages.txt` until each item has been confirmed manually.
+上面的软件包名称已于 2026-07-12 根据当前配置的 Arch 仓库元数据确认。
+软件包管理器仍可能显示最新的事务计划，请在确认后再接受。不要在没有逐项
+确认前，根据 `unwanted_packages.txt` 执行删除软件包的命令。
 
-The `xdg-desktop-portal-termfilechooser` helper is configured in this repo, but
-no package matching either `xdg-desktop-portal-termfilechooser` or the old
-`xdg-desktop-portal-termfilechooser-hunkyburrito-git` name was available in the
-configured package databases during this audit. Investigate the package/source
-name before installing it:
+仓库配置了 `xdg-desktop-portal-termfilechooser`，但审计时配置的软件包数据库中
+找不到 `xdg-desktop-portal-termfilechooser` 或旧名称
+`xdg-desktop-portal-termfilechooser-hunkyburrito-git`。安装前请先调查当前的
+软件包或源码名称：
 
-```bash
+~~~
 pacman -Ss termfilechooser
 paru -Ss termfilechooser
-```
+~~~
 
-The repo-local `yazi-wrapper.sh` is already linked; the portal backend package
-is the unresolved part.
+仓库内的 `yazi-wrapper.sh` 已经链接完成；目前未解决的是 portal 后端软件包。
 
-## TLP versus power-profiles-daemon: choice required
+## TLP 与 power-profiles-daemon：需要你选择
 
-The current system has `power-profiles-daemon`, while this repo also contains a
-TLP override and TLP sudoers policy. The DPMS script no longer changes power
-profiles, so TLP is not needed for DPMS itself. TLP documentation warns that
-TLP and `power-profiles-daemon` compete over overlapping settings.
+当前系统安装了 `power-profiles-daemon`，而仓库中也包含 TLP 覆盖配置和 TLP
+sudoers 策略。DPMS 脚本已经不再切换电源配置，因此 DPMS 本身不需要 TLP。
+TLP 文档警告，TLP 和 `power-profiles-daemon` 会修改相互重叠的设置。
 
-Keep the current GNOME power-profile setup by skipping TLP, or deliberately
-choose TLP and follow its conflict guidance. Only if TLP is the intended choice
-should you run commands like these after reviewing the transaction:
+你可以保留当前 GNOME 电源配置并跳过 TLP，或者明确选择使用 TLP 并按照其冲突
+处理方式配置。只有在确定使用 TLP 时，才执行类似下面的命令，并先检查事务计划：
 
-```bash
+~~~
 sudo pacman -Syu --needed tlp tlp-rdw
 sudo systemctl disable --now power-profiles-daemon.service
 sudo systemctl enable --now tlp.service
-```
+~~~
 
-Do not run both power managers concurrently. This choice was not made
-automatically because it changes the system's power-management policy.
+不要让两个电源管理器同时运行。这里没有自动替你做这个选择，因为它会改变
+系统的电源管理策略。
 
-## Items needing a personal decision or files outside this repo
+## 需要个人决定或仓库外文件的项目
 
 ### Nowledge Mem
 
-The tracked `scripts/launchers/nowledge-mem-desktop.sh` is deleted in the
-current worktree, while the desktop entry and `setup.sh` still reference it.
-I did not restore a user-deleted file. If Nowledge Mem is still wanted, inspect
-the old file and restore it deliberately:
+当前工作树中，已跟踪的 `scripts/launchers/nowledge-mem-desktop.sh` 被删除了，
+但桌面启动器和 `setup.sh` 仍然引用它。我没有擅自恢复可能是用户主动删除的文件。
+如果你仍然需要 Nowledge Mem，请先检查旧文件，再有意恢复：
 
-```bash
+~~~
 git show HEAD:scripts/launchers/nowledge-mem-desktop.sh
 git restore --source=HEAD -- scripts/launchers/nowledge-mem-desktop.sh
 chmod +x scripts/launchers/nowledge-mem-desktop.sh
-```
+~~~
 
-The expected AppImage `/home/nastem/Applications/nowledge-mem.AppImage` is
-also absent, so the desktop entry cannot work until that application is
-restored. `QQ.AppImage` and `WeChat.AppImage` are present and executable, but
-their configured user icon files are absent; restore those icons or accept the
-generic icon.
+预期的 AppImage `/home/nastem/Applications/nowledge-mem.AppImage` 也不存在，
+所以恢复应用程序之前，桌面启动器无法工作。`QQ.AppImage` 和
+`WeChat.AppImage` 已存在且可执行，但配置中的用户图标文件不存在；请恢复图标，
+或接受通用图标。
 
-OBS is configured to record under `/home/nastem/Videos/obs`; create that
-directory if it is not already present:
+OBS 配置的录制目录是 `/home/nastem/Videos/obs`。如果目录不存在，请创建：
 
-```bash
+~~~
 mkdir -p ~/Videos/obs
-```
+~~~
 
-### Existing worktree changes
+### 已存在的工作树修改
 
-These pre-existing changes were not reverted or included in the recovery fix:
+下面这些修改在本次恢复中没有回滚，也没有加入提交：
 
-- Most tracked files have a `100644 -> 100755` mode change.
-- `scripts/pkglist.txt` was reduced to the current installed snapshot.
-- `configs/btop/btop.conf`, `configs/nvim/lazy-lock.json`, and `configs/zshrc`
-  contain real content changes.
-- The three backup `.gitkeep` files are deleted.
-- The nested tmux submodules have local changes.
-- `.claude/`, `scripts/pkglist_1.txt`, and `unwanted_packages.txt` are
-  untracked.
+- 大多数已跟踪文件存在 `100644 -> 100755` 权限模式变化。
+- `scripts/pkglist.txt` 被缩减为当前安装系统的软件包快照。
+- `configs/btop/btop.conf`、`configs/nvim/lazy-lock.json` 和 `configs/zshrc`
+  存在实际内容变化。
+- 三个 backup 目录中的 `.gitkeep` 文件被删除。
+- 嵌套的 tmux 子模块存在本地修改。
+- `.claude/`、`scripts/pkglist_1.txt` 和 `unwanted_packages.txt` 是未跟踪文件。
 
-These may be intentional reinstall work, so they were left untouched. Empty
-backup directories will be recreated by the backup scripts when needed. On a
-fresh clone, initialize the now-complete submodule metadata with:
+这些修改可能是重装系统时有意保留的内容，因此没有触碰。需要时，备份脚本会
+自动重新创建空的备份目录。对于新克隆的仓库，可以用下面的命令初始化已经
+修复的子模块配置：
 
-```bash
+~~~
 git submodule sync --recursive
 git submodule update --init --recursive
-```
+~~~
 
-Do that only after preserving any local changes inside the current nested
-submodules.
+在当前仓库执行前，请先确认已经保留嵌套子模块中的本地修改。
 
-## References used for this audit
+## 本次审计使用的参考资料
 
-- [ArchWiki: systemd](https://wiki.archlinux.org/title/Systemd) — user-unit
-  activation and `enable --now` behavior.
-- [ArchWiki: Fcitx5](https://wiki.archlinux.org/title/Fcitx5) — package split,
-  Rime/GTK/Qt integration, and Wayland caveats.
-- [ArchWiki: Package management FAQs](https://wiki.archlinux.org/index.php/Package_Management_FAQs)
-  — full upgrade guidance and restoring package lists.
-- [TLP: power-profiles-daemon](https://linrunner.de/tlp/faq/ppd.html) — why
-  TLP and `power-profiles-daemon` should not be run together.
+- [ArchWiki：systemd](https://wiki.archlinux.org/title/Systemd) —— 用户单元和
+  `enable --now` 的行为。
+- [ArchWiki：Fcitx5](https://wiki.archlinux.org/title/Fcitx5) —— 软件包拆分、
+  Rime/GTK/Qt 集成及 Wayland 注意事项。
+- [ArchWiki：软件包管理 FAQ](https://wiki.archlinux.org/index.php/Package_Management_FAQs)
+  —— 系统升级和恢复软件包列表的建议。
+- [TLP：power-profiles-daemon](https://linrunner.de/tlp/faq/ppd.html) —— TLP
+  与 `power-profiles-daemon` 不应同时运行的原因。
 - [freedesktop.org Desktop Entry Specification](https://specifications.freedesktop.org/desktop-entry/desktop-entry-spec-latest.html)
-  — `Exec`, `TryExec`, and icon path behavior.
+  —— `Exec`、`TryExec` 和图标路径行为。
