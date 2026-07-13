@@ -32,7 +32,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
   during display-off, or `--action stop` for apps not reopened by DPMS.
 - The default config restarts `zen-browser`, `wechat`, and `qq`, leaves Kitty running,
   and stops Steam and Firefox without reopening them.
-- For noisy logs, lower `DPMS_VERBOSE`; for slower apps, increase `DPMS_START_WAIT_SEC` / `DPMS_START_RETRIES`.
+- DPMS uses fixed startup/shutdown timing: 15 seconds per startup check, 3 startup attempts, and 6 seconds for graceful shutdown.
 - `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
 
