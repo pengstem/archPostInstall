@@ -56,9 +56,6 @@ Rime input method user databases (build artifacts).
 
 ## State Files
 
-### DPMS State (Runtime)
-- `~/.cache/archpostinstall/dpms.log` - DPMS activity log with `.1`, `.2`, ... archives
-
 ### Backup Hashes (Runtime)
 - `~/.local/state/archpostinstall/themes.hash`
 - `~/.local/state/archpostinstall/icons.hash`
@@ -80,10 +77,6 @@ GNOME config change
         └── backup_themes_extensions.sh (if hash changed)
             └── backups/gnome/*.tar.gz (created)
 
-DPMS lock/unlock
-└── archpostinstall-dpms-lock-monitor.service
-    ├── dpms-toggle.sh --off (lock)
-    │   └── dpms.log (activity)
-    └── dpms-toggle.sh --on (unlock)
-        └── dpms.log (activity)
+Manual DPMS control
+└── dpms-toggle.sh --off/--on/--toggle
 ```

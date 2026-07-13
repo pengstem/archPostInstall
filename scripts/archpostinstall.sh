@@ -19,14 +19,12 @@ Commands:
   dpms-toggle             Toggle display power (GNOME)
   dpms-off                Force display off
   dpms-on                 Force display on and restore apps
-  dpms-lock-monitor       Monitor lock state and toggle DPMS
   backup-gnome            Sync GNOME extensions/themes and archive assets
   backup-themes           Archive GNOME themes, icons, and extensions
   restore-themes <files>  Restore themes/icons/extensions from archives
   backup-firefox          Archive ~/.mozilla
   restore-firefox <file>  Restore ~/.mozilla from an archive
   update-pkglist          Refresh scripts/pkglist.txt from pacman
-  measure-power           Measure power draw for TLP profiles
 EOF
 }
 
@@ -58,9 +56,6 @@ case "$cmd" in
     dpms-on)
         "$REPO_DIR/scripts/gnome/dpms-toggle.sh" --on
         ;;
-    dpms-lock-monitor)
-        "$REPO_DIR/scripts/gnome/dpms-lock-monitor.sh"
-        ;;
     backup-gnome)
         "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$@"
         ;;
@@ -78,9 +73,6 @@ case "$cmd" in
         ;;
     update-pkglist)
         "$REPO_DIR/scripts/update_pkglist.sh"
-        ;;
-    measure-power)
-        "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$@"
         ;;
     ""|-h|--help|help)
         usage

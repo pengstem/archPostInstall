@@ -27,40 +27,13 @@ require_cmd() {
     fi
 }
 
-get_session_id() {
-    local session_id="${XDG_SESSION_ID:-}"
-
-    if [ -n "$session_id" ]; then
-        printf "%s\n" "$session_id"
-        return 0
-    fi
-
-    if command -v loginctl >/dev/null 2>&1; then
-        session_id="$(loginctl list-sessions --no-legend 2>/dev/null | \
-            awk -v user="$USER" '$3 == user { print $1; exit }')"
-        if [ -n "$session_id" ]; then
-            printf "%s\n" "$session_id"
-            return 0
-        fi
-    fi
-
-    return 1
-}
-
 is_non_negative_int() {
     [[ "$1" =~ ^[0-9]+$ ]]
 }
 
 reset_dpms_config() {
     DPMS_APPS=()
-    DPMS_PROFILE_ON="balanced"
-    DPMS_PROFILE_OFF="power-saver"
-    DPMS_PROFILE_OFF_SSH="balanced"
-    DPMS_TLP_USE_SUDO=1
     DPMS_VERBOSE=1
-    DPMS_LOG_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall/dpms.log"
-    DPMS_LOG_MAX_BYTES=1048576
-    DPMS_LOG_KEEP=3
     DPMS_START_WAIT_SEC=15
     DPMS_START_RETRIES=3
     DPMS_KILL_WAIT_SEC=6
@@ -75,27 +48,6 @@ dpms_defaults() {
             return 1
         fi
         case "$1" in
-            --profile-on)
-                DPMS_PROFILE_ON="$2"
-                ;;
-            --profile-off)
-                DPMS_PROFILE_OFF="$2"
-                ;;
-            --profile-off-ssh)
-                DPMS_PROFILE_OFF_SSH="$2"
-                ;;
-            --tlp-use-sudo)
-                DPMS_TLP_USE_SUDO="$2"
-                ;;
-            --log-file)
-                DPMS_LOG_FILE="$2"
-                ;;
-            --log-max-bytes)
-                DPMS_LOG_MAX_BYTES="$2"
-                ;;
-            --log-keep)
-                DPMS_LOG_KEEP="$2"
-                ;;
             --start-wait)
                 DPMS_START_WAIT_SEC="$2"
                 ;;
@@ -195,10 +147,7 @@ validate_dpms_config() {
     done
 
     for value_name in \
-        DPMS_TLP_USE_SUDO \
         DPMS_VERBOSE \
-        DPMS_LOG_MAX_BYTES \
-        DPMS_LOG_KEEP \
         DPMS_START_WAIT_SEC \
         DPMS_START_RETRIES \
         DPMS_KILL_WAIT_SEC; do
@@ -230,78 +179,10 @@ load_dpms_config() {
     validate_dpms_config "$require_apps"
 }
 
-dpms_init_log() {
-    DPMS_LOG_TAG="$1"
-}
-
-dpms_rotate_log() {
-    local log_file="${DPMS_LOG_FILE:-}"
-    local max_bytes="${DPMS_LOG_MAX_BYTES:-0}"
-    local keep="${DPMS_LOG_KEEP:-0}"
-    local size idx
-
-    if [ -z "$log_file" ] || ! is_non_negative_int "$max_bytes" || \
-       ! is_non_negative_int "$keep" || [ "$max_bytes" -le 0 ] || [ "$keep" -le 0 ] || \
-       [ ! -f "$log_file" ]; then
-        return 0
-    fi
-
-    size="$(wc -c < "$log_file" 2>/dev/null || echo 0)"
-    if [ "$size" -lt "$max_bytes" ]; then
-        return 0
-    fi
-
-    rm -f "${log_file}.${keep}"
-    for ((idx=keep; idx>=2; idx--)); do
-        if [ -f "${log_file}.$((idx - 1))" ]; then
-            mv "${log_file}.$((idx - 1))" "${log_file}.${idx}"
-        fi
-    done
-    mv "$log_file" "${log_file}.1"
-}
-
 dpms_log() {
-    local ts msg
-
-    ts="$(date '+%Y-%m-%d %H:%M:%S')"
-    msg="$ts [${DPMS_LOG_TAG:-dpms}] $*"
-
-    if [ -n "${DPMS_LOG_FILE:-}" ]; then
-        mkdir -p "$(dirname "$DPMS_LOG_FILE")"
-        dpms_rotate_log
-        printf "%s\n" "$msg" >> "$DPMS_LOG_FILE"
-    fi
-
     if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
-        printf "%s\n" "$msg" >&2
+        printf "[dpms] %s\n" "$*" >&2
     fi
-}
-
-dpms_have_tlp() {
-    command -v tlpctl >/dev/null 2>&1 || command -v tlp >/dev/null 2>&1
-}
-
-dpms_set_tlp_profile() {
-    local profile="$1"
-
-    if command -v tlpctl >/dev/null 2>&1; then
-        tlpctl set "$profile" >/dev/null 2>&1
-        return $?
-    fi
-
-    if ! command -v tlp >/dev/null 2>&1; then
-        return 1
-    fi
-
-    if [ "${DPMS_TLP_USE_SUDO:-1}" -eq 1 ]; then
-        if ! command -v sudo >/dev/null 2>&1; then
-            return 1
-        fi
-        sudo -n tlp "$profile" >/dev/null 2>&1
-        return $?
-    fi
-
-    tlp "$profile" >/dev/null 2>&1
 }
 
 acquire_lock() {

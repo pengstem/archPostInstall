@@ -48,11 +48,11 @@ sudo: The "no new privileges" flag is set, which prevents sudo from running as r
 cd /home/nastem/Project/archPostInstall
 sudo -v
 ./setup.sh
-sudo visudo -cf /etc/sudoers.d/archpostinstall-tlp
 ~~~
 
-对于已经正确建立的链接，`setup.sh` 是幂等的。它会安装 TLP sudoers 文件并
-刷新系统链接，但不会创建下面提到的缺失 Nowledge Mem 启动脚本。
+对于已经正确建立的链接，`setup.sh` 是幂等的。它会刷新系统链接并清理已移除
+功能的旧用户链接和 TLP sudoers 文件，但不会创建下面提到的缺失 Nowledge Mem
+启动脚本。
 
 然后在已经登录的 GNOME 图形会话中执行：
 
@@ -60,9 +60,7 @@ sudo visudo -cf /etc/sudoers.d/archpostinstall-tlp
 mkdir -p ~/.local/share/gnome-shell/extensions ~/.themes ~/.local/share/icons
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path
-systemctl --user enable --now archpostinstall-dpms-lock-monitor.service
 systemctl --user --no-pager status archpostinstall-gnome-sync.path
-systemctl --user --no-pager status archpostinstall-dpms-lock-monitor.service
 ~~~
 
 如果用户 bus 不可用，请先登录 GNOME 图形会话；不要给这些命令加 `sudo`。
@@ -215,8 +213,8 @@ gnome-extensions info 仍显示 State: ERROR，注销后重新登录即可验证
 
 ## TLP 与 power-profiles-daemon：需要你选择
 
-当前系统安装了 `power-profiles-daemon`，而仓库中也包含 TLP 覆盖配置和 TLP
-sudoers 策略。DPMS 脚本已经不再切换电源配置，因此 DPMS 本身不需要 TLP。
+当前系统安装了 `power-profiles-daemon`，而仓库中也包含 TLP 覆盖配置。DPMS
+脚本已经不再切换电源配置，因此 DPMS 本身不需要 TLP。
 TLP 文档警告，TLP 和 `power-profiles-daemon` 会修改相互重叠的设置。
 
 你可以保留当前 GNOME 电源配置并跳过 TLP，或者明确选择使用 TLP 并按照其冲突

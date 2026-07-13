@@ -29,13 +29,11 @@
 | configs/bottom/bottom.toml | ~/.config/bottom/bottom.toml | user config |
 | configs/btop/btop.conf | ~/.config/btop/btop.conf | user config |
 | configs/tlp/99-archpostinstall.conf | /etc/tlp.d/99-archpostinstall.conf | sudo |
-| configs/sudoers.d/archpostinstall-tlp | /etc/sudoers.d/archpostinstall-tlp | sudo |
 | configs/pacman/pacman.conf | /etc/pacman.conf | sudo |
 | configs/paru/paru.conf | /etc/paru.conf | sudo |
 | configs/pacman/hooks/99-update-pkglist.hook | /etc/pacman.d/hooks/99-update-pkglist.hook | sudo |
 | configs/systemd/user/archpostinstall-gnome-sync.service | ~/.config/systemd/user/archpostinstall-gnome-sync.service | user unit |
 | configs/systemd/user/archpostinstall-gnome-sync.path | ~/.config/systemd/user/archpostinstall-gnome-sync.path | user unit |
-| configs/systemd/user/archpostinstall-dpms-lock-monitor.service | ~/.config/systemd/user/archpostinstall-dpms-lock-monitor.service | user unit |
 | configs/applications/google-chrome.desktop | ~/.local/share/applications/google-chrome.desktop | user desktop entry |
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
 | configs/applications/ratty.desktop | ~/.local/share/applications/ratty.desktop | user desktop entry |
@@ -46,10 +44,8 @@
 | scripts/gnome/backup_gnome_state.sh | ~/.local/bin/archpostinstall-gnome-sync | user bin |
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
 | scripts/gnome/dpms-toggle.sh | /usr/local/bin/dpms-toggle | sudo |
-| scripts/gnome/dpms-lock-monitor.sh | ~/.local/bin/archpostinstall-dpms-lock-monitor | user bin |
 | scripts/launchers/nowledge-mem-desktop.sh | ~/.local/bin/nowledge-mem-desktop | user bin |
 | scripts/launchers/yazi-desktop.sh | ~/.local/bin/yazi-desktop | user bin |
 | scripts/launchers/yazi-open-nautilus.sh | ~/.local/bin/yazi-open-nautilus | user bin |
-| scripts/power/measure_tlp_power.sh | ~/.local/bin/archpostinstall-measure-power | user bin |
 | scripts/zathura/page-to-clipboard.sh | ~/.local/bin/zathura-page-to-clipboard | user bin |
 | scripts/archpostinstall.sh | ~/.local/bin/archpostinstall | user bin |

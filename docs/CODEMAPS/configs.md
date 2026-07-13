@@ -21,7 +21,6 @@ configs/
 ├── paru/              # System: paru.conf
 ├── ratty/             # Terminal
 ├── rime/              # Input method (some files ignored)
-├── sudoers.d/         # System: sudo rules
 ├── systemd/user/      # User systemd units
 ├── tlp/               # System: TLP power config
 ├── tmux/              # Terminal multiplexer
@@ -71,17 +70,15 @@ configs/
 | `paru/paru.conf` | `/etc/paru.conf` |
 | `pacman/hooks/*.hook` | `/etc/pacman.d/hooks/` |
 | `tlp/99-archpostinstall.conf` | `/etc/tlp.d/` |
-| `sudoers.d/archpostinstall-tlp` | `/etc/sudoers.d/` |
 
 ## Key Config Files
 
 ### dpms.conf
 ```bash
-dpms_defaults --verbose 2 --log-keep 3
+dpms_defaults --verbose 1
 dpms_app --name zen-browser --match 'zen-bin|zen-browser' --start 'zen-browser'
 dpms_app --name steam --match 'steam' --action stop
 ```
 
 ### Systemd Units
 - `archpostinstall-gnome-sync.{path,service}` - Watch GNOME config changes
-- `archpostinstall-dpms-lock-monitor.service` - Lock/unlock watcher

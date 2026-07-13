@@ -58,6 +58,24 @@ create_link() {
     echo "✅ Linked"
 }
 
+remove_stale_link() {
+    local dest="$1"
+
+    if [ -L "$dest" ]; then
+        rm "$dest"
+        echo "  Removed obsolete link: $dest"
+    fi
+}
+
+remove_stale_sudo_file() {
+    local dest="$1"
+
+    if sudo test -f "$dest"; then
+        sudo rm "$dest"
+        echo "  Removed obsolete sudo file: $dest"
+    fi
+}
+
 # Function to create symlink with sudo (for /etc files)
 create_sudo_link() {
     local src="$1"
@@ -97,24 +115,13 @@ create_sudo_link() {
     echo "✅ Linked (sudo)"
 }
 
-# Function to install sudoers files with correct permissions
-install_sudoers() {
-    local src="$1"
-    local dest="$2"
-    local name="$3"
-
-    printf "  %-15s " "[$name]"
-
-    if [ ! -e "$src" ]; then
-        echo "❌ Source not found: $src"
-        return
-    fi
-
-    sudo install -m 0440 -o root -g root "$src" "$dest"
-    echo "✅ Installed"
-}
-
 # --- Link Configurations ---
+
+# Remove links created by features that are no longer part of the repository.
+remove_stale_link "$HOME/.local/bin/archpostinstall-dpms-lock-monitor"
+remove_stale_link "$HOME/.local/bin/archpostinstall-measure-power"
+remove_stale_link "$HOME/.config/systemd/user/archpostinstall-dpms-lock-monitor.service"
+remove_stale_sudo_file "/etc/sudoers.d/archpostinstall-tlp"
 
 # System Configs (Requires Sudo)
 create_sudo_link "$CONFIGS_DIR/pacman/pacman.conf" "/etc/pacman.conf" "Pacman"
@@ -123,7 +130,6 @@ create_sudo_link "$CONFIGS_DIR/pacman/hooks/99-update-pkglist.hook" "/etc/pacman
 create_sudo_link "$REPO_DIR/scripts/update_pkglist.sh" "/usr/local/bin/archpostinstall-update-pkglist" "Pkglist Sync"
 create_sudo_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "/usr/local/bin/dpms-toggle" "DPMS Toggle (System)"
 create_sudo_link "$CONFIGS_DIR/tlp/99-archpostinstall.conf" "/etc/tlp.d/99-archpostinstall.conf" "TLP"
-install_sudoers "$CONFIGS_DIR/sudoers.d/archpostinstall-tlp" "/etc/sudoers.d/archpostinstall-tlp" "TLP Sudoers"
 
 # Shell
 create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"
@@ -178,8 +184,6 @@ create_link "$CONFIGS_DIR/applications/ratty.desktop" "$HOME/.local/share/applic
 create_link "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$HOME/.local/bin/archpostinstall-gnome-sync" "Gnome Sync Bin"
 create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostinstall" "Archpostinstall Bin"
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
-create_link "$REPO_DIR/scripts/gnome/dpms-lock-monitor.sh" "$HOME/.local/bin/archpostinstall-dpms-lock-monitor" "DPMS Lock Monitor"
-create_link "$REPO_DIR/scripts/power/measure_tlp_power.sh" "$HOME/.local/bin/archpostinstall-measure-power" "Power Measure"
 create_link "$REPO_DIR/scripts/launchers/nowledge-mem-desktop.sh" "$HOME/.local/bin/nowledge-mem-desktop" "Nowledge Mem Bin"
 create_link "$REPO_DIR/scripts/launchers/yazi-desktop.sh" "$HOME/.local/bin/yazi-desktop" "Yazi Desktop"
 create_link "$REPO_DIR/scripts/launchers/yazi-open-nautilus.sh" "$HOME/.local/bin/yazi-open-nautilus" "Yazi Nautilus"
@@ -188,7 +192,6 @@ create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/z
 # Systemd (User)
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.path"    "$HOME/.config/systemd/user/archpostinstall-gnome-sync.path"    "Gnome Sync Path"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-dpms-lock-monitor.service" "$HOME/.config/systemd/user/archpostinstall-dpms-lock-monitor.service" "DPMS Lock Monitor Service"
 
 echo ""
 echo "✨ Configuration linking complete!"

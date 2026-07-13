@@ -30,8 +30,6 @@ archpostinstall update-pkglist
 archpostinstall dpms-toggle
 archpostinstall dpms-off
 archpostinstall dpms-on
-archpostinstall dpms-lock-monitor
-archpostinstall measure-power
 
 # Syntax-check a script without running it
 bash -n scripts/some_script.sh
@@ -48,13 +46,12 @@ bash -n scripts/some_script.sh
 - `scripts/install/` - Package and shell tool installation
 - `scripts/backup/` - Firefox and GNOME theme/extension backup/restore
 - `scripts/gnome/` - GNOME state sync and DPMS automation
-- `scripts/power/` - TLP power measurement tools
 - `scripts/zathura/` - Zathura PDF viewer helpers
 
 **Config structure:**
 - `configs/<tool>/` - Each tool's config mirrors its target location
 - System configs (`pacman/`, `paru/`) require sudo to link
-- `configs/systemd/user/` - User systemd units for GNOME sync and DPMS lock monitoring
+- `configs/systemd/user/` - User systemd units for GNOME sync
 
 **Key files:**
 - `scripts/pkglist.txt` - Package source of truth; auto-updated by pacman hook
@@ -82,7 +79,6 @@ After running `setup.sh`, enable user units:
 ```bash
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path  # Auto-sync GNOME state
-systemctl --user enable --now archpostinstall-dpms-lock-monitor.service  # DPMS automation
 ```
 
 ## Shell Script Conventions

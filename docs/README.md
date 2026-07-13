@@ -24,20 +24,16 @@ This folder contains reference notes and quick guidance for maintaining the Arch
   - `GNOME_BACKUP_DIR` to override backup location
   - `GNOME_SYNC_THROTTLE_SECONDS` to adjust archive frequency
 
-## DPMS Toggle and Lock Hook
+## DPMS Toggle
 - `dpms-toggle` turns the display off/on and manages app shutdown/restore.
-- `archpostinstall-dpms-lock-monitor.service` watches logind lock state and runs `dpms-toggle --off/--on` on lock/unlock.
 - Configure app behavior in `configs/archpostinstall/dpms.conf` with `dpms_defaults` and `dpms_app`.
-- Logs are written to `~/.cache/archpostinstall/dpms.log` for troubleshooting.
-- Log rotation is bounded inside `dpms-toggle` via `DPMS_LOG_MAX_BYTES` and `DPMS_LOG_KEEP`.
+- Diagnostic output is written to stderr; systemd captures it in the journal when a unit invokes the script.
 - `dpms_app` uses `--action restart` by default; use `--action start` for apps left running
   during display-off, or `--action stop` for apps not reopened by DPMS.
 - The default config restarts `zen-browser`, `wechat`, and `qq`, leaves Kitty running,
   and stops Steam and Firefox without reopening them.
 - For noisy logs, lower `DPMS_VERBOSE`; for slower apps, increase `DPMS_START_WAIT_SEC` / `DPMS_START_RETRIES`.
 - `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
-- Enable after linking:
-  - `systemctl --user enable --now archpostinstall-dpms-lock-monitor.service`
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
 
 ## Package List Updates
@@ -46,8 +42,6 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 
 ## TLP Power Management
 - TLP overrides live in `configs/tlp/99-archpostinstall.conf` and are linked to `/etc/tlp.d/99-archpostinstall.conf`.
-- `setup.sh` also installs `configs/sudoers.d/archpostinstall-tlp` for promptless TLP profile commands used by power measurement tooling.
-- Power measurements can be taken with `./scripts/power/measure_tlp_power.sh` (or `archpostinstall measure-power`).
 
 ## BaiduPCS-Go
 - Copy your real config to `configs/baidupcs/pcs_config.json` before running `./setup.sh`.

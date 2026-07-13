@@ -20,11 +20,8 @@ scripts/
 │   └── restore_firefox.sh            # Restore Firefox config
 ├── gnome/
 │   ├── backup_gnome_state.sh   # Sync GNOME state to docs/
-│   ├── dpms-common.sh          # DPMS config + logging helpers
-│   ├── dpms-toggle.sh          # Display power and app orchestration
-│   └── dpms-lock-monitor.sh    # Lock/unlock watcher for dpms-toggle
-├── power/
-│   └── measure_tlp_power.sh    # TLP power measurement
+│   ├── dpms-common.sh          # DPMS config + journal logging helpers
+│   └── dpms-toggle.sh          # Display power and app orchestration
 └── zathura/
     └── page-to-clipboard.sh    # PDF page extraction helper
 ```
@@ -42,11 +39,9 @@ scripts/
 | `backup_firefox.sh` | ~40 | Firefox profile backup |
 | `restore_firefox.sh` | ~50 | Firefox profile restore |
 | `backup_gnome_state.sh` | ~100 | GNOME state sync with throttle |
-| `dpms-common.sh` | ~317 | DPMS config DSL, validation, logging, locking |
+| `dpms-common.sh` | ~199 | DPMS config DSL, validation, journal logging, locking |
 | `dpms-toggle.sh` | ~225 | Display PowerSaveMode and app stop/start flow |
-| `dpms-lock-monitor.sh` | ~78 | Logind lock watcher for DPMS |
 | `update_pkglist.sh` | ~30 | Pacman hook target |
-| `measure_tlp_power.sh` | ~244 | Battery power measurement |
 | `page-to-clipboard.sh` | ~30 | Zathura helper |
 
 ## Key Functions
@@ -64,4 +59,3 @@ scripts/
 ### dpms-toggle.sh
 - Explicit app action flow (`restart`, `start`, or `stop`) from `dpms.conf`
 - Display PowerSaveMode control without TLP or power-profiles-daemon profile switching
-- Bounded in-process log rotation

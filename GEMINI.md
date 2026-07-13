@@ -41,7 +41,7 @@ The project includes a unified CLI tool linked to `archpostinstall`.
 ### 3. Automation Features
 *   **Package List Sync:** A pacman hook (`99-update-pkglist.hook`) automatically updates `scripts/pkglist.txt` after every `pacman` transaction.
 *   **GNOME Sync:** A systemd user service (`archpostinstall-gnome-sync`) monitors and backs up GNOME extensions and theme settings to `docs/` and `backups/`.
-*   **DPMS Automation:** `dpms-toggle` plus `archpostinstall-dpms-lock-monitor.service` manage display power, profile switching, and app stop/start on lock/unlock (configured in the `configs/archpostinstall/dpms.conf` helper DSL).
+*   **DPMS Automation:** `dpms-toggle` manages display power and app stop/start (configured in the `configs/archpostinstall/dpms.conf` helper DSL).
 
 ## Configuration Details
 

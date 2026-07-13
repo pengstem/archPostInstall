@@ -39,8 +39,7 @@ archpostinstall.sh (CLI router)
 ├── restore-themes    → backup/restore_themes_extensions.sh
 ├── backup-firefox    → backup/backup_firefox.sh
 ├── restore-firefox   → backup/restore_firefox.sh
-├── update-pkglist    → update_pkglist.sh
-└── measure-power     → power/measure_tlp_power.sh
+└── update-pkglist    → update_pkglist.sh
 ```
 
 ## Systemd Automation
@@ -49,8 +48,8 @@ archpostinstall.sh (CLI router)
 archpostinstall-gnome-sync.path     # Watches dconf/extensions/themes
 └── archpostinstall-gnome-sync.service → backup_gnome_state.sh
 
-archpostinstall-dpms-lock-monitor.service
-└── dpms-lock-monitor.sh → dpms-toggle.sh --off/--on
+manual dpms-off / dpms-on / dpms-toggle
+└── dpms-toggle.sh
 ```
 
 ## Pacman Hook

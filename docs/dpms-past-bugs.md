@@ -1,5 +1,19 @@
 # DPMS Past Bug List
 
+## Removal Pass (2026-07-13)
+
+- Removed file-based DPMS logging and rotation; messages now go to stderr and are
+  available through the systemd journal when launched by a unit.
+- Removed the lock/unlock monitor script and user service. DPMS is now explicit
+  `--on`, `--off`, or `--toggle` control only.
+- Removed the TLP measurement script, its DPMS TLP helpers, and the measurement-only
+  sudoers rule. The standalone TLP configuration remains available.
+- Validation references used on 2026-07-13:
+  - [systemd `journalctl` documentation](https://www.freedesktop.org/software/systemd/man/255/journalctl.html),
+    confirming that output from systemd units is connected to the journal.
+  - [GNOME community guidance on `LockedHint`](https://discourse.gnome.org/t/monitor-session-unlock-from-sandboxed-application/28155),
+    confirming the removed monitor's logind integration was only needed for automatic lock/unlock behavior.
+
 ## Simplification Pass (2026-07-13)
 
 - Replaced the unused `running`/`always`/`on_only` policy and reopen-state file with

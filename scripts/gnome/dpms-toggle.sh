@@ -34,8 +34,6 @@ esac
 
 setup_runtime_env
 load_dpms_config "$CONFIG_FILE" required 1
-dpms_init_log "dpms-toggle"
-require_cmd awk
 require_cmd busctl
 require_cmd flock
 require_cmd pgrep
@@ -138,12 +136,12 @@ start_app() {
 get_display_mode() {
     local mode
 
-    mode="$(busctl --user get-property org.gnome.Mutter.DisplayConfig \
-        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode |
-        awk '{print $2}')" || {
+    if ! mode="$(busctl --user get-property org.gnome.Mutter.DisplayConfig \
+        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode)"; then
         dpms_log "Error: unable to read display power state."
         return 1
-    }
+    fi
+    mode="${mode##* }"
 
     if ! [[ "$mode" =~ ^[0-9]+$ ]]; then
         dpms_log "Error: invalid display power state: $mode"
@@ -163,7 +161,7 @@ set_display_mode() {
 }
 
 dpms_off() {
-    local record app_name app_match app_start app_action
+    local record app_name app_match app_action
 
     if ! set_display_mode "$DISPLAY_OFF_MODE"; then
         dpms_log "Error: failed to turn the display off."
@@ -171,7 +169,7 @@ dpms_off() {
     fi
 
     for record in "${DPMS_APPS[@]}"; do
-        IFS="$DPMS_RECORD_SEP" read -r app_name app_match app_start app_action <<< "$record"
+        IFS="$DPMS_RECORD_SEP" read -r app_name app_match _ app_action <<< "$record"
         case "$app_action" in
             restart|stop)
                 stop_app "$app_name" "$app_match" || true
