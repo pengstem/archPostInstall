@@ -27,11 +27,13 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 ## DPMS Toggle and Lock Hook
 - `dpms-toggle` turns the display off/on and manages app shutdown/restore.
 - `archpostinstall-dpms-lock-monitor.service` watches logind lock state and runs `dpms-toggle --off/--on` on lock/unlock.
-- Configure app behavior in `configs/archpostinstall/dpms.conf` with `dpms_defaults`, `dpms_app`, and `dpms_kill_only`.
+- Configure app behavior in `configs/archpostinstall/dpms.conf` with `dpms_defaults` and `dpms_app`.
 - Logs are written to `~/.cache/archpostinstall/dpms.log` for troubleshooting.
 - Log rotation is bounded inside `dpms-toggle` via `DPMS_LOG_MAX_BYTES` and `DPMS_LOG_KEEP`.
-- Steam and Firefox are closed automatically by default via `dpms_kill_only`.
-- `zen-browser`, `wechat`, and `qq` are configured as `--policy always`; `kitty` is `--policy on_only`.
+- `dpms_app` uses `--action restart` by default; use `--action start` for apps left running
+  during display-off, or `--action stop` for apps not reopened by DPMS.
+- The default config restarts `zen-browser`, `wechat`, and `qq`, leaves Kitty running,
+  and stops Steam and Firefox without reopening them.
 - For noisy logs, lower `DPMS_VERBOSE`; for slower apps, increase `DPMS_START_WAIT_SEC` / `DPMS_START_RETRIES`.
 - `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
 - Enable after linking:

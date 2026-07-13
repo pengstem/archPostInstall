@@ -42,8 +42,8 @@ scripts/
 | `backup_firefox.sh` | ~40 | Firefox profile backup |
 | `restore_firefox.sh` | ~50 | Firefox profile restore |
 | `backup_gnome_state.sh` | ~100 | GNOME state sync with throttle |
-| `dpms-common.sh` | ~366 | DPMS config DSL, validation, logging, locking |
-| `dpms-toggle.sh` | ~440 | Linear DPMS off/on flow with app orchestration |
+| `dpms-common.sh` | ~317 | DPMS config DSL, validation, logging, locking |
+| `dpms-toggle.sh` | ~225 | Display PowerSaveMode and app stop/start flow |
 | `dpms-lock-monitor.sh` | ~78 | Logind lock watcher for DPMS |
 | `update_pkglist.sh` | ~30 | Pacman hook target |
 | `measure_tlp_power.sh` | ~244 | Battery power measurement |
@@ -62,6 +62,6 @@ scripts/
 - `install_plugin()` - Clone zsh plugin if missing
 
 ### dpms-toggle.sh
-- Explicit app stop/start flow from `dpms.conf`
+- Explicit app action flow (`restart`, `start`, or `stop`) from `dpms.conf`
 - Display PowerSaveMode control without TLP or power-profiles-daemon profile switching
 - Bounded in-process log rotation

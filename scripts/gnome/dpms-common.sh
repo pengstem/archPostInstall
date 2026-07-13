@@ -53,7 +53,6 @@ is_non_negative_int() {
 
 reset_dpms_config() {
     DPMS_APPS=()
-    DPMS_KILL_ONLY_APPS=()
     DPMS_PROFILE_ON="balanced"
     DPMS_PROFILE_OFF="power-saver"
     DPMS_PROFILE_OFF_SSH="balanced"
@@ -62,7 +61,6 @@ reset_dpms_config() {
     DPMS_LOG_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall/dpms.log"
     DPMS_LOG_MAX_BYTES=1048576
     DPMS_LOG_KEEP=3
-    DPMS_REOPEN_DELAY_SEC=2
     DPMS_START_WAIT_SEC=15
     DPMS_START_RETRIES=3
     DPMS_KILL_WAIT_SEC=6
@@ -98,9 +96,6 @@ dpms_defaults() {
             --log-keep)
                 DPMS_LOG_KEEP="$2"
                 ;;
-            --reopen-delay)
-                DPMS_REOPEN_DELAY_SEC="$2"
-                ;;
             --start-wait)
                 DPMS_START_WAIT_SEC="$2"
                 ;;
@@ -126,8 +121,7 @@ dpms_app() {
     local name=""
     local match=""
     local start=""
-    local stop=""
-    local policy="running"
+    local action="restart"
 
     while [ "$#" -gt 0 ]; do
         if [ "$#" -lt 2 ]; then
@@ -144,11 +138,8 @@ dpms_app() {
             --start)
                 start="$2"
                 ;;
-            --stop)
-                stop="$2"
-                ;;
-            --policy)
-                policy="$2"
+            --action)
+                action="$2"
                 ;;
             *)
                 echo "Error: unknown dpms_app option $1" >&2
@@ -158,50 +149,18 @@ dpms_app() {
         shift 2
     done
 
-    if [ -z "$name" ] || [ -z "$match" ] || [ -z "$start" ]; then
-        echo "Error: dpms_app requires --name, --match, and --start." >&2
-        return 1
-    fi
-
-    DPMS_APPS+=("${name}${DPMS_RECORD_SEP}${match}${DPMS_RECORD_SEP}${start}${DPMS_RECORD_SEP}${stop}${DPMS_RECORD_SEP}${policy}")
-}
-
-dpms_kill_only() {
-    local name=""
-    local match=""
-
-    while [ "$#" -gt 0 ]; do
-        if [ "$#" -lt 2 ]; then
-            echo "Error: missing value for option $1" >&2
-            return 1
-        fi
-        case "$1" in
-            --name)
-                name="$2"
-                ;;
-            --match)
-                match="$2"
-                ;;
-            *)
-                echo "Error: unknown dpms_kill_only option $1" >&2
-                return 1
-                ;;
-        esac
-        shift 2
-    done
-
     if [ -z "$name" ] || [ -z "$match" ]; then
-        echo "Error: dpms_kill_only requires --name and --match." >&2
+        echo "Error: dpms_app requires --name and --match." >&2
         return 1
     fi
 
-    DPMS_KILL_ONLY_APPS+=("${name}${DPMS_RECORD_SEP}${match}")
+    DPMS_APPS+=("${name}${DPMS_RECORD_SEP}${match}${DPMS_RECORD_SEP}${start}${DPMS_RECORD_SEP}${action}")
 }
 
 validate_dpms_config() {
     local require_apps="${1:-1}"
     local -A seen_names=()
-    local record name match start stop policy
+    local record name match start action
 
     if [ "$require_apps" -eq 1 ] && [ "${#DPMS_APPS[@]}" -eq 0 ]; then
         echo "Error: at least one dpms_app entry is required." >&2
@@ -209,16 +168,22 @@ validate_dpms_config() {
     fi
 
     for record in "${DPMS_APPS[@]}"; do
-        IFS="$DPMS_RECORD_SEP" read -r name match start stop policy <<< "$record"
-        if [ -z "$name" ] || [ -z "$match" ] || [ -z "$start" ]; then
+        IFS="$DPMS_RECORD_SEP" read -r name match start action <<< "$record"
+        if [ -z "$name" ] || [ -z "$match" ]; then
             echo "Error: invalid dpms_app entry in config." >&2
             return 1
         fi
-        case "$policy" in
-            running|always|on_only)
+        case "$action" in
+            restart|start)
+                if [ -z "$start" ]; then
+                    echo "Error: $action action requires --start for $name." >&2
+                    return 1
+                fi
+                ;;
+            stop)
                 ;;
             *)
-                echo "Error: unsupported app policy '$policy' for $name." >&2
+                echo "Error: unsupported app action '$action' for $name." >&2
                 return 1
                 ;;
         esac
@@ -229,25 +194,11 @@ validate_dpms_config() {
         seen_names[$name]=1
     done
 
-    for record in "${DPMS_KILL_ONLY_APPS[@]}"; do
-        IFS="$DPMS_RECORD_SEP" read -r name match <<< "$record"
-        if [ -z "$name" ] || [ -z "$match" ]; then
-            echo "Error: invalid dpms_kill_only entry in config." >&2
-            return 1
-        fi
-        if [ -n "${seen_names[$name]+x}" ]; then
-            echo "Error: duplicate DPMS item name '$name'." >&2
-            return 1
-        fi
-        seen_names[$name]=1
-    done
-
     for value_name in \
         DPMS_TLP_USE_SUDO \
         DPMS_VERBOSE \
         DPMS_LOG_MAX_BYTES \
         DPMS_LOG_KEEP \
-        DPMS_REOPEN_DELAY_SEC \
         DPMS_START_WAIT_SEC \
         DPMS_START_RETRIES \
         DPMS_KILL_WAIT_SEC; do
@@ -355,23 +306,12 @@ dpms_set_tlp_profile() {
 
 acquire_lock() {
     local lock_file="$1"
-    local lock_dir="$2"
 
     mkdir -p "$(dirname "$lock_file")"
 
-    if command -v flock >/dev/null 2>&1; then
-        exec 9>"$lock_file"
-        if ! flock -n 9; then
-            dpms_log "Another DPMS instance is running; skipping."
-            exit 0
-        fi
-        return 0
-    fi
-
-    if ! mkdir "$lock_dir" 2>/dev/null; then
+    exec 9>"$lock_file"
+    if ! flock -n 9; then
         dpms_log "Another DPMS instance is running; skipping."
         exit 0
     fi
-
-    trap 'rmdir "'"$lock_dir"'" 2>/dev/null || true' EXIT
 }

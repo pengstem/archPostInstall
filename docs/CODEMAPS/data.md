@@ -57,7 +57,6 @@ Rime input method user databases (build artifacts).
 ## State Files
 
 ### DPMS State (Runtime)
-- `~/.cache/archpostinstall/dpms.state` - Plain-text reopen queue (one app id per line)
 - `~/.cache/archpostinstall/dpms.log` - DPMS activity log with `.1`, `.2`, ... archives
 
 ### Backup Hashes (Runtime)
@@ -84,9 +83,7 @@ GNOME config change
 DPMS lock/unlock
 └── archpostinstall-dpms-lock-monitor.service
     ├── dpms-toggle.sh --off (lock)
-    │   ├── dpms.state (current state)
     │   └── dpms.log (activity)
     └── dpms-toggle.sh --on (unlock)
-        ├── dpms.state (cleared)
         └── dpms.log (activity)
 ```

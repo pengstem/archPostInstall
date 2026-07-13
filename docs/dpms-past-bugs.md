@@ -1,5 +1,22 @@
 # DPMS Past Bug List
 
+## Simplification Pass (2026-07-13)
+
+- Replaced the unused `running`/`always`/`on_only` policy and reopen-state file with
+  explicit `restart`, `start`, and `stop` app actions.
+- Removed custom stop commands, the reopen delay, duplicate display-state short-circuits,
+  and the non-`flock` lock-directory fallback from the DPMS path.
+- Display power is now set first; apps are changed only after the corresponding display
+  operation succeeds. Existing logging and start/stop timeouts remain for diagnosis and
+  slow GUI applications.
+- Validation references used on 2026-07-13:
+  - [GNOME Mutter `MetaMonitorManager` documentation](https://mutter.gnome.org/meta/class.MonitorManager.html),
+    for the `org.gnome.Mutter.DisplayConfig` service and power-save state.
+  - [Linux `pgrep`/`pkill` manual](https://man7.org/linux/man-pages/man1/pgrep.1.html),
+    for full-command-line matching and signal behavior.
+  - [GNOME community reference](https://discourse.gnome.org/t/how-to-make-kiosk-sessions-screen-go-blank/32548),
+    confirming the GNOME Wayland `PowerSaveMode` values used here.
+
 ## Cleanup Pass (2026-06-08)
 
 - Removed the unused power-backend resolver and its stale `--power-backend` / `--switch-power` config parsing from `dpms-common.sh`.
