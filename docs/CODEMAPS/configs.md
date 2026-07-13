@@ -75,7 +75,6 @@ configs/
 
 ### dpms.conf
 ```bash
-dpms_defaults --verbose 1
 dpms_app --name zen-browser --match 'zen-bin|zen-browser' --start 'zen-browser'
 dpms_app --name steam --match 'steam' --action stop
 ```

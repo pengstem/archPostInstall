@@ -51,7 +51,7 @@
 
 ## Simplification Pass (2026-03-26)
 
-- Replaced the parallel-array config with `dpms_defaults`, `dpms_app`, and `dpms_kill_only`.
+- Replaced the parallel-array config with `dpms_app` entries and explicit actions.
 - Collapsed the old multi-branch DPMS state machine into a linear off/on flow.
 - Removed brightness restore, generic GUI sweeping, app activation commands, suspend-on-lock, and the log cleanup timer/service.
 - Runtime state is now a plain-text reopen queue instead of sourced shell variables.

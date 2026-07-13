@@ -36,7 +36,7 @@ case "${1:-}" in
 esac
 
 setup_runtime_env
-load_dpms_config "$CONFIG_FILE" required 1
+load_dpms_config "$CONFIG_FILE"
 require_cmd busctl
 require_cmd flock
 require_cmd pgrep

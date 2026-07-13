@@ -55,7 +55,7 @@ bash -n scripts/some_script.sh
 
 **Key files:**
 - `scripts/pkglist.txt` - Package source of truth; auto-updated by pacman hook
-- `configs/archpostinstall/dpms.conf` - DPMS automation DSL (`dpms_defaults`, `dpms_app`)
+- `configs/archpostinstall/dpms.conf` - DPMS application configuration (`dpms_app`)
 - `docs/fileLocationList.md` - Complete source-to-target symlink mapping
 
 ## Symlink Behavior

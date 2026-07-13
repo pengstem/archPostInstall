@@ -26,13 +26,12 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 
 ## DPMS Toggle
 - `dpms-toggle` turns the display off/on and manages app shutdown/restore.
-- Configure app behavior in `configs/archpostinstall/dpms.conf` with `dpms_defaults` and `dpms_app`.
+- Configure app behavior in `configs/archpostinstall/dpms.conf` with `dpms_app`.
 - Diagnostic output is written to stderr; systemd captures it in the journal when a unit invokes the script.
 - `dpms_app` uses `--action restart` by default; use `--action start` for apps left running
   during display-off, or `--action stop` for apps not reopened by DPMS.
 - The default config restarts `zen-browser`, `wechat`, and `qq`, leaves Kitty running,
   and stops Steam and Firefox without reopening them.
-- DPMS uses fixed startup/shutdown timing: 15 seconds per startup check, 3 startup attempts, and 6 seconds for graceful shutdown.
 - `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
 

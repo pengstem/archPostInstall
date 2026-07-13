@@ -27,36 +27,6 @@ require_cmd() {
   fi
 }
 
-is_non_negative_int() {
-  [[ "$1" =~ ^[0-9]+$ ]]
-}
-
-reset_dpms_config() {
-  DPMS_APPS=()
-  DPMS_VERBOSE=1
-}
-
-# dpms_defaults is a sourced config DSL; assignments are consumed after load_dpms_config.
-# shellcheck disable=SC2034
-dpms_defaults() {
-  while [ "$#" -gt 0 ]; do
-    if [ "$#" -lt 2 ]; then
-      echo "Error: missing value for option $1" >&2
-      return 1
-    fi
-    case "$1" in
-    --verbose)
-      DPMS_VERBOSE="$2"
-      ;;
-    *)
-      echo "Error: unknown dpms_defaults option $1" >&2
-      return 1
-      ;;
-    esac
-    shift 2
-  done
-}
-
 dpms_app() {
   local name=""
   local match=""
@@ -98,11 +68,10 @@ dpms_app() {
 }
 
 validate_dpms_config() {
-  local require_apps="${1:-1}"
   local -A seen_names=()
   local record name match start action
 
-  if [ "$require_apps" -eq 1 ] && [ "${#DPMS_APPS[@]}" -eq 0 ]; then
+  if [ "${#DPMS_APPS[@]}" -eq 0 ]; then
     echo "Error: at least one dpms_app entry is required." >&2
     return 1
   fi
@@ -133,38 +102,25 @@ validate_dpms_config() {
     fi
     seen_names[$name]=1
   done
-
-  if ! is_non_negative_int "$DPMS_VERBOSE"; then
-    echo "Error: DPMS_VERBOSE must be a non-negative integer." >&2
-    return 1
-  fi
 }
 
 load_dpms_config() {
   local config_file="$1"
-  local file_mode="${2:-required}"
-  local require_apps="${3:-1}"
 
-  reset_dpms_config
+  DPMS_APPS=()
 
   if [ ! -f "$config_file" ]; then
-    if [ "$file_mode" = "optional" ]; then
-      validate_dpms_config "$require_apps"
-      return $?
-    fi
     echo "Error: config file not found: $config_file" >&2
     return 1
   fi
 
   # shellcheck source=/dev/null
   . "$config_file"
-  validate_dpms_config "$require_apps"
+  validate_dpms_config
 }
 
 dpms_log() {
-  if [ "${DPMS_VERBOSE:-1}" -ge 1 ]; then
-    printf "[dpms] %s\n" "$*" >&2
-  fi
+  printf "[dpms] %s\n" "$*" >&2
 }
 
 acquire_lock() {
