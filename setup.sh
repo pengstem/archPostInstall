@@ -58,24 +58,6 @@ create_link() {
     echo "✅ Linked"
 }
 
-remove_stale_link() {
-    local dest="$1"
-
-    if [ -L "$dest" ]; then
-        rm "$dest"
-        echo "  Removed obsolete link: $dest"
-    fi
-}
-
-remove_stale_sudo_file() {
-    local dest="$1"
-
-    if sudo test -f "$dest"; then
-        sudo rm "$dest"
-        echo "  Removed obsolete sudo file: $dest"
-    fi
-}
-
 # Function to create symlink with sudo (for /etc files)
 create_sudo_link() {
     local src="$1"
@@ -116,12 +98,6 @@ create_sudo_link() {
 }
 
 # --- Link Configurations ---
-
-# Remove links created by features that are no longer part of the repository.
-remove_stale_link "$HOME/.local/bin/archpostinstall-dpms-lock-monitor"
-remove_stale_link "$HOME/.local/bin/archpostinstall-measure-power"
-remove_stale_link "$HOME/.config/systemd/user/archpostinstall-dpms-lock-monitor.service"
-remove_stale_sudo_file "/etc/sudoers.d/archpostinstall-tlp"
 
 # System Configs (Requires Sudo)
 create_sudo_link "$CONFIGS_DIR/pacman/pacman.conf" "/etc/pacman.conf" "Pacman"
