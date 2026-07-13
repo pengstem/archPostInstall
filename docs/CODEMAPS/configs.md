@@ -13,10 +13,7 @@ configs/
 ├── ghostty/           # Terminal
 ├── gitconfig          # Git config
 ├── kitty/             # Terminal
-├── mbsyncrc           # isync/mbsync config
 ├── mpv/               # Media player
-├── msmtprc            # msmtp config
-├── neomutt/           # Email client
 ├── nvim/              # Neovim
 ├── p10k.zsh           # Powerlevel10k theme
 ├── pacman/            # System: pacman.conf + hooks
@@ -58,9 +55,6 @@ configs/
 | `yazi/` | `~/.config/yazi/` |
 | `zathura/` | `~/.config/zathura/` |
 | `mpv/` | `~/.config/mpv/` |
-| `neomutt/` | `~/.config/neomutt/` |
-| `mbsyncrc` | `~/.mbsyncrc` |
-| `msmtprc` | `~/.msmtprc` |
 | `fcitx5/` | `~/.config/fcitx5/` |
 | `rime/` | `~/.local/share/fcitx5/rime/` |
 | `archpostinstall/` | `~/.config/archpostinstall/` |

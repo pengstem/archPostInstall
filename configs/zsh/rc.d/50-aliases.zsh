@@ -7,8 +7,6 @@ alias lt='eza --tree --level=2 --icons --hyperlink'
 # System utilities.
 alias st='systemctl-tui'
 
-# Mail.
-alias mutt='mbsync -a && TERM=xterm-direct neomutt'
 
 # Global aliases for highlighted help output.
 alias -g -- --h1='-h 2>&1 | bat --language=help --style=plain'

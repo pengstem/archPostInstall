@@ -11,7 +11,6 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `fcitx5/` input method config
 - `ghostty/`, `kitty/`, `wezterm/`, `mpv/`, `zathura/` terminal and media/reader configs
 - `nvim/`, `zed/` editor configs
-- `neomutt/` mail client config
 - `obs-studio/` OBS Studio profiles and scene collections
 - `rime/` schema and dictionaries (live `user.yaml` is ignored)
 - `tmux/` tmux config and helper scripts

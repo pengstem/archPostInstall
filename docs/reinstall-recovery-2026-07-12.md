@@ -78,7 +78,7 @@ systemctl --user --no-pager status archpostinstall-dpms-lock-monitor.service
 完成正常的系统升级后，可以安装与仓库配置对应的官方仓库软件包：
 
 ~~~
-sudo pacman -Syu --needed fcitx5 fcitx5-rime fcitx5-configtool fcitx5-gtk fcitx5-qt ghostty mpv tmux zellij zathura zathura-pdf-mupdf obs-studio isync msmtp neomutt bottom wezterm ratty baidupcs-go zed
+sudo pacman -Syu --needed fcitx5 fcitx5-rime fcitx5-configtool fcitx5-gtk fcitx5-qt ghostty mpv tmux zellij zathura zathura-pdf-mupdf obs-studio bottom wezterm ratty baidupcs-go zed
 ~~~
 
 上面的软件包名称已于 2026-07-12 根据当前配置的 Arch 仓库元数据确认。

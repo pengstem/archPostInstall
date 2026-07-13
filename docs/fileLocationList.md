@@ -19,9 +19,6 @@
 | configs/obs-studio/basic/profiles | ~/.config/obs-studio/basic/profiles | user config |
 | configs/obs-studio/basic/scenes | ~/.config/obs-studio/basic/scenes | user config |
 | configs/obs-studio/scripts | ~/.config/obs-studio/scripts | user config |
-| configs/neomutt | ~/.config/neomutt | user config |
-| configs/mbsyncrc | ~/.mbsyncrc | user config |
-| configs/msmtprc | ~/.msmtprc | user config |
 | configs/xdg-desktop-portal | ~/.config/xdg-desktop-portal | user config |
 | configs/xdg-desktop-portal-termfilechooser | ~/.config/xdg-desktop-portal-termfilechooser | user config |
 | configs/baidupcs | ~/.config/BaiduPCS-Go | requires pcs_config.json |

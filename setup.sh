@@ -151,9 +151,6 @@ create_link "$CONFIGS_DIR/mpv"              "$HOME/.config/mpv"             "mpv
 create_link "$CONFIGS_DIR/obs-studio/basic/profiles" "$HOME/.config/obs-studio/basic/profiles" "OBS Profiles"
 create_link "$CONFIGS_DIR/obs-studio/basic/scenes"   "$HOME/.config/obs-studio/basic/scenes"   "OBS Scenes"
 create_link "$CONFIGS_DIR/obs-studio/scripts"        "$HOME/.config/obs-studio/scripts"        "OBS Scripts"
-create_link "$CONFIGS_DIR/neomutt"          "$HOME/.config/neomutt"         "NeoMutt"
-create_link "$CONFIGS_DIR/mbsyncrc"         "$HOME/.mbsyncrc"               "mbsync"
-create_link "$CONFIGS_DIR/msmtprc"          "$HOME/.msmtprc"                "msmtp"
 create_link "$CONFIGS_DIR/xdg-desktop-portal" "$HOME/.config/xdg-desktop-portal" "XDG Portal"
 create_link "$CONFIGS_DIR/xdg-desktop-portal-termfilechooser" "$HOME/.config/xdg-desktop-portal-termfilechooser" "XDG Portal Filechooser"
 if [ -f "$CONFIGS_DIR/baidupcs/pcs_config.json" ]; then
