@@ -1,0 +1,8 @@
+os:
+  # Send copied text through the terminal so Kitty can put it in the local
+  # clipboard even when lazygit is running over SSH.
+  copyToClipboardCmd: >
+    case "$TERM" in
+      screen*|tmux*) printf "\033Ptmux;\033\033]52;c;$(printf {{text}} | base64 -w 0)\a\033\\" > /dev/tty ;;
+      *) printf "\033]52;c;$(printf {{text}} | base64 -w 0)\a" > /dev/tty ;;
+    esac

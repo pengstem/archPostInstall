@@ -143,6 +143,8 @@ create_link "$CONFIGS_DIR/nvim"             "$HOME/.config/nvim"            "Neo
 create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed"
 
 # Tools
+create_link "$CONFIGS_DIR/lazygit"           "$HOME/.config/lazygit" \
+       "Lazygit"
 create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
 create_link "$CONFIGS_DIR/zellij"           "$HOME/.config/zellij"          "Zellij"
 create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"

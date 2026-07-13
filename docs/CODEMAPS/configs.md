@@ -13,6 +13,7 @@ configs/
 ├── ghostty/           # Terminal
 ├── gitconfig          # Git config
 ├── kitty/             # Terminal
+├── lazygit/           # Git terminal UI
 ├── mpv/               # Media player
 ├── nvim/              # Neovim
 ├── p10k.zsh           # Powerlevel10k theme
@@ -45,6 +46,7 @@ configs/
 | `p10k.zsh` | `~/.p10k.zsh` |
 | `gitconfig` | `~/.gitconfig` |
 | `kitty/` | `~/.config/kitty/` |
+| `lazygit/` | `~/.config/lazygit/` |
 | `ratty/` | `~/.config/ratty/` |
 | `ghostty/` | `~/.config/ghostty/` |
 | `wezterm/` | `~/.config/wezterm/` |

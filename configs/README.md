@@ -8,6 +8,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `archpostinstall/` helper configs (dpms automation)
 - `baidupcs/` BaiduPCS-Go template; real `pcs_config.json` is ignored
 - `bottom/`, `btop/` system monitor configs
+- `lazygit/` lazygit terminal UI config
 - `fcitx5/` input method config
 - `ghostty/`, `kitty/`, `wezterm/`, `mpv/`, `zathura/` terminal and media/reader configs
 - `nvim/`, `zed/` editor configs
