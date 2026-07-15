@@ -83,6 +83,27 @@ return {
       })
 
       opts.setup = opts.setup or {}
+
+      -- LazyVim's public selector does not include ts_ls, but nvim-lspconfig
+      -- still provides its config. Use Arch's server for plain TypeScript
+      -- projects unless a framework extra needs vtsls' plugin integration.
+      local typescript_path = system_executable("typescript-language-server")
+      local typescript_framework_extra = false
+      for _, extra in ipairs({ "lang.vue", "lang.svelte", "lang.astro", "lang.angular" }) do
+        if LazyVim.has_extra(extra) then
+          typescript_framework_extra = true
+          break
+        end
+      end
+      if typescript_path and not typescript_framework_extra then
+        opts.servers.ts_ls = vim.tbl_deep_extend("force", opts.servers.ts_ls or {}, {
+          enabled = true,
+        })
+        opts.servers.vtsls = vim.tbl_deep_extend("force", opts.servers.vtsls or {}, {
+          enabled = false,
+        })
+      end
+
       for server, command in pairs(lsp_commands) do
         local path = system_executable(command)
         if path then
