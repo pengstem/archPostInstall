@@ -1,4 +1,4 @@
-# Package list generated on Mon Jul 13 07:37:39 PM +08 2026
+# Package list generated on Wed Jul 15 01:01:33 PM +08 2026
 7zip
 abduco
 alacritty
@@ -31,6 +31,7 @@ coin-or-cbc
 compsize
 conntrack-tools
 crosstool-ng
+cuda
 cursor-bin
 dictd
 dkms
@@ -73,6 +74,7 @@ gnome-browser-connector
 gnome-color-manager
 gnome-control-center
 gnome-keyring
+gnome-remote-desktop
 gnome-screenshot
 gnome-session
 gnome-settings-daemon
@@ -137,6 +139,7 @@ mitmproxy
 mkinitcpio
 mokutil
 mold
+moonlight-qt
 mosh
 mpv
 mtr
@@ -243,6 +246,7 @@ starship
 steam
 strace
 sudo
+sunshine
 sysstat
 systemctl-tui
 tailscale
