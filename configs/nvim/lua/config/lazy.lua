@@ -1,5 +1,9 @@
 vim.g.lazyvim_python_lsp = "ty"
 
+-- Prefer Arch's typescript-language-server when it is installed. Until then,
+-- keep LazyVim's vtsls fallback so TypeScript support remains available.
+vim.g.lazyvim_ts_lsp = vim.fn.executable("typescript-language-server") == 1 and "ts_ls" or "vtsls"
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
