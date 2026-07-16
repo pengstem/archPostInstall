@@ -1,4 +1,4 @@
-# Package list generated on Wed Jul 15 01:01:33 PM +08 2026
+# Package list generated on Thu Jul 16 08:56:53 AM +08 2026
 7zip
 abduco
 alacritty
@@ -10,6 +10,7 @@ audacity
 baidupcs-go
 base
 base-devel
+bash-language-server
 bat
 bear
 bibata-cursor-theme-bin
@@ -39,6 +40,7 @@ dmidecode
 dnsmasq
 docker
 docker-compose
+dockerfile-language-server
 downgrade
 dune
 dust
@@ -129,9 +131,12 @@ linux-zen-headers
 localsend
 loupe
 lshw
+lua-language-server
 man-db
 mangohud
 man-pages
+markdownlint-cli2
+marksman
 maven
 mediainfo
 minicom
@@ -234,6 +239,7 @@ scc
 sccache
 scrcpy
 shellcheck
+shfmt
 silicon
 sleuthkit
 smartmontools
@@ -245,11 +251,13 @@ spotify-launcher
 starship
 steam
 strace
+stylua
 sudo
 sunshine
 sysstat
 systemctl-tui
 tailscale
+taplo-cli
 tcpdump
 tealdeer
 tecla
@@ -271,6 +279,7 @@ ttf-maplemono-nf-cn-unhinted
 ttf-ms-fonts
 ttf-wps-fonts
 ty
+typescript-language-server
 udiskie
 usbip
 uv
@@ -279,6 +288,7 @@ vim
 virt-install
 virt-manager
 visual-studio-code-bin
+vscode-json-languageserver
 websocat
 wemeet-bin
 wezterm
@@ -303,6 +313,7 @@ xdg-desktop-portal-gnome
 xdg-desktop-portal-termfilechooser-hunkyburrito-git
 xdg-user-dirs-gtk
 xdg-utils
+yaml-language-server
 yay
 yazi
 yt-dlp
