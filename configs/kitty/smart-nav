@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Smart horizontal navigation for kitty:
+#   left/right neighbor exists -> focus that pane
+#   no neighbor                -> switch tab
+
+case "$1" in
+    left)
+        fallback="previous_tab"
+        ;;
+    right)
+        fallback="next_tab"
+        ;;
+    *)
+        printf 'smart-nav: unsupported direction: %s\\n' "$1" >&2
+        exit 2
+        ;;
+esac
+
+kitten @ focus-window --match "neighbor:$1" 2>/dev/null ||
+    kitten @ action "$fallback"
