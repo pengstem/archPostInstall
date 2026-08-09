@@ -17,6 +17,7 @@
 | configs/zed | ~/.config/zed | user config |
 | configs/yazi | ~/.config/yazi | user config |
 | configs/zathura | ~/.config/zathura | user config |
+| configs/fastfetch | ~/.config/fastfetch | user config |
 | configs/mpv | ~/.config/mpv | user config |
 | configs/obs-studio/basic/profiles | ~/.config/obs-studio/basic/profiles | user config |
 | configs/obs-studio/basic/scenes | ~/.config/obs-studio/basic/scenes | user config |
