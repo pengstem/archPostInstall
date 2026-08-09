@@ -12,17 +12,10 @@ if [[ -d "$HOME/.grok/completions/zsh" ]]; then
 fi
 
 plugins=(
-    archlinux
     codex
-    gitignore
-    git
     fzf
     fzf-tab
-    zsh-autosuggestions
-    tldr
-    web-search
     sudo
-    zsh-syntax-highlighting
 )
 
 if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then

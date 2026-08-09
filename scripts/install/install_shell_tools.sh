@@ -28,7 +28,7 @@ else
   echo "Oh My Zsh already installed."
 fi
 
-# 2. Install Zsh Plugins (git clone to custom folder)
+# 2. Install Zsh plugins that are not provided by the package list.
 
 install_plugin() {
   local repo_url=$1
@@ -47,12 +47,6 @@ install_plugin() {
     fi
   fi
 }
-
-# zsh-autosuggestions
-install_plugin "https://github.com/zsh-users/zsh-autosuggestions" "zsh-autosuggestions"
-
-# zsh-syntax-highlighting
-install_plugin "https://github.com/zsh-users/zsh-syntax-highlighting.git" "zsh-syntax-highlighting"
 
 # fzf-tab
 install_plugin "https://github.com/Aloxaf/fzf-tab" "fzf-tab"

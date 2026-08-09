@@ -19,7 +19,8 @@ This directory is linked to `~/.config/zsh` by `setup.sh`.
 - `50-aliases.zsh`
 - `60-functions.zsh`
 - `90-shell-options.zsh`
-- `99-local-overrides.zsh`
+- `95-local-overrides.zsh`
+- `99-interactive-plugins.zsh`
 
 Oh My Zsh normally owns the single `compinit` call; `90-shell-options.zsh` only
 provides a fallback when Oh My Zsh is unavailable. Add custom completion
@@ -31,9 +32,9 @@ Powerlevel10k is the sole Zsh prompt owner: `00-instant-prompt.zsh` loads its
 instant prompt, `10-oh-my-zsh.zsh` selects the theme, and `40-tool-init.zsh`
 loads the tracked `~/.p10k.zsh`. Keep other prompt initializers disabled in Zsh.
 
-`40-tool-init.zsh` defers TheFuck's Python-backed alias generation until the
-first `fuck` command in each shell. This keeps optional correction support while
-avoiding its startup cost in shells that never use it.
+`99-interactive-plugins.zsh` loads the Pacman-managed autosuggestions and syntax
+highlighting scripts after custom widgets and local overrides. Keep syntax
+highlighting last, and do not also clone these plugins into Oh My Zsh.
 
 ## Startup Benchmark
 
