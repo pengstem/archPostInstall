@@ -23,9 +23,21 @@ if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init zsh --cmd cd)"
 fi
 
-# TheFuck alias helper.
+# TheFuck alias helper. Generating the real function starts Python, so defer it
+# until the first time the command is used.
 if command -v thefuck >/dev/null 2>&1; then
-    eval "$(thefuck --alias)"
+    _archpostinstall_load_thefuck() {
+        local thefuck_init
+
+        thefuck_init="$(command thefuck --alias)" || return
+        eval "$thefuck_init" || return
+        unfunction _archpostinstall_load_thefuck
+    }
+
+    fuck() {
+        _archpostinstall_load_thefuck || return
+        fuck "$@"
+    }
 fi
 
 # Powerlevel10k user config.

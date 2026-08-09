@@ -30,3 +30,24 @@ dump-file state.
 Powerlevel10k is the sole Zsh prompt owner: `00-instant-prompt.zsh` loads its
 instant prompt, `10-oh-my-zsh.zsh` selects the theme, and `40-tool-init.zsh`
 loads the tracked `~/.p10k.zsh`. Keep other prompt initializers disabled in Zsh.
+
+`40-tool-init.zsh` defers TheFuck's Python-backed alias generation until the
+first `fuck` command in each shell. This keeps optional correction support while
+avoiding its startup cost in shells that never use it.
+
+## Startup Benchmark
+
+Measure the bare interpreter, the normal interactive configuration, and the
+login-shell path with the same warm 30-run workload:
+
+```sh
+hyperfine --warmup 5 --runs 30 \
+    'zsh -dfi -c exit' \
+    'zsh -i -c exit' \
+    'zsh -l -i -c exit'
+```
+
+Use the median to compare revisions and the 95th percentile to spot startup
+jitter. The login-shell result also includes `/etc/zsh/zprofile` and the
+distribution's `/etc/profile.d/*.sh` hooks, so it is not a measurement of this
+repository alone.
