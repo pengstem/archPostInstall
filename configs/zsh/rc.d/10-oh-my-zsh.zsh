@@ -5,14 +5,17 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 zstyle ':omz:update' mode reminder
 
 plugins=(
+    archlinux
+    codex
+    gitignore
     git
-    zsh-autosuggestions
-    zsh-syntax-highlighting
     fzf
     fzf-tab
+    zsh-autosuggestions
     tldr
     web-search
     sudo
+    zsh-syntax-highlighting
 )
 
 if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
