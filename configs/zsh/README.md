@@ -12,6 +12,7 @@ This directory is linked to `~/.config/zsh` by `setup.sh`.
 ## Current Load Order
 - `00-instant-prompt.zsh`
 - `05-user-bin.zsh`
+- `08-shell-state.zsh`
 - `10-oh-my-zsh.zsh`
 - `20-env.zsh`
 - `30-path.zsh`
@@ -21,6 +22,10 @@ This directory is linked to `~/.config/zsh` by `setup.sh`.
 - `90-shell-options.zsh`
 - `95-local-overrides.zsh`
 - `99-interactive-plugins.zsh`
+
+`08-shell-state.zsh` defines the XDG cache/state directories, history file, and
+`ZSH_COMPDUMP` before Oh My Zsh starts. This keeps completion dumps under
+`~/.cache/zsh/` instead of recreating `~/.zcompdump-*` in the home directory.
 
 Oh My Zsh normally owns the single `compinit` call; `90-shell-options.zsh` only
 provides a fallback when Oh My Zsh is unavailable. Add custom completion
