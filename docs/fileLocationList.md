@@ -1,5 +1,6 @@
 | Source | Target | Notes |
 | --- | --- | --- |
+| configs/mimeapps.list | ~/.config/mimeapps.list | user default application associations |
 | configs/tmux | ~/.config/tmux | user config |
 | configs/zellij | ~/.config/zellij | user config |
 | configs/lazygit | ~/.config/lazygit | user config |

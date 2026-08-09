@@ -3,6 +3,7 @@
 This directory contains tracked configs that are symlinked into place by `setup.sh`.
 
 ## Notable Directories
+- `mimeapps.list` user-level default application and MIME associations
 - `applications/` user `.desktop` launchers
 - `alacritty/` Alacritty terminal config
 - `archpostinstall/` helper configs (dpms automation)

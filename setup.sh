@@ -149,6 +149,7 @@ create_link "$CONFIGS_DIR/bottom/bottom.toml" "$HOME/.config/bottom/bottom.toml"
 create_link "$CONFIGS_DIR/btop/btop.conf"   "$HOME/.config/btop/btop.conf"  "btop"
 
 # Applications
+create_link "$CONFIGS_DIR/mimeapps.list" "$HOME/.config/mimeapps.list" "MIME Apps"
 create_link "$CONFIGS_DIR/applications/google-chrome.desktop" "$HOME/.local/share/applications/google-chrome.desktop" "Chrome (Custom)"
 create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
 create_link "$CONFIGS_DIR/applications/yazi.desktop"  "$HOME/.local/share/applications/yazi.desktop"  "Yazi"
