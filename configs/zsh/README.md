@@ -8,6 +8,7 @@ This directory is linked to `~/.config/zsh` by `setup.sh`.
 
 ## Current Load Order
 - `00-instant-prompt.zsh`
+- `05-user-bin.zsh`
 - `10-oh-my-zsh.zsh`
 - `20-env.zsh`
 - `30-path.zsh`
@@ -16,3 +17,9 @@ This directory is linked to `~/.config/zsh` by `setup.sh`.
 - `60-functions.zsh`
 - `90-shell-options.zsh`
 - `99-local-overrides.zsh`
+
+Oh My Zsh normally owns the single `compinit` call; `90-shell-options.zsh` only
+provides a fallback when Oh My Zsh is unavailable. Add custom completion
+directories to `fpath` before `10-oh-my-zsh.zsh` sources Oh My Zsh because
+re-running `compinit` later can replace plugin registrations with stale
+dump-file state.

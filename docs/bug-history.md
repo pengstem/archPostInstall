@@ -23,3 +23,7 @@ This file tracks notable configuration issues, their root causes, and the fixes 
 ## 2026-06-08
 - GNOME backup pruning: `backup_themes_extensions.sh` used an unquoted glob array and `ls -t` to detect/prune archives, which was fragile and noisy under ShellCheck.
   Fix: use `find` for existence checks and compare mtimes with `stat` before pruning older archives.
+
+## 2026-08-09
+- Codex CLI Zsh completion: Oh My Zsh registered `codex` completion, but later `compinit -C` calls in `90-shell-options.zsh` and the Grok installer block reloaded the stale `~/.zcompdump` and removed the `codex -> _codex` mapping.
+  Fix: let Oh My Zsh own completion initialization, move the Grok completion directory into `fpath` before Oh My Zsh loads, and remove the two later `compinit` calls. Validated on 2026-08-09 with Codex CLI 0.147.0, Zsh 5.9.2, and Oh My Zsh commit `99aaf58d`.

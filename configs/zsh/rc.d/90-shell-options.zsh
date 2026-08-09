@@ -17,10 +17,12 @@ bindkey '^x^e' kitty_scrollback_edit_command_line
 unalias run-help 2>/dev/null || true
 autoload -Uz run-help
 
-# Completion system.
-# -C skips insecure directory checks for faster startup.
-autoload -Uz compinit
-compinit -C
+# Oh My Zsh normally initializes completion. Keep a fallback for setups where
+# Oh My Zsh has not been installed yet, without running compinit twice.
+if (( ! ${+functions[compdef]} )); then
+    autoload -Uz compinit
+    compinit
+fi
 
 # Sudo toggle: press ESC twice to prepend/remove sudo.
 sudo-command-line() {
