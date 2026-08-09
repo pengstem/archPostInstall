@@ -12,29 +12,3 @@ for zsh_config in "$ZSH_CONFIG_DIR"/*.zsh(N); do
 done
 
 unset ZSH_CONFIG_DIR zsh_config
-
-if [[ -s "$HOME/.bun/_bun" ]] && (( ${+functions[compdef]} )); then
-    source "$HOME/.bun/_bun"
-fi
-
-# bun completions
-[ -s "/home/nastem/.bun/_bun" ] && source "/home/nastem/.bun/_bun"
-export PATH="$HOME/x-tools/loongarch64-unknown-linux-musl/bin:$PATH"
-
-
-# Added by Antigravity CLI installer
-export PATH="/home/nastem/.local/bin:$PATH"
-
-
-
-# BEGIN opam configuration
-# This is useful if you're using opam as it adds:
-#   - the correct directories to the PATH
-#   - auto-completion for the opam binary
-# This section can be safely removed at any time if needed.
-[[ ! -r '/home/nastem/.opam/opam-init/init.zsh' ]] || source '/home/nastem/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
-# END opam configuration
-
-# >>> grok installer >>>
-export PATH="$HOME/.grok/bin:$PATH"
-# <<< grok installer <<<

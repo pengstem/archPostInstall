@@ -5,6 +5,9 @@ This directory is linked to `~/.config/zsh` by `setup.sh`.
 - `rc.d/` contains modular config snippets loaded by `~/.zshrc`.
 - Files are loaded in lexical order, so numeric prefixes control startup order.
 - Keep machine-specific secrets and overrides in `~/.zshrc.local` (not tracked in this repo).
+- Keep `~/.zshrc` loader-only: environment variables belong in `20-env.zsh`,
+  executable search paths in `30-path.zsh`, and tool startup code in
+  `40-tool-init.zsh`.
 
 ## Current Load Order
 - `00-instant-prompt.zsh`
