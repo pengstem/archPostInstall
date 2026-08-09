@@ -26,3 +26,7 @@ provides a fallback when Oh My Zsh is unavailable. Add custom completion
 directories to `fpath` before `10-oh-my-zsh.zsh` sources Oh My Zsh because
 re-running `compinit` later can replace plugin registrations with stale
 dump-file state.
+
+Powerlevel10k is the sole Zsh prompt owner: `00-instant-prompt.zsh` loads its
+instant prompt, `10-oh-my-zsh.zsh` selects the theme, and `40-tool-init.zsh`
+loads the tracked `~/.p10k.zsh`. Keep other prompt initializers disabled in Zsh.

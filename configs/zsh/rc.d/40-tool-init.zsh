@@ -28,12 +28,7 @@ if command -v thefuck >/dev/null 2>&1; then
     eval "$(thefuck --alias)"
 fi
 
-# Starship prompt (if installed).
-if command -v starship >/dev/null 2>&1; then
-    eval "$(starship init zsh)"
-fi
-
-# Powerlevel10k user config (kept for compatibility/instant prompt settings).
+# Powerlevel10k user config.
 if [[ -f "$HOME/.p10k.zsh" ]]; then
     source "$HOME/.p10k.zsh"
 fi

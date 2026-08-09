@@ -29,3 +29,5 @@ This file tracks notable configuration issues, their root causes, and the fixes 
   Fix: let Oh My Zsh own completion initialization, move the Grok completion directory into `fpath` before Oh My Zsh loads, and remove the two later `compinit` calls. Validated on 2026-08-09 with Codex CLI 0.147.0, Zsh 5.9.2, and Oh My Zsh commit `99aaf58d`.
 - Zsh modular loader: installer fragments accumulated after the `rc.d` loader, sourcing Bun completion three times and Opam initialization twice while also duplicating PATH entries.
   Fix: restore `configs/zshrc` to a loader-only file, keep the existing single Bun/Opam initialization in `40-tool-init.zsh`, and move the Grok and LoongArch toolchain paths into `30-path.zsh`. Validated on 2026-08-09 with Zsh 5.9.2.
+- Zsh prompt ownership: Powerlevel10k and Starship were both initialized, adding competing `precmd` and `preexec` hooks even though only Powerlevel10k had a tracked configuration.
+  Fix: keep Powerlevel10k as the sole Zsh prompt and stop running `starship init zsh`; retain the Starship package for optional use in other shells. Validated on 2026-08-09 with Powerlevel10k 1.20.17 and Starship 1.26.0.
