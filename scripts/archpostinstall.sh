@@ -16,6 +16,7 @@ Commands:
   install-maplemono-cn    Install Maple Mono NF CN from a temporary Arch Linux CN repo
   install-shell           Install Oh My Zsh, plugins, and powerlevel10k
   link-configs            Symlink tracked configs into place
+  boot-splash <action>    Apply, verify, or roll back the Zen Connect splash
   dpms-toggle             Toggle display power (GNOME)
   dpms-off                Force display off
   dpms-on                 Force display on and restore apps
@@ -46,6 +47,9 @@ case "$cmd" in
         ;;
     link-configs)
         "$REPO_DIR/setup.sh"
+        ;;
+    boot-splash)
+        "$REPO_DIR/scripts/install/install_boot_splash.sh" "$@"
         ;;
     dpms-toggle)
         "$REPO_DIR/scripts/gnome/dpms-toggle.sh"

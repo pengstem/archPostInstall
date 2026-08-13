@@ -97,6 +97,46 @@ create_sudo_link() {
     echo "✅ Linked (sudo)"
 }
 
+# Plymouth resolves its theme directory while mkinitcpio builds the image.
+# Keep these files at their canonical system paths instead of symlinking them,
+# otherwise mkinitcpio archives the repository path inside the initramfs.
+install_sudo_copy() {
+    local src="$1"
+    local dest="$2"
+    local name="$3"
+
+    printf "  %-15s " "[$name]"
+
+    if [ ! -e "$src" ]; then
+        echo "❌ Source not found: $src"
+        return
+    fi
+
+    if sudo test -e "$dest" || sudo test -L "$dest"; then
+        if [ -d "$src" ] && sudo test -d "$dest" && ! sudo test -L "$dest" \
+            && sudo diff -qr -- "$src" "$dest" >/dev/null; then
+            echo "✅ Already copied"
+            return
+        fi
+        if [ -f "$src" ] && sudo test -f "$dest" && ! sudo test -L "$dest" \
+            && sudo cmp -s -- "$src" "$dest"; then
+            echo "✅ Already copied"
+            return
+        fi
+
+        echo -n "🔄 Backing up... "
+        sudo mv "$dest" "$dest.bak_$(date +%s)"
+    fi
+
+    sudo mkdir -p "$(dirname "$dest")"
+    if [ -d "$src" ]; then
+        sudo cp -a --reflink=auto --no-preserve=ownership -- "$src" "$dest"
+    else
+        sudo install -m 0644 -- "$src" "$dest"
+    fi
+    echo "✅ Copied (sudo)"
+}
+
 # --- Link Configurations ---
 
 # System Configs (Requires Sudo)
@@ -106,6 +146,11 @@ create_sudo_link "$CONFIGS_DIR/pacman/hooks/99-update-pkglist.hook" "/etc/pacman
 create_sudo_link "$REPO_DIR/scripts/update_pkglist.sh" "/usr/local/bin/archpostinstall-update-pkglist" "Pkglist Sync"
 create_sudo_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "/usr/local/bin/dpms-toggle" "DPMS Toggle (System)"
 create_sudo_link "$CONFIGS_DIR/tlp/99-archpostinstall.conf" "/etc/tlp.d/99-archpostinstall.conf" "TLP"
+install_sudo_copy "$CONFIGS_DIR/plymouth/themes/connect" "/usr/share/plymouth/themes/connect" "Plymouth Theme"
+install_sudo_copy "$CONFIGS_DIR/plymouth/plymouthd.conf" "/etc/plymouth/plymouthd.conf" "Plymouth Config"
+create_sudo_link "$CONFIGS_DIR/mkinitcpio/90-archpostinstall-nvidia-plymouth.conf" "/etc/mkinitcpio.conf.d/90-archpostinstall-nvidia-plymouth.conf" "Mkinitcpio Boot"
+create_sudo_link "$CONFIGS_DIR/kernel/cmdline.d/90-archpostinstall-splash.conf" "/etc/cmdline.d/90-archpostinstall-splash.conf" "Kernel Splash"
+create_sudo_link "$CONFIGS_DIR/mkinitcpio/linux-zen.preset" "/etc/mkinitcpio.d/linux-zen.preset" "Zen UKI Preset"
 
 # Shell
 create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"

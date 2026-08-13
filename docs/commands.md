@@ -12,6 +12,9 @@ archpostinstall install-packages
 archpostinstall install-maplemono-cn
 archpostinstall install-shell
 archpostinstall link-configs
+archpostinstall boot-splash apply
+archpostinstall boot-splash verify
+archpostinstall boot-splash rollback
 archpostinstall dpms-toggle
 archpostinstall dpms-off
 archpostinstall dpms-on
@@ -32,6 +35,7 @@ Use these when you want explicit control:
 ./scripts/install/install_packages.sh
 ./scripts/install/install_maplemono_cn_font.sh
 ./scripts/install/install_shell_tools.sh
+./scripts/install/install_boot_splash.sh <apply|verify|rollback>
 ./scripts/backup/backup_themes_extensions.sh [output_dir]
 ./scripts/backup/restore_themes_extensions.sh <archives...>
 ./scripts/backup/backup_firefox.sh [output_dir]

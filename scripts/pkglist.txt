@@ -183,6 +183,7 @@ pipewire-alsa
 pipewire-jack
 pipewire-pulse
 playerctl
+plymouth
 pnpm
 postgresql
 power-profiles-daemon

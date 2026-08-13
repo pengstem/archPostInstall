@@ -14,6 +14,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `ghostty/`, `kitty/`, `wezterm/`, `fastfetch/`, `mpv/`, `zathura/` terminal and media/reader configs
 - `nvim/`, `zed/` editor configs
 - `obs-studio/` OBS Studio profiles and scene collections
+- `plymouth/`, `mkinitcpio/`, `kernel/` Zen UKI and Connect boot splash configuration
 - `rime/` schema and dictionaries (live `user.yaml` is ignored)
 - `tmux/` tmux config and helper scripts
 - `zellij/` zellij config and layouts
@@ -23,5 +24,6 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `systemd/user/` user units (GNOME sync)
 
 ## Notes
-- System files under `pacman/` and hooks require sudo to link.
+- System files under `pacman/`, `plymouth/`, `mkinitcpio/`, and `kernel/` require root privileges to install. Plymouth files are copied to their canonical paths so mkinitcpio archives them correctly; the remaining managed configs are linked.
+- Use `archpostinstall boot-splash apply` from a root shell to back up, rebuild, and verify the Zen UKI after linking boot configs.
 - Keep secrets out of tracked files; use `.example` templates when needed.
