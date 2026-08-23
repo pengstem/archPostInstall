@@ -7,6 +7,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - `docs/gnome-extensions.md` and `docs/gnome-appearrance.md` are updated by the GNOME sync script.
 - `docs/bug-history.md` tracks notable config issues and fixes.
 - `docs/thoughts.md` is a freeform notes file for future changes.
+- `docs/screensaver.md` explains the Omarchy-inspired GNOME screensaver and its safety boundary.
 - `docs/commands.md` lists common commands and the unified CLI.
 
 ## Quick Start
@@ -34,6 +35,12 @@ This folder contains reference notes and quick guidance for maintaining the Arch
   and stops Steam and Firefox without reopening them.
 - `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
 - If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
+
+## Animated Screensaver
+- `Super+F11` or `archpostinstall screensaver toggle` opens the custom full-screen animation.
+- The user service launches it after five idle minutes and closes it on keyboard or pointer activity.
+- It is not a lock screen and does not change GNOME lock, suspend, or DPMS settings.
+- Customize the art and effect allowlist in `configs/archpostinstall/screensaver.*`; see `docs/screensaver.md`.
 
 ## Package List Updates
 - Pacman hook triggers `archpostinstall-update-pkglist` after transactions.

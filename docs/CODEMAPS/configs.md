@@ -6,7 +6,7 @@
 
 ```
 configs/
-├── archpostinstall/    # DPMS config
+├── archpostinstall/    # DPMS and screensaver config/art
 ├── applications/       # Desktop entries (QQ, WeChat, Ratty)
 ├── baidupcs/          # BaiduPCS (optional, needs manual setup)
 ├── fcitx5/            # Input method
@@ -79,5 +79,10 @@ dpms_app --name zen-browser --match 'zen-bin|zen-browser' --start 'zen-browser'
 dpms_app --name steam --match 'steam' --action stop
 ```
 
+### screensaver.conf / screensaver.txt
+- Five-minute idle delay, 60 FPS, Maple Mono NF CN, and a curated TTE effect allowlist
+- Custom single-cell-width NASTEM ASCII artwork
+
 ### Systemd Units
 - `archpostinstall-gnome-sync.{path,service}` - Watch GNOME config changes
+- `archpostinstall-screensaver.service` - Watch Mutter idle/activity state

@@ -1,0 +1,14 @@
+[Unit]
+Description=Launch the animated screensaver on GNOME idle
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionEnvironment=XDG_CURRENT_DESKTOP=GNOME
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/archpostinstall-screensaver idle-daemon
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

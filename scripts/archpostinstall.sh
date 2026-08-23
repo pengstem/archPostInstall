@@ -20,6 +20,7 @@ Commands:
   dpms-toggle             Toggle display power (GNOME)
   dpms-off                Force display off
   dpms-on                 Force display on and restore apps
+  screensaver [action]    Control the Omarchy-inspired GNOME screensaver
   backup-gnome            Sync GNOME extensions/themes and archive assets
   backup-themes           Archive GNOME themes, icons, and extensions
   restore-themes <files>  Restore themes/icons/extensions from archives
@@ -59,6 +60,9 @@ case "$cmd" in
         ;;
     dpms-on)
         "$REPO_DIR/scripts/gnome/dpms-toggle.sh" --on
+        ;;
+    screensaver)
+        "$REPO_DIR/scripts/gnome/screensaver.sh" "$@"
         ;;
     backup-gnome)
         "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$@"

@@ -6,7 +6,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `mimeapps.list` user-level default application and MIME associations
 - `applications/` user `.desktop` launchers
 - `alacritty/` Alacritty terminal config
-- `archpostinstall/` helper configs (dpms automation)
+- `archpostinstall/` helper configs (DPMS and animated screensaver)
 - `baidupcs/` BaiduPCS-Go template; real `pcs_config.json` is ignored
 - `bottom/`, `btop/` system monitor configs
 - `lazygit/` lazygit terminal UI config
@@ -21,7 +21,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `zsh/` modular Zsh snippets loaded by `zshrc`
 - `xdg-desktop-portal/`, `xdg-desktop-portal-termfilechooser/` portal configs
 - `pacman/` and `paru/` system package manager configs
-- `systemd/user/` user units (GNOME sync)
+- `systemd/user/` user units (GNOME sync and idle screensaver)
 
 ## Notes
 - System files under `pacman/`, `plymouth/`, `mkinitcpio/`, and `kernel/` require root privileges to install. Plymouth files are copied to their canonical paths so mkinitcpio archives them correctly; the remaining managed configs are linked.

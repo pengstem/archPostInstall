@@ -28,6 +28,8 @@
 | configs/fcitx5 | ~/.config/fcitx5 | user config |
 | configs/rime | ~/.local/share/fcitx5/rime | user config |
 | configs/archpostinstall/dpms.conf | ~/.config/archpostinstall/dpms.conf | user config |
+| configs/archpostinstall/screensaver.conf | ~/.config/archpostinstall/screensaver.conf | screensaver timing, font, effects, and shortcut |
+| configs/archpostinstall/screensaver.txt | ~/.config/archpostinstall/screensaver.txt | custom ASCII artwork |
 | configs/bottom/bottom.toml | ~/.config/bottom/bottom.toml | user config |
 | configs/btop/btop.conf | ~/.config/btop/btop.conf | user config |
 | configs/tlp/99-archpostinstall.conf | /etc/tlp.d/99-archpostinstall.conf | sudo |
@@ -36,6 +38,7 @@
 | configs/pacman/hooks/99-update-pkglist.hook | /etc/pacman.d/hooks/99-update-pkglist.hook | sudo |
 | configs/systemd/user/archpostinstall-gnome-sync.service | ~/.config/systemd/user/archpostinstall-gnome-sync.service | user unit |
 | configs/systemd/user/archpostinstall-gnome-sync.path | ~/.config/systemd/user/archpostinstall-gnome-sync.path | user unit |
+| configs/systemd/user/archpostinstall-screensaver.service | ~/.config/systemd/user/archpostinstall-screensaver.service | GNOME idle monitor user unit |
 | configs/applications/google-chrome.desktop | ~/.local/share/applications/google-chrome.desktop | user desktop entry |
 | configs/applications/QQ.desktop | ~/.local/share/applications/QQ.desktop | user desktop entry |
 | configs/applications/ratty.desktop | ~/.local/share/applications/ratty.desktop | user desktop entry |
@@ -45,6 +48,7 @@
 | scripts/update_pkglist.sh | /usr/local/bin/archpostinstall-update-pkglist | sudo |
 | scripts/gnome/backup_gnome_state.sh | ~/.local/bin/archpostinstall-gnome-sync | user bin |
 | scripts/gnome/dpms-toggle.sh | ~/.local/bin/dpms-toggle | user bin |
+| scripts/gnome/screensaver.sh | ~/.local/bin/archpostinstall-screensaver | user bin |
 | scripts/gnome/dpms-toggle.sh | /usr/local/bin/dpms-toggle | sudo |
 | scripts/launchers/nowledge-mem-desktop.sh | ~/.local/bin/nowledge-mem-desktop | user bin |
 | scripts/launchers/yazi-desktop.sh | ~/.local/bin/yazi-desktop | user bin |

@@ -4,7 +4,7 @@
 
 ## Overview
 
-Arch Linux post-install automation: packages, dotfiles symlinks, GNOME state tracking, and DPMS display/app management.
+Arch Linux post-install automation: packages, dotfiles symlinks, GNOME state tracking, animated idle screensaver, and DPMS display/app management.
 
 ## Entry Points
 
@@ -14,7 +14,7 @@ bootstrap.sh          # Full setup orchestrator
 ├── install_shell_tools.sh
 └── setup.sh          # Symlink orchestrator
 
-scripts/archpostinstall.sh  # Unified CLI (14 subcommands)
+scripts/archpostinstall.sh  # Unified CLI (16 subcommands)
 ```
 
 ## Script Call Graph
@@ -33,6 +33,7 @@ archpostinstall.sh (CLI router)
 ├── install-shell     → install_shell_tools.sh
 ├── link-configs      → setup.sh
 ├── dpms-*            → gnome/dpms-toggle.sh
+├── screensaver       → gnome/screensaver.sh
 ├── backup-gnome      → gnome/backup_gnome_state.sh
 │                       └── backup/backup_themes_extensions.sh
 ├── backup-themes     → backup/backup_themes_extensions.sh
@@ -47,6 +48,9 @@ archpostinstall.sh (CLI router)
 ```
 archpostinstall-gnome-sync.path     # Watches dconf/extensions/themes
 └── archpostinstall-gnome-sync.service → backup_gnome_state.sh
+
+archpostinstall-screensaver.service # Watches Mutter idle/activity state
+└── screensaver-idle.py → screensaver.sh start/stop
 
 manual dpms-off / dpms-on / dpms-toggle
 └── dpms-toggle.sh

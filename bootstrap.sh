@@ -72,6 +72,11 @@ log_header "🔗 [3/3] Linking Dotfiles"
 
 # 4. Default Shell
 log_header "⚙️  Finalizing"
+if [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]]; then
+    log_info "Enabling the GNOME idle screensaver and Super+F11 shortcut..."
+    "$SCRIPTS_DIR/gnome/screensaver.sh" install
+fi
+
 CURRENT_SHELL="${SHELL:-}"
 ZSH_PATH="$(command -v zsh || true)"
 if [ -z "$ZSH_PATH" ]; then

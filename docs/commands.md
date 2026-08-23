@@ -18,6 +18,7 @@ archpostinstall boot-splash rollback
 archpostinstall dpms-toggle
 archpostinstall dpms-off
 archpostinstall dpms-on
+archpostinstall screensaver <start|stop|toggle|status|install|uninstall>
 archpostinstall backup-gnome
 archpostinstall backup-themes
 archpostinstall restore-themes <archives...>
@@ -42,6 +43,7 @@ Use these when you want explicit control:
 ./scripts/backup/restore_firefox.sh <archive>
 ./scripts/gnome/backup_gnome_state.sh
 ./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle]
+./scripts/gnome/screensaver.sh [start|stop|toggle|status|install|uninstall]
 ./scripts/update_pkglist.sh
 ```
 
@@ -51,4 +53,11 @@ Enable automatic GNOME sync after linking:
 ```
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path
+```
+
+## Systemd (Animated Screensaver)
+`bootstrap.sh` enables this automatically on GNOME. For an existing linked checkout:
+
+```
+archpostinstall screensaver install
 ```

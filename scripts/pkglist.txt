@@ -188,6 +188,7 @@ pnpm
 postgresql
 power-profiles-daemon
 powertop
+python-terminaltexteffects
 qemu-audio-alsa
 qemu-audio-dbus
 qemu-audio-jack

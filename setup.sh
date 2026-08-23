@@ -191,6 +191,8 @@ fi
 create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
 create_link "$CONFIGS_DIR/rime"             "$HOME/.local/share/fcitx5/rime" "Fcitx5 Rime"
 create_link "$CONFIGS_DIR/archpostinstall/dpms.conf" "$HOME/.config/archpostinstall/dpms.conf" "DPMS Config"
+create_link "$CONFIGS_DIR/archpostinstall/screensaver.conf" "$HOME/.config/archpostinstall/screensaver.conf" "Saver Config"
+create_link "$CONFIGS_DIR/archpostinstall/screensaver.txt" "$HOME/.config/archpostinstall/screensaver.txt" "Saver Art"
 create_link "$CONFIGS_DIR/bottom/bottom.toml" "$HOME/.config/bottom/bottom.toml" "bottom"
 create_link "$CONFIGS_DIR/btop/btop.conf"   "$HOME/.config/btop/btop.conf"  "btop"
 
@@ -207,6 +209,7 @@ create_link "$CONFIGS_DIR/applications/ratty.desktop" "$HOME/.local/share/applic
 create_link "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$HOME/.local/bin/archpostinstall-gnome-sync" "Gnome Sync Bin"
 create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostinstall" "Archpostinstall Bin"
 create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
+create_link "$REPO_DIR/scripts/gnome/screensaver.sh" "$HOME/.local/bin/archpostinstall-screensaver" "Screensaver Bin"
 create_link "$REPO_DIR/scripts/launchers/nowledge-mem-desktop.sh" "$HOME/.local/bin/nowledge-mem-desktop" "Nowledge Mem Bin"
 create_link "$REPO_DIR/scripts/launchers/yazi-desktop.sh" "$HOME/.local/bin/yazi-desktop" "Yazi Desktop"
 create_link "$REPO_DIR/scripts/launchers/yazi-open-nautilus.sh" "$HOME/.local/bin/yazi-open-nautilus" "Yazi Nautilus"
@@ -215,6 +218,7 @@ create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/z
 # Systemd (User)
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"
 create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.path"    "$HOME/.config/systemd/user/archpostinstall-gnome-sync.path"    "Gnome Sync Path"
+create_link "$CONFIGS_DIR/systemd/user/archpostinstall-screensaver.service" "$HOME/.config/systemd/user/archpostinstall-screensaver.service" "Screensaver Service"
 
 echo ""
 echo "✨ Configuration linking complete!"
