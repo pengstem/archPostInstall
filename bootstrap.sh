@@ -39,7 +39,7 @@ log_info() {
 log_header "🚀 Starting Arch Linux Post-Install Setup"
 
 echo "This script will configure your system:"
-echo " 1. Install system packages"
+echo " 1. Install system packages and the Rust screensaver engine"
 echo " 2. Setup Shell environment"
 echo " 3. Symlink configuration files"
 echo ""
@@ -61,6 +61,7 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 # 1. Packages
 log_header "📦 [1/3] Installing System Packages"
 "$SCRIPTS_DIR/install/install_packages.sh"
+"$SCRIPTS_DIR/install/install_ttfx.sh"
 
 # 2. Shell
 log_header "🐚 [2/3] Setting up Shell & Tools"

@@ -12,6 +12,7 @@ scripts/
 ├── install/
 │   ├── install_packages.sh   # Paru/yay package installation
 │   ├── install_maplemono_cn_font.sh # Temporary Arch Linux CN font installer
+│   ├── install_ttfx.sh       # Pinned install and latest stable upgrade
 │   └── install_shell_tools.sh # Oh My Zsh, plugins, p10k
 ├── backup/
 │   ├── backup_themes_extensions.sh   # GNOME themes/icons/extensions
@@ -23,7 +24,7 @@ scripts/
 │   ├── dpms-common.sh          # DPMS config + journal logging helpers
 │   ├── dpms-toggle.sh          # Display power and app orchestration
 │   ├── screensaver-idle.py     # Mutter idle and GNOME shortcut integration
-│   └── screensaver.sh          # Full-screen TTE lifecycle
+│   └── screensaver.sh          # Full-screen Rust ttfx lifecycle
 └── zathura/
     └── page-to-clipboard.sh    # PDF page extraction helper
 ```
@@ -35,6 +36,7 @@ scripts/
 | `archpostinstall.sh` | ~105 | CLI dispatcher |
 | `install_packages.sh` | ~50 | Package installation |
 | `install_maplemono_cn_font.sh` | ~102 | Temporary Arch Linux CN Maple Mono installer |
+| `install_ttfx.sh` | ~120 | Install pinned ttfx or upgrade to the latest stable tag |
 | `install_shell_tools.sh` | ~80 | Shell environment setup |
 | `backup_themes_extensions.sh` | ~120 | Hash-based backup with pruning |
 | `restore_themes_extensions.sh` | ~60 | Auto-detect and restore |
@@ -43,7 +45,7 @@ scripts/
 | `backup_gnome_state.sh` | ~100 | GNOME state sync with throttle |
 | `dpms-common.sh` | ~199 | DPMS config DSL, validation, journal logging, locking |
 | `dpms-toggle.sh` | ~225 | Display PowerSaveMode and app stop/start flow |
-| `screensaver.sh` | ~320 | Kitty/TTE launcher, exact-PID lifecycle, and integration commands |
+| `screensaver.sh` | ~340 | Kitty/ttfx launcher, exact-PID lifecycle, upgrade, and integration commands |
 | `screensaver-idle.py` | ~280 | Mutter idle watches and merged GNOME shortcut setup |
 | `update_pkglist.sh` | ~30 | Pacman hook target |
 | `page-to-clipboard.sh` | ~30 | Zathura helper |
@@ -65,6 +67,6 @@ scripts/
 - Display PowerSaveMode control without TLP or power-profiles-daemon profile switching
 
 ### screensaver.sh
-- Full-screen Kitty process with centered random TerminalTextEffects animations
+- Full-screen Kitty process with centered random Rust ttfx animations
 - Exact runner PID tracking for idempotent start/stop behavior
 - Mutter user-activity watcher dismisses on keyboard or pointer input

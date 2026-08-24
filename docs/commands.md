@@ -18,7 +18,7 @@ archpostinstall boot-splash rollback
 archpostinstall dpms-toggle
 archpostinstall dpms-off
 archpostinstall dpms-on
-archpostinstall screensaver <start|stop|toggle|status|install|uninstall>
+archpostinstall screensaver <start|stop|toggle|status|upgrade|install|uninstall>
 archpostinstall backup-gnome
 archpostinstall backup-themes
 archpostinstall restore-themes <archives...>
@@ -35,6 +35,7 @@ Use these when you want explicit control:
 ./setup.sh
 ./scripts/install/install_packages.sh
 ./scripts/install/install_maplemono_cn_font.sh
+./scripts/install/install_ttfx.sh [install|upgrade]
 ./scripts/install/install_shell_tools.sh
 ./scripts/install/install_boot_splash.sh <apply|verify|rollback>
 ./scripts/backup/backup_themes_extensions.sh [output_dir]
@@ -43,7 +44,7 @@ Use these when you want explicit control:
 ./scripts/backup/restore_firefox.sh <archive>
 ./scripts/gnome/backup_gnome_state.sh
 ./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle]
-./scripts/gnome/screensaver.sh [start|stop|toggle|status|install|uninstall]
+./scripts/gnome/screensaver.sh [start|stop|toggle|status|upgrade|install|uninstall]
 ./scripts/update_pkglist.sh
 ```
 

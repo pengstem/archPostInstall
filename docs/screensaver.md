@@ -8,12 +8,13 @@ Hyprland-specific monitor focus and window rules.
 ## What Runs
 
 - Kitty opens a decoration-free, opaque, full-screen window.
-- TerminalTextEffects 0.15.0 animates `screensaver.txt` with a curated random
-  effect at 60 FPS.
+- `ttfx` 0.3.2, the release-optimized Rust port of TerminalTextEffects 0.15.0,
+  animates `screensaver.txt` with a curated random effect at 60 FPS.
 - Mutter's session D-Bus idle monitor starts it after five minutes and closes
   it on the next keyboard or pointer event.
-- The launcher resolves both system-installed `tte` and uv's user executable
-  directory, because GNOME shortcuts do not inherit an interactive Zsh `PATH`.
+- The launcher resolves `ttfx` from the system, `~/.local/bin`, or Cargo's user
+  bin directory, because GNOME shortcuts do not inherit an interactive Zsh
+  `PATH`. The Python `tte` name remains available only as an explicit A/B mode.
 - A two-second launch grace prevents the initiating shortcut's key release and
   window mapping from immediately dismissing the new full-screen window.
 - `archpostinstall-screensaver.service` keeps the idle monitor available in the
@@ -41,6 +42,17 @@ and registers `Super+F11`. On an existing installation after running
 archpostinstall screensaver install
 ```
 
+Upgrade the Rust renderer to the newest stable upstream tag with:
+
+```bash
+archpostinstall screensaver upgrade
+```
+
+The normal bootstrap pins the known-good minimum (`ttfx` 0.3.2 at revision
+`7203e354`) but never downgrades a newer installed release. The explicit
+upgrade command discovers stable semantic-version tags from the official
+repository, builds with Cargo's lock file, and verifies the installed version.
+
 Disable the service and remove only its own shortcut with:
 
 ```bash
@@ -51,23 +63,45 @@ archpostinstall screensaver uninstall
 
 - Edit `configs/archpostinstall/screensaver.txt` to change the centered artwork.
 - Edit `configs/archpostinstall/screensaver.conf` to change the idle delay,
-  font, frame rate, shortcut, or random-effect allowlist.
+  font, frame rate, shortcut, or random-effect allowlist. Set
+  `SCREENSAVER_ENGINE="tte"` temporarily only when comparing against Python.
 - Keep artwork characters single-column. Block and box-drawing characters work;
-  emoji and many CJK characters do not align correctly in TTE's current canvas
+  emoji and many CJK characters do not align correctly in the inherited canvas
   model.
+
+## Local Performance Comparison
+
+Measured on this machine on 2026-08-24 with the repository's 8-line, 55-column
+ASCII art, a fixed 200x50 canvas, output redirected to `/dev/null`, and frame
+pacing disabled (`--frame-rate 0`). Each animation is the mean of three runs
+after one warm-up; startup is the mean of 50 runs after ten warm-ups.
+
+| Workload | Python TTE 0.15.0 | Rust ttfx 0.3.2 | Speedup |
+|---|---:|---:|---:|
+| CLI startup (`--version`) | 144.3 ms | 1.6 ms | 87.59x |
+| `beams` | 14.166 s | 520.6 ms | 27.21x |
+| `decrypt` | 1.144 s | 47.3 ms | 24.19x |
+| `waves` | 1.335 s | 58.9 ms | 22.68x |
+| `rings` | 3.600 s | 164.2 ms | 21.93x |
+
+Across the four actual animation workloads, the local median improvement is
+23.44x. Three `/proc` samples of the same `beams` workload showed a median peak
+RSS of 380,048 KiB for Python and 218,092 KiB for Rust: 42.61% less memory.
+These throughput numbers measure rendering headroom, not how quickly the
+visible animation ends at the configured 60 FPS.
 
 ## Validation Basis
 
-Validated on 2026-08-24 with GNOME Shell 50.4, Kitty 0.48.2,
-TerminalTextEffects 0.15.0, one 3840x2400 Wayland output, and the
-`python-terminaltexteffects` 0.15.0-1 AUR package metadata.
+Validated on 2026-08-24 with GNOME Shell 50.4, Kitty 0.48.2, Rust 1.97.0,
+`ttfx` 0.3.2, TerminalTextEffects 0.15.0 as the benchmark baseline, and one
+3840x2400 Wayland output.
 
 The implementation was checked against:
 
 - [Omarchy Quattro screensaver manual](https://github.com/basecamp/omarchy/blob/quattro/manual/13-toggles-idle-screensaver.md), which documents per-monitor full-screen terminals, random text effects, and editable ASCII branding.
 - [Current Omarchy launcher](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-launch-screensaver) and [runner](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-screensaver), for the full-screen terminal and centered-canvas behavior.
-- [TerminalTextEffects installation and CLI](https://pypi.org/project/terminaltexteffects/), for version 0.15.0 and the random-effect/include-effect options.
-- [uv executable-directory reference](https://docs.astral.sh/uv/reference/storage/), for locating tool entry points under the XDG user executable directory or `~/.local/bin`.
+- [ttfx source and benchmark notes](https://github.com/omacom-io/ttfx), for the parity-tested Rust port, compatible CLI, release build, and upstream performance methodology.
+- [TerminalTextEffects installation and CLI](https://pypi.org/project/terminaltexteffects/), for the original 0.15.0 behavior used as the comparison baseline.
 - [Kitty invocation reference](https://sw.kovidgoyal.net/kitty/invocation.html), for Wayland app IDs, per-launch config overrides, and `--start-as fullscreen`.
 - [GNOME idle monitor API](https://gnome.pages.gitlab.gnome.org/gnome-desktop/html/gnome-desktop3/gnome-desktop3-GnomeIdleMonitor.html), especially the one-shot user-active watch used to dismiss on keyboard or pointer activity.
 - [Omarchy customization discussion #3204](https://github.com/basecamp/omarchy/discussions/3204), confirming that replacing the ASCII input preserves the animations, and [Quattro issue #7762](https://github.com/basecamp/omarchy/issues/7762), which records why relying only on terminal key input misses global mouse movement.

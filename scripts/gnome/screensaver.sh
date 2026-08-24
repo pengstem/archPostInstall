@@ -12,7 +12,7 @@ RUNTIME_BASE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 RUNTIME_DIR="$RUNTIME_BASE/archpostinstall"
 RUNNER_PID_FILE="$RUNTIME_DIR/screensaver.pid"
 START_LOCK_FILE="$RUNTIME_DIR/screensaver-start.lock"
-TTE_BIN=""
+EFFECT_ENGINE_BIN=""
 
 usage() {
     cat <<'EOF'
@@ -23,6 +23,7 @@ Commands:
   start         Open the screensaver now
   stop          Close the running screensaver
   status        Show runner and idle-service state
+  upgrade       Upgrade the Rust renderer to the latest stable release
   install       Enable idle launch and register Super+F11 in GNOME
   uninstall     Disable idle launch and remove the GNOME shortcut
   idle-daemon   Run the GNOME idle monitor (used by systemd)
@@ -36,25 +37,31 @@ require_cmd() {
     fi
 }
 
-resolve_tte() {
-    local candidate
+resolve_effect_engine() {
+    local candidate engine
 
-    if command -v tte >/dev/null 2>&1; then
-        TTE_BIN="$(command -v tte)"
+    engine="${SCREENSAVER_ENGINE:-}"
+    if command -v "$engine" >/dev/null 2>&1; then
+        EFFECT_ENGINE_BIN="$(command -v "$engine")"
         return 0
     fi
 
     for candidate in \
-        "${UV_TOOL_BIN_DIR:+$UV_TOOL_BIN_DIR/tte}" \
-        "${XDG_BIN_HOME:+$XDG_BIN_HOME/tte}" \
-        "${XDG_DATA_HOME:-$HOME/.local/share}/../bin/tte"; do
+        "${XDG_BIN_HOME:+$XDG_BIN_HOME/$engine}" \
+        "$HOME/.local/bin/$engine" \
+        "$HOME/.cargo/bin/$engine" \
+        "${UV_TOOL_BIN_DIR:+$UV_TOOL_BIN_DIR/$engine}" \
+        "${XDG_DATA_HOME:-$HOME/.local/share}/../bin/$engine"; do
         if [ -n "$candidate" ] && [ -x "$candidate" ]; then
-            TTE_BIN="$(readlink -f "$candidate" 2>/dev/null || echo "$candidate")"
+            EFFECT_ENGINE_BIN="$(readlink -f "$candidate" 2>/dev/null || echo "$candidate")"
             return 0
         fi
     done
 
-    echo "Error: required command not found: tte" >&2
+    echo "Error: required screensaver engine not found: $engine" >&2
+    if [ "$engine" = "ttfx" ]; then
+        echo "Run ./scripts/install/install_ttfx.sh to install the pinned Rust engine." >&2
+    fi
     return 1
 }
 
@@ -72,6 +79,13 @@ load_config() {
     # shellcheck disable=SC1090
     source "$CONFIG_FILE"
 
+    case "${SCREENSAVER_ENGINE:-}" in
+        ttfx | tte) ;;
+        *)
+            echo "Error: SCREENSAVER_ENGINE must be ttfx or tte." >&2
+            return 1
+            ;;
+    esac
     if ! [[ "${SCREENSAVER_IDLE_SECONDS:-}" =~ ^[1-9][0-9]*$ ]]; then
         echo "Error: SCREENSAVER_IDLE_SECONDS must be a positive integer." >&2
         return 1
@@ -149,7 +163,7 @@ start_screensaver() {
     require_cmd flock
     require_cmd kitty
     require_cmd python
-    resolve_tte
+    resolve_effect_engine
     mkdir -p "$RUNTIME_DIR"
 
     exec 9>"$START_LOCK_FILE"
@@ -198,7 +212,7 @@ run_screensaver() {
 
     load_config
     require_cmd python
-    resolve_tte
+    resolve_effect_engine
     mkdir -p "$RUNTIME_DIR"
 
     if runner_is_running; then
@@ -250,7 +264,7 @@ run_screensaver() {
 
     printf '\033]11;rgb:00/00/00\007\033[2J\033[H\033[?25l'
     while true; do
-        "$TTE_BIN" "${effect_args[@]}" &
+        "$EFFECT_ENGINE_BIN" "${effect_args[@]}" &
         effect_pid=$!
         while kill -0 "$effect_pid" 2>/dev/null; do
             if IFS= read -r -s -n 1 -t 0.1; then
@@ -295,6 +309,15 @@ uninstall_integration() {
 }
 
 show_status() {
+    local renderer_version
+
+    if load_config >/dev/null 2>&1 && resolve_effect_engine >/dev/null 2>&1; then
+        renderer_version="$("$EFFECT_ENGINE_BIN" --version 2>/dev/null || echo unknown)"
+        echo "renderer: $renderer_version ($EFFECT_ENGINE_BIN)"
+    else
+        echo "renderer: unavailable"
+    fi
+
     if runner_is_running; then
         echo "screensaver: running (PID $(read_runner_pid))"
     else
@@ -313,6 +336,14 @@ show_status() {
     fi
 }
 
+upgrade_renderer() {
+    if [ ! -x "$SCRIPT_DIR/../install/install_ttfx.sh" ]; then
+        echo "Error: ttfx installer not found next to this repository checkout." >&2
+        return 1
+    fi
+    "$SCRIPT_DIR/../install/install_ttfx.sh" upgrade
+}
+
 case "${1:-toggle}" in
     toggle)
         if runner_is_running; then
@@ -329,6 +360,9 @@ case "${1:-toggle}" in
         ;;
     status)
         show_status
+        ;;
+    upgrade)
+        upgrade_renderer
         ;;
     install)
         install_integration

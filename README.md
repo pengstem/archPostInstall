@@ -17,6 +17,6 @@ A personal Arch Linux post-install and dotfiles repo. It automates package insta
 - Pacman hook updates `scripts/pkglist.txt` automatically after transactions.
 - GNOME sync writes extension/theme notes into `docs/` and archives assets into `backups/gnome/`.
 - DPMS automation is configured in `configs/archpostinstall/dpms.conf` with a small helper DSL and is controlled through `dpms-toggle`.
-- The Omarchy-inspired GNOME screensaver uses custom ASCII art, TerminalTextEffects, `Super+F11`, and a Mutter idle monitor; see `docs/screensaver.md`.
+- The Omarchy-inspired GNOME screensaver uses custom ASCII art, the Rust `ttfx` renderer, `Super+F11`, and a Mutter idle monitor; see `docs/screensaver.md`.
 - Secrets are not tracked: copy `configs/baidupcs/pcs_config.json.example` to `configs/baidupcs/pcs_config.json` locally.
 - `configs/rime/user.yaml` is ignored because it changes with typing.

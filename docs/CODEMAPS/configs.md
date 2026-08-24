@@ -80,7 +80,7 @@ dpms_app --name steam --match 'steam' --action stop
 ```
 
 ### screensaver.conf / screensaver.txt
-- Five-minute idle delay, 60 FPS, Maple Mono NF CN, and a curated TTE effect allowlist
+- Five-minute idle delay, 60 FPS, Maple Mono NF CN, Rust ttfx engine, and a curated effect allowlist
 - Custom single-cell-width NASTEM ASCII artwork
 
 ### Systemd Units
