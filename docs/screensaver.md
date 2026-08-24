@@ -21,6 +21,9 @@ Hyprland-specific monitor focus and window rules.
   GNOME graphical session.
 - `Super+F11` toggles it immediately; `Super+F12` remains the separate DPMS
   shortcut.
+- DPMS has priority: turning the display off stops an active screensaver, and
+  a nonzero Mutter `PowerSaveMode` prevents a new full-screen window from
+  starting. Turning the display back on only restarts the idle countdown.
 
 This is visual only. It does not authenticate, lock the session, inhibit
 GNOME's own lock screen, or change suspend/DPMS policy.

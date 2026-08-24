@@ -12,6 +12,7 @@ RUNTIME_BASE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 RUNTIME_DIR="$RUNTIME_BASE/archpostinstall"
 RUNNER_PID_FILE="$RUNTIME_DIR/screensaver.pid"
 START_LOCK_FILE="$RUNTIME_DIR/screensaver-start.lock"
+DISPLAY_ON_MODE=0
 TTFX_BIN=""
 
 usage() {
@@ -35,6 +36,39 @@ require_cmd() {
         echo "Error: required command not found: $1" >&2
         return 1
     fi
+}
+
+get_display_mode() {
+    local mode
+
+    if ! mode="$(busctl --user get-property org.gnome.Mutter.DisplayConfig \
+        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode)"; then
+        echo "Error: unable to read display power state." >&2
+        return 1
+    fi
+    mode="${mode##* }"
+    if ! [[ "$mode" =~ ^[0-9]+$ ]]; then
+        echo "Error: invalid display power state: $mode" >&2
+        return 1
+    fi
+
+    printf '%s\n' "$mode"
+}
+
+display_is_on() {
+    local mode
+
+    mode="$(get_display_mode)" || return 1
+    [ "$mode" -eq "$DISPLAY_ON_MODE" ]
+}
+
+skip_when_display_is_off() {
+    if display_is_on; then
+        return 1
+    fi
+
+    echo "Screensaver skipped: display power is off or unavailable." >&2
+    return 0
 }
 
 resolve_ttfx() {
@@ -149,6 +183,10 @@ start_screensaver() {
 
     load_config
     require_cmd flock
+    require_cmd busctl
+    if skip_when_display_is_off; then
+        return 0
+    fi
     require_cmd kitty
     require_cmd python
     resolve_ttfx
@@ -184,6 +222,10 @@ start_screensaver() {
     kitty "${kitty_args[@]}" "$SCRIPT_PATH" run
 
     for ((attempt = 0; attempt < 50; attempt++)); do
+        if skip_when_display_is_off; then
+            stop_screensaver
+            return 0
+        fi
         if runner_is_running; then
             return 0
         fi
@@ -200,6 +242,10 @@ run_screensaver() {
 
     load_config
     require_cmd python
+    require_cmd busctl
+    if skip_when_display_is_off; then
+        return 0
+    fi
     resolve_ttfx
     mkdir -p "$RUNTIME_DIR"
 

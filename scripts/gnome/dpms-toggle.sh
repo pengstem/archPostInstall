@@ -163,6 +163,18 @@ set_display_mode() {
     >/dev/null 2>&1
 }
 
+stop_active_screensaver() {
+  local screensaver_bin="$SCRIPT_DIR/screensaver.sh"
+
+  if [ ! -x "$screensaver_bin" ]; then
+    dpms_log "Warning: screensaver controller not found: $screensaver_bin"
+    return 0
+  fi
+  if ! "$screensaver_bin" stop; then
+    dpms_log "Warning: failed to stop the active screensaver."
+  fi
+}
+
 dpms_off() {
   local record app_name app_match app_action
 
@@ -170,6 +182,8 @@ dpms_off() {
     dpms_log "Error: failed to turn the display off."
     return 1
   fi
+
+  stop_active_screensaver
 
   for record in "${DPMS_APPS[@]}"; do
     IFS="$DPMS_RECORD_SEP" read -r app_name app_match _ app_action <<<"$record"

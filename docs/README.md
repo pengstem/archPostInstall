@@ -40,6 +40,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - `Super+F11` or `archpostinstall screensaver toggle` opens the custom full-screen animation.
 - `archpostinstall screensaver upgrade` builds the latest stable Rust renderer release.
 - The user service launches it after five idle minutes and closes it on keyboard or pointer activity.
+- DPMS-off suppresses and stops the animation; DPMS-on only rearms the idle countdown.
 - It is not a lock screen and does not change GNOME lock, suspend, or DPMS settings.
 - Customize the art and effect allowlist in `configs/archpostinstall/screensaver.*`; see `docs/screensaver.md`.
 

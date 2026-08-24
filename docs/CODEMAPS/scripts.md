@@ -44,8 +44,8 @@ scripts/
 | `restore_firefox.sh` | ~50 | Firefox profile restore |
 | `backup_gnome_state.sh` | ~100 | GNOME state sync with throttle |
 | `dpms-common.sh` | ~199 | DPMS config DSL, validation, journal logging, locking |
-| `dpms-toggle.sh` | ~225 | Display PowerSaveMode and app stop/start flow |
-| `screensaver.sh` | ~340 | Kitty/ttfx launcher, exact-PID lifecycle, upgrade, and integration commands |
+| `dpms-toggle.sh` | ~245 | Display PowerSaveMode, screensaver coordination, and app stop/start flow |
+| `screensaver.sh` | ~420 | Kitty/ttfx launcher, DPMS guard, exact-PID lifecycle, upgrade, and integration commands |
 | `screensaver-idle.py` | ~280 | Mutter idle watches and merged GNOME shortcut setup |
 | `update_pkglist.sh` | ~30 | Pacman hook target |
 | `page-to-clipboard.sh` | ~30 | Zathura helper |
@@ -65,8 +65,10 @@ scripts/
 ### dpms-toggle.sh
 - Explicit app action flow (`restart`, `start`, or `stop`) from `dpms.conf`
 - Display PowerSaveMode control without TLP or power-profiles-daemon profile switching
+- Display-off stops the custom screensaver before managing configured apps
 
 ### screensaver.sh
 - Full-screen Kitty process with centered random Rust ttfx animations
 - Exact runner PID tracking for idempotent start/stop behavior
 - Mutter user-activity watcher dismisses on keyboard or pointer input
+- Nonzero Mutter PowerSaveMode suppresses startup, including launch races

@@ -1,5 +1,23 @@
 # DPMS Past Bug List
 
+## Screensaver Coordination (2026-08-24)
+
+- Made manual DPMS-off authoritative over the animated screensaver: after the
+  Mutter display-power write succeeds, `dpms-toggle.sh` stops any active
+  screensaver before continuing with configured app shutdown.
+- Added a `PowerSaveMode` guard before the screensaver creates Kitty, inside
+  the Kitty runner, and after runner registration. The final check closes the
+  race where DPMS-off lands between the initial check and asynchronous window
+  creation.
+- DPMS-on intentionally does not launch the screensaver. Its shortcut input
+  fires Mutter's user-active watch, which stops any stale runner and rearms the
+  five-minute idle watch.
+- Validated against Mutter 50.4 and gnome-settings-daemon 50.1 source on
+  2026-08-24. Mutter's native backend disables the KMS device for every
+  nonzero power-save mode; the idle monitor only fires the active transition
+  on user activity. Local validation used a mocked `busctl` off-state so no
+  physical output had to be powered down.
+
 ## Removal Pass (2026-07-13)
 
 - Removed file-based DPMS logging and rotation; messages now go to stderr and are
