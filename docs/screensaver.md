@@ -14,7 +14,7 @@ Hyprland-specific monitor focus and window rules.
   it on the next keyboard or pointer event.
 - The launcher resolves `ttfx` from the system, `~/.local/bin`, or Cargo's user
   bin directory, because GNOME shortcuts do not inherit an interactive Zsh
-  `PATH`. The Python `tte` name remains available only as an explicit A/B mode.
+  `PATH`.
 - A two-second launch grace prevents the initiating shortcut's key release and
   window mapping from immediately dismissing the new full-screen window.
 - `archpostinstall-screensaver.service` keeps the idle monitor available in the
@@ -63,8 +63,7 @@ archpostinstall screensaver uninstall
 
 - Edit `configs/archpostinstall/screensaver.txt` to change the centered artwork.
 - Edit `configs/archpostinstall/screensaver.conf` to change the idle delay,
-  font, frame rate, shortcut, or random-effect allowlist. Set
-  `SCREENSAVER_ENGINE="tte"` temporarily only when comparing against Python.
+  font, frame rate, shortcut, or random-effect allowlist.
 - Keep artwork characters single-column. Block and box-drawing characters work;
   emoji and many CJK characters do not align correctly in the inherited canvas
   model.

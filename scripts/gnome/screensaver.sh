@@ -12,7 +12,7 @@ RUNTIME_BASE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 RUNTIME_DIR="$RUNTIME_BASE/archpostinstall"
 RUNNER_PID_FILE="$RUNTIME_DIR/screensaver.pid"
 START_LOCK_FILE="$RUNTIME_DIR/screensaver-start.lock"
-EFFECT_ENGINE_BIN=""
+TTFX_BIN=""
 
 usage() {
     cat <<'EOF'
@@ -37,31 +37,26 @@ require_cmd() {
     fi
 }
 
-resolve_effect_engine() {
-    local candidate engine
+resolve_ttfx() {
+    local candidate
 
-    engine="${SCREENSAVER_ENGINE:-}"
-    if command -v "$engine" >/dev/null 2>&1; then
-        EFFECT_ENGINE_BIN="$(command -v "$engine")"
+    if command -v ttfx >/dev/null 2>&1; then
+        TTFX_BIN="$(command -v ttfx)"
         return 0
     fi
 
     for candidate in \
-        "${XDG_BIN_HOME:+$XDG_BIN_HOME/$engine}" \
-        "$HOME/.local/bin/$engine" \
-        "$HOME/.cargo/bin/$engine" \
-        "${UV_TOOL_BIN_DIR:+$UV_TOOL_BIN_DIR/$engine}" \
-        "${XDG_DATA_HOME:-$HOME/.local/share}/../bin/$engine"; do
+        "${XDG_BIN_HOME:+$XDG_BIN_HOME/ttfx}" \
+        "$HOME/.local/bin/ttfx" \
+        "$HOME/.cargo/bin/ttfx"; do
         if [ -n "$candidate" ] && [ -x "$candidate" ]; then
-            EFFECT_ENGINE_BIN="$(readlink -f "$candidate" 2>/dev/null || echo "$candidate")"
+            TTFX_BIN="$(readlink -f "$candidate" 2>/dev/null || echo "$candidate")"
             return 0
         fi
     done
 
-    echo "Error: required screensaver engine not found: $engine" >&2
-    if [ "$engine" = "ttfx" ]; then
-        echo "Run ./scripts/install/install_ttfx.sh to install the pinned Rust engine." >&2
-    fi
+    echo "Error: required screensaver renderer not found: ttfx" >&2
+    echo "Run ./scripts/install/install_ttfx.sh to install the pinned Rust renderer." >&2
     return 1
 }
 
@@ -79,13 +74,6 @@ load_config() {
     # shellcheck disable=SC1090
     source "$CONFIG_FILE"
 
-    case "${SCREENSAVER_ENGINE:-}" in
-        ttfx | tte) ;;
-        *)
-            echo "Error: SCREENSAVER_ENGINE must be ttfx or tte." >&2
-            return 1
-            ;;
-    esac
     if ! [[ "${SCREENSAVER_IDLE_SECONDS:-}" =~ ^[1-9][0-9]*$ ]]; then
         echo "Error: SCREENSAVER_IDLE_SECONDS must be a positive integer." >&2
         return 1
@@ -163,7 +151,7 @@ start_screensaver() {
     require_cmd flock
     require_cmd kitty
     require_cmd python
-    resolve_effect_engine
+    resolve_ttfx
     mkdir -p "$RUNTIME_DIR"
 
     exec 9>"$START_LOCK_FILE"
@@ -212,7 +200,7 @@ run_screensaver() {
 
     load_config
     require_cmd python
-    resolve_effect_engine
+    resolve_ttfx
     mkdir -p "$RUNTIME_DIR"
 
     if runner_is_running; then
@@ -264,7 +252,7 @@ run_screensaver() {
 
     printf '\033]11;rgb:00/00/00\007\033[2J\033[H\033[?25l'
     while true; do
-        "$EFFECT_ENGINE_BIN" "${effect_args[@]}" &
+        "$TTFX_BIN" "${effect_args[@]}" &
         effect_pid=$!
         while kill -0 "$effect_pid" 2>/dev/null; do
             if IFS= read -r -s -n 1 -t 0.1; then
@@ -311,9 +299,9 @@ uninstall_integration() {
 show_status() {
     local renderer_version
 
-    if load_config >/dev/null 2>&1 && resolve_effect_engine >/dev/null 2>&1; then
-        renderer_version="$("$EFFECT_ENGINE_BIN" --version 2>/dev/null || echo unknown)"
-        echo "renderer: $renderer_version ($EFFECT_ENGINE_BIN)"
+    if load_config >/dev/null 2>&1 && resolve_ttfx >/dev/null 2>&1; then
+        renderer_version="$("$TTFX_BIN" --version 2>/dev/null || echo unknown)"
+        echo "renderer: $renderer_version ($TTFX_BIN)"
     else
         echo "renderer: unavailable"
     fi
