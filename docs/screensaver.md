@@ -12,6 +12,10 @@ Hyprland-specific monitor focus and window rules.
   effect at 60 FPS.
 - Mutter's session D-Bus idle monitor starts it after five minutes and closes
   it on the next keyboard or pointer event.
+- The launcher resolves both system-installed `tte` and uv's user executable
+  directory, because GNOME shortcuts do not inherit an interactive Zsh `PATH`.
+- A two-second launch grace prevents the initiating shortcut's key release and
+  window mapping from immediately dismissing the new full-screen window.
 - `archpostinstall-screensaver.service` keeps the idle monitor available in the
   GNOME graphical session.
 - `Super+F11` toggles it immediately; `Super+F12` remains the separate DPMS
@@ -63,6 +67,7 @@ The implementation was checked against:
 - [Omarchy Quattro screensaver manual](https://github.com/basecamp/omarchy/blob/quattro/manual/13-toggles-idle-screensaver.md), which documents per-monitor full-screen terminals, random text effects, and editable ASCII branding.
 - [Current Omarchy launcher](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-launch-screensaver) and [runner](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-screensaver), for the full-screen terminal and centered-canvas behavior.
 - [TerminalTextEffects installation and CLI](https://pypi.org/project/terminaltexteffects/), for version 0.15.0 and the random-effect/include-effect options.
+- [uv executable-directory reference](https://docs.astral.sh/uv/reference/storage/), for locating tool entry points under the XDG user executable directory or `~/.local/bin`.
 - [Kitty invocation reference](https://sw.kovidgoyal.net/kitty/invocation.html), for Wayland app IDs, per-launch config overrides, and `--start-as fullscreen`.
 - [GNOME idle monitor API](https://gnome.pages.gitlab.gnome.org/gnome-desktop/html/gnome-desktop3/gnome-desktop3-GnomeIdleMonitor.html), especially the one-shot user-active watch used to dismiss on keyboard or pointer activity.
 - [Omarchy customization discussion #3204](https://github.com/basecamp/omarchy/discussions/3204), confirming that replacing the ASCII input preserves the animations, and [Quattro issue #7762](https://github.com/basecamp/omarchy/issues/7762), which records why relying only on terminal key input misses global mouse movement.

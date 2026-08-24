@@ -12,6 +12,7 @@ RUNTIME_BASE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 RUNTIME_DIR="$RUNTIME_BASE/archpostinstall"
 RUNNER_PID_FILE="$RUNTIME_DIR/screensaver.pid"
 START_LOCK_FILE="$RUNTIME_DIR/screensaver-start.lock"
+TTE_BIN=""
 
 usage() {
     cat <<'EOF'
@@ -33,6 +34,28 @@ require_cmd() {
         echo "Error: required command not found: $1" >&2
         return 1
     fi
+}
+
+resolve_tte() {
+    local candidate
+
+    if command -v tte >/dev/null 2>&1; then
+        TTE_BIN="$(command -v tte)"
+        return 0
+    fi
+
+    for candidate in \
+        "${UV_TOOL_BIN_DIR:+$UV_TOOL_BIN_DIR/tte}" \
+        "${XDG_BIN_HOME:+$XDG_BIN_HOME/tte}" \
+        "${XDG_DATA_HOME:-$HOME/.local/share}/../bin/tte"; do
+        if [ -n "$candidate" ] && [ -x "$candidate" ]; then
+            TTE_BIN="$(readlink -f "$candidate" 2>/dev/null || echo "$candidate")"
+            return 0
+        fi
+    done
+
+    echo "Error: required command not found: tte" >&2
+    return 1
 }
 
 load_config() {
@@ -59,6 +82,10 @@ load_config() {
     fi
     if ! [[ "${SCREENSAVER_FRAME_RATE:-}" =~ ^[1-9][0-9]*$ ]]; then
         echo "Error: SCREENSAVER_FRAME_RATE must be a positive integer." >&2
+        return 1
+    fi
+    if ! [[ "${SCREENSAVER_INPUT_GRACE_SECONDS:-}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+        echo "Error: SCREENSAVER_INPUT_GRACE_SECONDS must be a non-negative number." >&2
         return 1
     fi
     if [ -z "${SCREENSAVER_FONT_FAMILY:-}" ] || [ -z "${SCREENSAVER_SHORTCUT:-}" ]; then
@@ -122,7 +149,7 @@ start_screensaver() {
     require_cmd flock
     require_cmd kitty
     require_cmd python
-    require_cmd tte
+    resolve_tte
     mkdir -p "$RUNTIME_DIR"
 
     exec 9>"$START_LOCK_FILE"
@@ -171,7 +198,7 @@ run_screensaver() {
 
     load_config
     require_cmd python
-    require_cmd tte
+    resolve_tte
     mkdir -p "$RUNTIME_DIR"
 
     if runner_is_running; then
@@ -200,7 +227,10 @@ run_screensaver() {
     trap cleanup EXIT
     trap 'exit 0' INT TERM HUP QUIT
 
-    python "$IDLE_HELPER" wait-active --pid "$$" >/dev/null 2>&1 &
+    (
+        sleep "$SCREENSAVER_INPUT_GRACE_SECONDS"
+        exec python "$IDLE_HELPER" wait-active --pid "$$"
+    ) >/dev/null 2>&1 &
     activity_pid=$!
 
     effect_args=(
@@ -220,7 +250,7 @@ run_screensaver() {
 
     printf '\033]11;rgb:00/00/00\007\033[2J\033[H\033[?25l'
     while true; do
-        tte "${effect_args[@]}" &
+        "$TTE_BIN" "${effect_args[@]}" &
         effect_pid=$!
         while kill -0 "$effect_pid" 2>/dev/null; do
             if IFS= read -r -s -n 1 -t 0.1; then
