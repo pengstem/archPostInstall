@@ -16,6 +16,7 @@ plugins=(
     fzf
     fzf-tab
     sudo
+    extract
 )
 
 if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
