@@ -1,3 +1,9 @@
+gui:
+  sidePanels:
+    - [files, worktrees, submodules]
+    - [branches, remotes, tags]
+    - [commits, reflog]
+    - [stash]
 os:
   # Send copied text through the terminal so Kitty can put it in the local
   # clipboard even when lazygit is running over SSH.
