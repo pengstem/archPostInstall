@@ -19,6 +19,7 @@ This directory is linked to `~/.config/zsh` by `setup.sh`.
 - `40-tool-init.zsh`
 - `50-aliases.zsh`
 - `60-functions.zsh`
+- `85-fortune-cowsay.zsh`
 - `90-shell-options.zsh`
 - `95-local-overrides.zsh`
 - `99-interactive-plugins.zsh`
