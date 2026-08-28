@@ -1,5 +1,5 @@
 # Bun completion.
-if [[ -s "$BUN_INSTALL/_bun" ]]; then
+if [[ -s "$BUN_INSTALL/_bun" ]] && (( ${+functions[compdef]} )); then
     source "$BUN_INSTALL/_bun"
 fi
 
