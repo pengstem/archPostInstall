@@ -1,15 +1,14 @@
 # Startup greeting: a random fortune delivered by a random cowfile.
-# Printed by a one-shot precmd hook instead of at source time so that no
-# console I/O happens during zsh initialization, which keeps Powerlevel10k's
-# instant prompt warning-free. The hook removes itself before printing so the
-# greeting appears exactly once, above the first real prompt.
-_fortune_cowsay_greet() {
+# Printed at source time on purpose: Powerlevel10k's instant prompt captures
+# console output produced during initialization into a buffer and replays it
+# above the first prompt, which is exactly where this greeting belongs. The
+# matching POWERLEVEL9K_INSTANT_PROMPT=quiet in 00-instant-prompt.zsh keeps
+# p10k from flagging this deliberate output with its init-output warning.
+() {
     emulate -L zsh
-    precmd_functions=(${precmd_functions:#_fortune_cowsay_greet})
     (( $+commands[fortune] && $+commands[cowsay] )) || return
     local -a cowfiles
     cowfiles=(/usr/share/cowsay/cows/*.cow(N))
     (( $#cowfiles )) || return
     fortune -s | cowsay -f ${cowfiles[RANDOM % $#cowfiles + 1]:t:r}
 }
-precmd_functions+=(_fortune_cowsay_greet)
