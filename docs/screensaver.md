@@ -67,9 +67,11 @@ archpostinstall screensaver uninstall
 - Edit `configs/archpostinstall/screensaver.txt` to change the centered artwork.
 - Edit `configs/archpostinstall/screensaver.conf` to change the idle delay,
   font, frame rate, shortcut, or random-effect allowlist.
-- The bundled composition keeps the original six-line NASTEM wordmark centered
-  between cowsay's stock `default` cow and `sheep` figures. It is 103 columns
-  wide and fits the 110x30 Kitty grid on the 2560x1600 built-in display.
+- The bundled 107x28 composition keeps the original six-line NASTEM wordmark
+  at its geometric center, with ten unevenly scattered stock cowsay figures:
+  `tux`, `kitty`, `bunny`, `koala`, `default`, `moose`, `elephant`,
+  `hellokitty`, `sheep`, and `small`. It fits the 110x30 Kitty grid on the
+  2560x1600 built-in display.
 - Keep artwork characters single-column. ASCII, block, and box-drawing
   characters work; emoji and many CJK characters do not align correctly in the
   inherited canvas model.
@@ -97,7 +99,7 @@ visible animation ends at the configured 60 FPS.
 
 ## Validation Basis
 
-The launcher and benchmark were validated on 2026-08-24. The cowsay-flanked
+The launcher and benchmark were validated on 2026-08-24. The scattered cowsay
 artwork was validated on 2026-09-04 with GNOME Shell 50.4, Kitty 0.48.2, and
 `ttfx` 0.3.2 on a 2560x1600 Wayland output at 1.333x scaling (110x30 terminal
 cells) and a 3840x2160 output at 1.5x scaling (147x36 terminal cells).
