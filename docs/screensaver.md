@@ -67,9 +67,12 @@ archpostinstall screensaver uninstall
 - Edit `configs/archpostinstall/screensaver.txt` to change the centered artwork.
 - Edit `configs/archpostinstall/screensaver.conf` to change the idle delay,
   font, frame rate, shortcut, or random-effect allowlist.
-- Keep artwork characters single-column. Block and box-drawing characters work;
-  emoji and many CJK characters do not align correctly in the inherited canvas
-  model.
+- The bundled deep-space console is 104 columns by 25 lines. At the configured
+  22 pt font it fits the 110x30 Kitty grid measured on the 2560x1600 built-in
+  display at 1.333x scaling, while retaining a small animation margin.
+- Keep artwork strictly ASCII/single-column. `ttfx` intentionally treats one
+  code point as one terminal cell, so emoji, CJK, and other wide characters can
+  misalign or clip even when their string length appears to fit.
 
 ## Local Performance Comparison
 
@@ -94,15 +97,17 @@ visible animation ends at the configured 60 FPS.
 
 ## Validation Basis
 
-Validated on 2026-08-24 with GNOME Shell 50.4, Kitty 0.48.2, Rust 1.97.0,
-`ttfx` 0.3.2, TerminalTextEffects 0.15.0 as the benchmark baseline, and one
-3840x2400 Wayland output.
+The launcher and benchmark were validated on 2026-08-24. The expanded artwork
+was validated on 2026-09-04 with GNOME Shell 50.4, Kitty 0.48.2, and `ttfx`
+0.3.2 on a 2560x1600 Wayland output at 1.333x scaling (110x30 terminal cells)
+and a 3840x2160 output at 1.5x scaling (147x36 terminal cells).
 
 The implementation was checked against:
 
 - [Omarchy Quattro screensaver manual](https://github.com/basecamp/omarchy/blob/quattro/manual/13-toggles-idle-screensaver.md), which documents per-monitor full-screen terminals, random text effects, and editable ASCII branding.
 - [Current Omarchy launcher](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-launch-screensaver) and [runner](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-screensaver), for the full-screen terminal and centered-canvas behavior.
 - [ttfx source and benchmark notes](https://github.com/omacom-io/ttfx), for the parity-tested Rust port, compatible CLI, release build, and upstream performance methodology.
+- [ttfx's implementation plan](https://github.com/omacom/ttfx/blob/master/plan.md), which documents the one-code-point-per-cell compatibility model, and [Omarchy issue #9027](https://github.com/omacom/omarchy/issues/9027), which demonstrates real artwork clipping when display scaling leaves fewer terminal columns than the asset expects.
 - [TerminalTextEffects installation and CLI](https://pypi.org/project/terminaltexteffects/), for the original 0.15.0 behavior used as the comparison baseline.
 - [Kitty invocation reference](https://sw.kovidgoyal.net/kitty/invocation.html), for Wayland app IDs, per-launch config overrides, and `--start-as fullscreen`.
 - [GNOME idle monitor API](https://gnome.pages.gitlab.gnome.org/gnome-desktop/html/gnome-desktop3/gnome-desktop3-GnomeIdleMonitor.html), especially the one-shot user-active watch used to dismiss on keyboard or pointer activity.
