@@ -67,12 +67,12 @@ archpostinstall screensaver uninstall
 - Edit `configs/archpostinstall/screensaver.txt` to change the centered artwork.
 - Edit `configs/archpostinstall/screensaver.conf` to change the idle delay,
   font, frame rate, shortcut, or random-effect allowlist.
-- The bundled deep-space console is 104 columns by 25 lines. At the configured
-  22 pt font it fits the 110x30 Kitty grid measured on the 2560x1600 built-in
-  display at 1.333x scaling, while retaining a small animation margin.
-- Keep artwork strictly ASCII/single-column. `ttfx` intentionally treats one
-  code point as one terminal cell, so emoji, CJK, and other wide characters can
-  misalign or clip even when their string length appears to fit.
+- The bundled composition keeps the original six-line NASTEM wordmark centered
+  between cowsay's stock `default` cow and `sheep` figures. It is 103 columns
+  wide and fits the 110x30 Kitty grid on the 2560x1600 built-in display.
+- Keep artwork characters single-column. ASCII, block, and box-drawing
+  characters work; emoji and many CJK characters do not align correctly in the
+  inherited canvas model.
 
 ## Local Performance Comparison
 
@@ -97,10 +97,10 @@ visible animation ends at the configured 60 FPS.
 
 ## Validation Basis
 
-The launcher and benchmark were validated on 2026-08-24. The expanded artwork
-was validated on 2026-09-04 with GNOME Shell 50.4, Kitty 0.48.2, and `ttfx`
-0.3.2 on a 2560x1600 Wayland output at 1.333x scaling (110x30 terminal cells)
-and a 3840x2160 output at 1.5x scaling (147x36 terminal cells).
+The launcher and benchmark were validated on 2026-08-24. The cowsay-flanked
+artwork was validated on 2026-09-04 with GNOME Shell 50.4, Kitty 0.48.2, and
+`ttfx` 0.3.2 on a 2560x1600 Wayland output at 1.333x scaling (110x30 terminal
+cells) and a 3840x2160 output at 1.5x scaling (147x36 terminal cells).
 
 The implementation was checked against:
 
@@ -108,6 +108,7 @@ The implementation was checked against:
 - [Current Omarchy launcher](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-launch-screensaver) and [runner](https://github.com/basecamp/omarchy/blob/quattro/bin/omarchy-screensaver), for the full-screen terminal and centered-canvas behavior.
 - [ttfx source and benchmark notes](https://github.com/omacom-io/ttfx), for the parity-tested Rust port, compatible CLI, release build, and upstream performance methodology.
 - [ttfx's implementation plan](https://github.com/omacom/ttfx/blob/master/plan.md), which documents the one-code-point-per-cell compatibility model, and [Omarchy issue #9027](https://github.com/omacom/omarchy/issues/9027), which demonstrates real artwork clipping when display scaling leaves fewer terminal columns than the asset expects.
+- [The maintained cowsay repository](https://github.com/cowsay-org/cowsay) and [Arch Linux's cowsay 3.8.4-1 package](https://archlinux.org/packages/extra/any/cowsay/), for the stock cowfile figures used by this artwork.
 - [TerminalTextEffects installation and CLI](https://pypi.org/project/terminaltexteffects/), for the original 0.15.0 behavior used as the comparison baseline.
 - [Kitty invocation reference](https://sw.kovidgoyal.net/kitty/invocation.html), for Wayland app IDs, per-launch config overrides, and `--start-as fullscreen`.
 - [GNOME idle monitor API](https://gnome.pages.gitlab.gnome.org/gnome-desktop/html/gnome-desktop3/gnome-desktop3-GnomeIdleMonitor.html), especially the one-shot user-active watch used to dismiss on keyboard or pointer activity.
