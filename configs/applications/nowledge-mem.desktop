@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Nowledge Mem
-Exec=/home/nastem/.local/bin/nowledge-mem-desktop
-TryExec=/home/nastem/.local/bin/nowledge-mem-desktop
-Type=Application
-Terminal=false
-Categories=Utility;
-Comment=Open the Nowledge memory app
-Keywords=knowledge;memory;nowledge;ai;
