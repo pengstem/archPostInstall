@@ -9,3 +9,8 @@
 [submodule "configs/tmux/plugins/tmux-yank"]
 	path = configs/tmux/plugins/tmux-yank
 	url = https://github.com/tmux-plugins/tmux-yank
+
+[submodule "vendor/rime-frost"]
+	path = vendor/rime-frost
+	url = https://github.com/gaboolic/rime-frost.git
+	branch = master

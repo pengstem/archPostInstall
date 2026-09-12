@@ -1,0 +1,75 @@
+# Personal settings preserved during the 2026-09-12 submodule migration.
+# Edit this patch, not the linked upstream YAML.
+patch:
+  schema/name: 小鹤双拼
+  schema/author:
+  - Dvel
+  schema/description: '雾凇拼音 - 小鹤双拼
+
+    https://github.com/iDvel/rime-ice
+
+    '
+  schema/dependencies:
+  - melt_eng
+  - radical_pinyin
+  switches:
+  - name: ascii_mode
+    states:
+    - 中
+    - Ａ
+  - name: ascii_punct
+    states:
+    - ¥
+    - $
+  - name: traditionalization
+    states:
+    - 简
+    - 繁
+  - name: emoji
+    states:
+    - 💀
+    - 😄
+    reset: 1
+  - name: full_shape
+    states:
+    - 半角
+    - 全角
+  engine/translators:
+  - punct_translator
+  - script_translator
+  - lua_translator@*date_translator
+  - lua_translator@*lunar
+  - table_translator@custom_phrase
+  - table_translator@melt_eng
+  - table_translator@cn_en
+  - table_translator@radical_lookup
+  - lua_translator@*unicode
+  - lua_translator@*number_translator
+  - lua_translator@*calculator
+  - lua_translator@*force_gc
+  engine/filters:
+  - lua_filter@*is_in_user_dict
+  - lua_filter@*corrector
+  - reverse_lookup_filter@radical_reverse_lookup
+  - lua_filter@*autocap_filter
+  - lua_filter@*pin_cand_filter
+  - lua_filter@*reduce_english_filter
+  - simplifier@emoji
+  - simplifier@traditionalize
+  - lua_filter@*aux_code
+  - uniquifier
+  pin_cand_filter:
+  - "d\t的"
+  translator/max_homographs: null
+  translator/max_homophones: null
+  translator/max_sentences: null
+  translator/grammar_penalty: null
+  custom_phrase/user_dict: custom_phrase_double
+  key_binder/aux_code_trigger: '`'
+  key_binder/bindings: null
+  chaifen_all: null
+  chaifen: null
+  frost_aux: null
+  chinese_english: null
+  grammar: null
+  mars: null

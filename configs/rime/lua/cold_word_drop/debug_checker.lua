@@ -1,0 +1,1 @@
+../../../../vendor/rime-frost/lua/cold_word_drop/debug_checker.lua

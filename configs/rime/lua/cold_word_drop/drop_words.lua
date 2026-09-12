@@ -1,0 +1,1 @@
+../../../../vendor/rime-frost/lua/cold_word_drop/drop_words.lua

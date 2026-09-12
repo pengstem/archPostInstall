@@ -3,12 +3,14 @@
 A personal Arch Linux post-install and dotfiles repo. It automates package installs, symlinks configs into place, and captures GNOME theme/extension state for easy rebuilds.
 
 ## Quick Start
+- Initialize Rime upstream after cloning: `git submodule update --init -- vendor/rime-frost` (also handled by `setup.sh`).
 - Full setup: `./bootstrap.sh`
 - Symlink configs only: `./setup.sh`
 - Unified CLI: `./scripts/archpostinstall.sh --help` (or `archpostinstall --help` after linking)
 
 ## Repository Layout
 - `configs/` tracked configs for shells, editors, terminals, DE/IMEs, and tools.
+- `vendor/rime-frost/` upstream Rime submodule; see [Rime maintenance](configs/rime/README.md) for manual updates.
 - `scripts/` grouped by purpose: `install/`, `backup/`, `gnome/`.
 - `docs/` reference notes and mappings (`docs/README.md` is the entry point).
 - `backups/` archive output (ignored in Git).

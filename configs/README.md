@@ -15,7 +15,7 @@ This directory contains tracked configs that are symlinked into place by `setup.
 - `nvim/`, `zed/` editor configs
 - `obs-studio/` OBS Studio profiles and scene collections
 - `plymouth/`, `mkinitcpio/`, `kernel/` Zen UKI and Connect boot splash configuration
-- `rime/` schema and dictionaries (live `user.yaml` is ignored)
+- `rime/` personal patches and links into `vendor/rime-frost/`; see [maintenance instructions](rime/README.md) (live user databases and `user.yaml` are ignored)
 - `tmux/` tmux config and helper scripts
 - `zellij/` zellij config and layouts
 - `zsh/` modular Zsh snippets loaded by `zshrc`

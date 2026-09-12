@@ -1,0 +1,20 @@
+# Personal settings preserved during the 2026-09-12 submodule migration.
+# Edit this patch, not the linked upstream YAML.
+patch:
+  config_version: '2024-07-12'
+  schema_list:
+  - schema: rime_frost
+  - schema: rime_frost_double_pinyin
+  - schema: rime_frost_double_pinyin_mspy
+  - schema: rime_frost_double_pinyin_sogou
+  - schema: rime_frost_double_pinyin_flypy
+  switcher/hotkeys:
+  - F4
+  - Control+grave
+  - Control+Shift+grave
+  switcher/save_options:
+  - ascii_punct
+  - traditionalization
+  - emoji
+  - full_shape
+  menu/page_size: 8

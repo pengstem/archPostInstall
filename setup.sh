@@ -15,6 +15,11 @@ fi
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIGS_DIR="$REPO_DIR/configs"
 
+# Initialize the recorded Rime upstream revision; upgrades remain manual.
+if [ ! -f "$REPO_DIR/vendor/rime-frost/default.yaml" ]; then
+    git -C "$REPO_DIR" submodule update --init -- vendor/rime-frost
+fi
+
 echo "==========================================================="
 echo "   🔗 Setting up Symbolic Links"
 echo "==========================================================="
