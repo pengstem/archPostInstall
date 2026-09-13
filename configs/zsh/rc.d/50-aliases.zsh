@@ -1,8 +1,8 @@
 # Modern replacements for standard commands (using eza).
-alias ls='eza --icons --hyperlink'
-alias ll='eza -l --icons --git --hyperlink'
-alias la='eza -la --icons --git --hyperlink'
-alias lt='eza --tree --level=2 --icons --hyperlink'
+alias ls='eza --icons=auto --hyperlink=auto'
+alias ll='eza -l --icons=auto --git --hyperlink=auto'
+alias la='eza -la --icons=auto --git --hyperlink=auto'
+alias lt='eza --tree --level=2 --icons=auto --hyperlink=auto'
 
 # System utilities.
 alias st='systemctl-tui'
