@@ -60,7 +60,7 @@ sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 # 0. Package manager configuration must precede package installation:
-# pkglist.txt depends on repositories that only the tracked pacman.conf enables.
+# scripts/pkglist/ depends on repositories that only the tracked pacman.conf enables.
 log_header "🧰 [0/3] Configuring pacman"
 "$REPO_DIR/setup.sh" --group pacman
 sudo pacman -Syu --noconfirm  # refresh newly enabled repos without a partial upgrade

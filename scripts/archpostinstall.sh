@@ -12,7 +12,7 @@ Usage: archpostinstall <command> [args]
 
 Commands:
   bootstrap               Run full post-install flow
-  install-packages        Install packages from scripts/pkglist.txt
+  install-packages        Install packages from scripts/pkglist/
   install-maplemono-cn    Install Maple Mono NF CN from a temporary Arch Linux CN repo
   install-shell           Install Oh My Zsh, plugins, and powerlevel10k
   link-configs [opts]     Install every manifest.tsv entry (see setup.sh --help)
@@ -28,7 +28,7 @@ Commands:
   restore-themes <files>  Restore themes/icons/extensions from archives
   backup-firefox          Archive ~/.mozilla
   restore-firefox <file>  Restore ~/.mozilla from an archive
-  update-pkglist          Refresh scripts/pkglist.txt from pacman
+  update-pkglist          Refresh scripts/pkglist/ from pacman
 EOF
 }
 

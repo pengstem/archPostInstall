@@ -6,6 +6,6 @@ Type = Package
 Target = *
 
 [Action]
-Description = Update archPostInstall pkglist.txt
+Description = Update archPostInstall package lists
 When = PostTransaction
 Exec = /usr/local/bin/archpostinstall-update-pkglist

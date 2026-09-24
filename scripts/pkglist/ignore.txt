@@ -1,0 +1,9 @@
+# Explicit packages that update_pkglist.sh never records.
+# AUR helpers are bootstrapped by install_packages.sh.
+paru
+paru-debug
+yay
+yay-debug
+# Installed from a temporary archlinuxcn repo by install_maplemono_cn_font.sh.
+archlinuxcn-keyring
+ttf-maplemono-nf-cn-unhinted

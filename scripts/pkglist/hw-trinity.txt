@@ -1,0 +1,7 @@
+# Hardware-specific packages for host "trinity" (AMD CPU, NVIDIA GPU).
+# Maintained by hand: install_packages.sh only installs hw-$(uname -n).txt,
+# and update_pkglist.sh keeps every package listed in any hw-*.txt out of
+# native.txt/aur.txt.
+amd-ucode
+libva-nvidia-driver
+nvidia-open-dkms
