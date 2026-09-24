@@ -2,7 +2,8 @@
 
 # Check and update pinned third-party code:
 #   rime  the rime-frost dictionaries and schemas (vendor/rime-frost submodule)
-#   mpv   the uosc and thumbfast scripts vendored under configs/mpv
+#   mpv   uosc (release snapshot in vendor/uosc) and thumbfast (vendor/thumbfast
+#         submodule), both linked into configs/mpv
 #
 # Usage: update_vendor.sh [--check] [rime|mpv]...   (default: both)
 #
@@ -19,8 +20,9 @@ RIME_CONF="$REPO_DIR/configs/rime"
 RIME_STAMP="$RIME_CONF/build/rime_frost.table.bin"
 
 MPV_DIR="$REPO_DIR/configs/mpv"
+UOSC_DIR="$REPO_DIR/vendor/uosc"
 UOSC_REPO="tomasklaen/uosc"
-THUMBFAST_URL="https://raw.githubusercontent.com/po5/thumbfast/master/thumbfast.lua"
+THUMBFAST_SUB="$REPO_DIR/vendor/thumbfast"
 
 CHECK=0
 TARGETS=()
@@ -30,7 +32,8 @@ usage() {
 Usage: update_vendor.sh [--check] [rime|mpv]...
 
   rime      Fast-forward vendor/rime-frost to upstream master and redeploy Rime
-  mpv       Update uosc to its latest release (merging uosc.conf) and thumbfast
+  mpv       Update uosc to its latest release (merging uosc.conf) and
+            fast-forward the thumbfast submodule
   --check   Only report what is outdated; change nothing
 EOF
 }
@@ -82,8 +85,8 @@ warn() {
 # (symlinks into the submodule have mode 120000 and are skipped; README.md
 # documents this repository and is not a copy of upstream's).
 rime_overrides() {
-    git -C "$REPO_DIR" ls-files -s -- configs/rime \
-        | awk '$1 != "120000" { sub(/^configs\/rime\//, "", $4); if ($4 != "README.md") print $4 }'
+    git -C "$REPO_DIR" ls-files -s -- configs/rime |
+        awk '$1 != "120000" { sub(/^configs\/rime\//, "", $4); if ($4 != "README.md") print $4 }'
 }
 
 report_rime_changes() {
@@ -220,9 +223,9 @@ update_uosc() {
     local old_dir
     local new_dir
 
-    current="$(sed -n "s/^local uosc_version = '\(.*\)'/\1/p" "$MPV_DIR/scripts/uosc/main.lua")"
-    latest="$(git ls-remote --tags --refs "https://github.com/$UOSC_REPO.git" \
-        | awk -F/ '{print $3}' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)"
+    current="$(sed -n "s/^local uosc_version = '\(.*\)'/\1/p" "$UOSC_DIR/scripts/uosc/main.lua")"
+    latest="$(git ls-remote --tags --refs "https://github.com/$UOSC_REPO.git" |
+        awk -F/ '{print $3}' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)"
     if [[ "$current" == "$latest" ]]; then
         note "✅ uosc is up to date ($current)."
         return 1
@@ -235,12 +238,11 @@ update_uosc() {
     old_dir="$(uosc_release_dir "$current")"
     new_dir="$(uosc_release_dir "$latest")"
 
-    # Refuse to overwrite local edits to the vendored scripts.
-    if diff -rq -x ziggy-darwin -x ziggy-windows.exe \
-        "$old_dir/scripts/uosc" "$MPV_DIR/scripts/uosc" >/dev/null; then
-        :
-    else
-        warn "configs/mpv/scripts/uosc differs from the $current release; update it by hand."
+    # Refuse to overwrite local edits to the vendored release.
+    if ! diff -rq -x ziggy-darwin -x ziggy-windows.exe \
+        "$old_dir/scripts/uosc" "$UOSC_DIR/scripts/uosc" >/dev/null ||
+        ! diff -rq "$old_dir/fonts" "$UOSC_DIR/fonts" >/dev/null; then
+        warn "vendor/uosc differs from the $current release; update it by hand."
         return 1
     fi
 
@@ -252,23 +254,32 @@ update_uosc() {
     fi
 
     rsync -a --delete --exclude ziggy-darwin --exclude ziggy-windows.exe \
-        "$new_dir/scripts/uosc/" "$MPV_DIR/scripts/uosc/"
-    cp -- "$new_dir"/fonts/* "$MPV_DIR/fonts/"
+        "$new_dir/scripts/uosc/" "$UOSC_DIR/scripts/uosc/"
+    rsync -a --delete "$new_dir/fonts/" "$UOSC_DIR/fonts/"
     cp -- "$TMP_DIR/uosc.conf" "$MPV_DIR/script-opts/uosc.conf"
     note "✅ uosc updated to $latest (uosc.conf merged)."
 }
 
 update_thumbfast() {
-    curl -fsSL -o "$TMP_DIR/thumbfast.lua" "$THUMBFAST_URL"
-    if cmp -s "$TMP_DIR/thumbfast.lua" "$MPV_DIR/scripts/thumbfast.lua"; then
-        note "✅ thumbfast is up to date."
+    local old
+    local new
+
+    if ! [ -e "$THUMBFAST_SUB/.git" ]; then
+        git -C "$REPO_DIR" submodule update --init -- vendor/thumbfast
+    fi
+    git -C "$THUMBFAST_SUB" fetch -q origin HEAD
+    old="$(git -C "$THUMBFAST_SUB" rev-parse HEAD)"
+    new="$(git -C "$THUMBFAST_SUB" rev-parse FETCH_HEAD)"
+    if [[ "$old" == "$new" ]]; then
+        note "✅ thumbfast is up to date (${old:0:7})."
         return 1
     fi
-    note "thumbfast differs from upstream master."
+    note "thumbfast ${old:0:7} -> ${new:0:7}:"
+    git -C "$THUMBFAST_SUB" log -n 10 --format='    %ad %s' --date=short "$old..$new"
     if ((CHECK)); then
         return 1
     fi
-    cp -- "$TMP_DIR/thumbfast.lua" "$MPV_DIR/scripts/thumbfast.lua"
+    git -C "$THUMBFAST_SUB" checkout -q --detach "$new"
     note "✅ thumbfast updated."
 }
 
@@ -286,6 +297,7 @@ EOF
         --msg-level=all=warn 'av://lavfi:testsrc=duration=3' --length=3 2>&1 || true)"
     if grep -qiE 'error|traceback' <<<"$output"; then
         warn "mpv reported errors while loading the scripts:"
+        # shellcheck disable=SC2001 # indenting every line, not a single substitution
         sed 's/^/      /' <<<"$output"
     elif grep -q 'uosc-version' <<<"$output"; then
         note "✅ mpv loads the scripts ($(grep -o 'uosc-version .*' <<<"$output"))."
@@ -302,7 +314,7 @@ update_mpv() {
     update_thumbfast && changed=1
     if ((changed)); then
         verify_mpv
-        git -C "$REPO_DIR" add configs/mpv
+        git -C "$REPO_DIR" add vendor/uosc vendor/thumbfast configs/mpv/script-opts/uosc.conf
         note "Staged; commit with: git commit -m 'chore(mpv): update uosc and thumbfast'"
     fi
 }

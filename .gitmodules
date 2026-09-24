@@ -2,3 +2,6 @@
 	path = vendor/rime-frost
 	url = https://github.com/gaboolic/rime-frost.git
 	branch = master
+[submodule "vendor/thumbfast"]
+	path = vendor/thumbfast
+	url = https://github.com/po5/thumbfast.git

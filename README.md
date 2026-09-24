@@ -11,7 +11,7 @@ A personal Arch Linux post-install and dotfiles repo. It automates package insta
 
 ## Repository Layout
 - `configs/` tracked configs for shells, editors, terminals, DE/IMEs, and tools.
-- `vendor/rime-frost/` upstream Rime submodule; see [Rime maintenance](configs/rime/README.md) for manual updates.
+- `vendor/` pinned third-party code (rime-frost, thumbfast, uosc); see [vendor/README.md](vendor/README.md). Update with `archpostinstall update-vendor`.
 - `manifest.tsv` every source-to-target mapping; user configs are symlinked, root-read files are copied.
 - `scripts/` grouped by purpose: `install/`, `backup/`, `gnome/`; package lists in `scripts/pkglist/`.
 - `docs/` reference notes and mappings (`docs/README.md` is the entry point).

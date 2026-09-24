@@ -353,12 +353,14 @@ process_group() {
 for group in "${ALL_GROUPS[@]}"; do
     [[ " ${SELECTED_GROUPS[*]} " == *" $group "* ]] || continue
 
-    # Initialize the recorded Rime upstream revision; upgrades remain manual.
-    if [[ "$group" == user && "$ACTION" != prune && "$ACTION" != adopt ]] && ! [ -f "$REPO_DIR/vendor/rime-frost/default.yaml" ]; then
+    # Check out the recorded vendor/ submodule revisions (rime-frost,
+    # thumbfast); upgrades go through `archpostinstall update-vendor`.
+    if [[ "$group" == user && "$ACTION" != prune && "$ACTION" != adopt ]] &&
+        git -C "$REPO_DIR" submodule status | grep -q '^-'; then
         if [[ "$ACTION" == check ]]; then
-            issue "Rime Upstream" "vendor/rime-frost submodule is not initialized"
+            issue "Vendor" "submodules are not initialized (git submodule update --init)"
         else
-            run git -C "$REPO_DIR" submodule update --init -- vendor/rime-frost
+            run git -C "$REPO_DIR" submodule update --init
         fi
     fi
 
