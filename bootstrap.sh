@@ -39,6 +39,7 @@ log_info() {
 log_header "🚀 Starting Arch Linux Post-Install Setup"
 
 echo "This script will configure your system:"
+echo " 0. Install pacman/paru configuration (repositories such as multilib)"
 echo " 1. Install system packages and the Rust screensaver engine"
 echo " 2. Setup Shell environment"
 echo " 3. Symlink configuration files"
@@ -57,6 +58,12 @@ log_info "Requesting sudo privileges..."
 sudo -v
 # Keep sudo alive
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# 0. Package manager configuration must precede package installation:
+# pkglist.txt depends on repositories that only the tracked pacman.conf enables.
+log_header "🧰 [0/3] Configuring pacman"
+"$REPO_DIR/setup.sh" --group pacman
+sudo pacman -Syu --noconfirm  # refresh newly enabled repos without a partial upgrade
 
 # 1. Packages
 log_header "📦 [1/3] Installing System Packages"
