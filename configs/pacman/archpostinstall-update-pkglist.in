@@ -1,0 +1,7 @@
+#!/bin/sh
+# Installed by setup.sh from configs/pacman/archpostinstall-update-pkglist.in.
+# The pacman hook runs this as root; drop to the repository owner before
+# touching anything in the user-writable checkout.
+script='@REPO_DIR@/scripts/update_pkglist.sh'
+[ -x "$script" ] || exit 0
+exec runuser -u '@USER@' -- "$script"

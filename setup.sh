@@ -3,227 +3,323 @@
 # =============================================================================
 # Arch Post-Install: Dotfiles Setup Script
 # =============================================================================
+#
+# Installs every entry of manifest.tsv. See that file for the format.
 
 set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+MANIFEST="$REPO_DIR/manifest.tsv"
+ALL_GROUPS=(pacman system user)
+USER_NAME="$(id -un)"
+
+DRY_RUN=0
+CHECK=0
+SELECTED_GROUPS=()
+ISSUES=0
+RENDER_DIR=""
+
+usage() {
+    cat <<'EOF'
+Usage: setup.sh [--group pacman|system|user]... [--dry-run] [--check]
+
+  --group G   Only install group G (repeatable; default: all, in manifest order)
+  --dry-run   Print what would change without touching anything
+  --check     Report missing sources, drifted targets, and leftover backups;
+              exits 1 when something needs attention (never uses sudo)
+EOF
+}
+
+while (($#)); do
+    case "$1" in
+        --group)
+            SELECTED_GROUPS+=("${2:?--group needs a value}")
+            shift 2
+            ;;
+        -n | --dry-run)
+            DRY_RUN=1
+            shift
+            ;;
+        --check)
+            CHECK=1
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
 
 if [[ "${EUID}" -eq 0 ]]; then
     echo "Please run this script as a regular user with sudo privileges."
     exit 1
 fi
 
-# Define directories
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIGS_DIR="$REPO_DIR/configs"
-
-# Initialize the recorded Rime upstream revision; upgrades remain manual.
-if [ ! -f "$REPO_DIR/vendor/rime-frost/default.yaml" ]; then
-    git -C "$REPO_DIR" submodule update --init -- vendor/rime-frost
+if ((${#SELECTED_GROUPS[@]} == 0)); then
+    SELECTED_GROUPS=("${ALL_GROUPS[@]}")
 fi
-
-echo "==========================================================="
-echo "   🔗 Setting up Symbolic Links"
-echo "==========================================================="
-
-# Function to create symlink
-create_link() {
-    local src="$1"
-    local dest="$2"
-    local name="$3"
-
-    printf "  %-15s " "[$name]"
-
-    # Check source
-    if [ ! -e "$src" ]; then
-        echo "❌ Source not found: $src"
-        return
+for group in "${SELECTED_GROUPS[@]}"; do
+    if [[ " ${ALL_GROUPS[*]} " != *" $group "* ]]; then
+        echo "Unknown group: $group (expected one of: ${ALL_GROUPS[*]})" >&2
+        exit 1
     fi
+done
 
-    # Check existing destination
-    if [ -e "$dest" ] || [ -L "$dest" ]; then
-        # Check if already correctly linked
-        if [ -L "$dest" ]; then
-            local resolved_dest
-            resolved_dest="$(readlink -f "$dest" 2>/dev/null || true)"
-            if [ "$resolved_dest" == "$src" ]; then
-                echo "✅ Already linked"
-                return
-            fi
-        fi
+RENDER_DIR="$(mktemp -d)"
+trap 'rm -rf "$RENDER_DIR"' EXIT
 
-        # Backup
-        echo -n "🔄 Backing up... "
-        mv "$dest" "$dest.bak_$(date +%s)"
-    fi
+# --- Helpers ---
 
-    # Ensure parent dir
-    mkdir -p "$(dirname "$dest")"
-
-    # Link
-    ln -s "$src" "$dest"
-    echo "✅ Linked"
+status() {
+    printf '  %-24s %s\n' "[$1]" "$2"
 }
 
-# Function to create symlink with sudo (for /etc files)
-create_sudo_link() {
-    local src="$1"
-    local dest="$2"
-    local name="$3"
-
-    printf "  %-15s " "[$name]"
-
-    # Check source
-    if [ ! -e "$src" ]; then
-        echo "❌ Source not found: $src"
-        return
-    fi
-
-    # Check existing destination
-    if sudo test -e "$dest" || sudo test -L "$dest"; then
-        # Check if already correctly linked
-        if sudo test -L "$dest"; then
-            local resolved_dest
-            resolved_dest="$(sudo readlink -f "$dest" 2>/dev/null || true)"
-            if [ "$resolved_dest" == "$src" ]; then
-                echo "✅ Already linked"
-                return
-            fi
-        fi
-
-        # Backup
-        echo -n "🔄 Backing up... "
-        sudo mv "$dest" "$dest.bak_$(date +%s)"
-    fi
-
-    # Ensure parent dir
-    sudo mkdir -p "$(dirname "$dest")"
-
-    # Link
-    sudo ln -s "$src" "$dest"
-    echo "✅ Linked (sudo)"
+issue() {
+    ISSUES=$((ISSUES + 1))
+    status "$1" "⚠️  $2"
 }
 
-# Plymouth resolves its theme directory while mkinitcpio builds the image.
-# Keep these files at their canonical system paths instead of symlinking them,
-# otherwise mkinitcpio archives the repository path inside the initramfs.
-install_sudo_copy() {
-    local src="$1"
-    local dest="$2"
-    local name="$3"
-
-    printf "  %-15s " "[$name]"
-
-    if [ ! -e "$src" ]; then
-        echo "❌ Source not found: $src"
-        return
-    fi
-
-    if sudo test -e "$dest" || sudo test -L "$dest"; then
-        if [ -d "$src" ] && sudo test -d "$dest" && ! sudo test -L "$dest" \
-            && sudo diff -qr -- "$src" "$dest" >/dev/null; then
-            echo "✅ Already copied"
-            return
-        fi
-        if [ -f "$src" ] && sudo test -f "$dest" && ! sudo test -L "$dest" \
-            && sudo cmp -s -- "$src" "$dest"; then
-            echo "✅ Already copied"
-            return
-        fi
-
-        echo -n "🔄 Backing up... "
-        sudo mv "$dest" "$dest.bak_$(date +%s)"
-    fi
-
-    sudo mkdir -p "$(dirname "$dest")"
-    if [ -d "$src" ]; then
-        sudo cp -a --reflink=auto --no-preserve=ownership -- "$src" "$dest"
+# Run a mutating command, or only describe it under --dry-run.
+run() {
+    if ((DRY_RUN)); then
+        printf '      would run: %s\n' "$*"
     else
-        sudo install -m 0644 -- "$src" "$dest"
+        "$@"
     fi
-    echo "✅ Copied (sudo)"
 }
 
-# --- Link Configurations ---
+is_repo_link() {
+    [ -L "$1" ] && [[ "$(readlink -f "$1" 2>/dev/null)" == "$REPO_DIR"/* ]]
+}
 
-# System Configs (Requires Sudo)
-create_sudo_link "$CONFIGS_DIR/pacman/pacman.conf" "/etc/pacman.conf" "Pacman"
-create_sudo_link "$CONFIGS_DIR/paru/paru.conf"     "/etc/paru.conf"   "Paru"
-create_sudo_link "$CONFIGS_DIR/pacman/hooks/99-update-pkglist.hook" "/etc/pacman.d/hooks/99-update-pkglist.hook" "Pkglist Hook"
-create_sudo_link "$REPO_DIR/scripts/update_pkglist.sh" "/usr/local/bin/archpostinstall-update-pkglist" "Pkglist Sync"
-create_sudo_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "/usr/local/bin/dpms-toggle" "DPMS Toggle (System)"
-create_sudo_link "$CONFIGS_DIR/tlp/99-archpostinstall.conf" "/etc/tlp.d/99-archpostinstall.conf" "TLP"
-install_sudo_copy "$CONFIGS_DIR/plymouth/themes/connect" "/usr/share/plymouth/themes/connect" "Plymouth Theme"
-install_sudo_copy "$CONFIGS_DIR/plymouth/plymouthd.conf" "/etc/plymouth/plymouthd.conf" "Plymouth Config"
-create_sudo_link "$CONFIGS_DIR/mkinitcpio/90-archpostinstall-nvidia-plymouth.conf" "/etc/mkinitcpio.conf.d/90-archpostinstall-nvidia-plymouth.conf" "Mkinitcpio Boot"
-create_sudo_link "$CONFIGS_DIR/kernel/cmdline.d/90-archpostinstall-splash.conf" "/etc/cmdline.d/90-archpostinstall-splash.conf" "Kernel Splash"
-create_sudo_link "$CONFIGS_DIR/mkinitcpio/linux-zen.preset" "/etc/mkinitcpio.d/linux-zen.preset" "Zen UKI Preset"
+# Clear the destination before installing. Links back into this repository
+# are simply removed (their content is tracked); anything else is backed up.
+make_room() {
+    local dest="$1"
+    shift
 
-# Shell
-create_link "$CONFIGS_DIR/zshrc"            "$HOME/.zshrc"                  "Zshrc"
-create_link "$CONFIGS_DIR/zsh"              "$HOME/.config/zsh"             "Zsh Modules"
-create_link "$CONFIGS_DIR/p10k.zsh"         "$HOME/.p10k.zsh"               "P10k Config"
-create_link "$CONFIGS_DIR/gitconfig"        "$HOME/.gitconfig"              "Gitconfig"
+    if ! [ -e "$dest" ] && ! [ -L "$dest" ]; then
+        return
+    fi
+    if is_repo_link "$dest"; then
+        run "$@" rm -f -- "$dest"
+    else
+        run "$@" mv -- "$dest" "$dest.bak_$(date +%s)"
+    fi
+}
 
-# Terminals
-create_link "$CONFIGS_DIR/kitty"           "$HOME/.config/kitty"           "Kitty"
-create_link "$CONFIGS_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" "Alacritty"
-create_link "$CONFIGS_DIR/ghostty"          "$HOME/.config/ghostty"         "Ghostty"
-create_link "$CONFIGS_DIR/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua" "WezTerm"
-create_link "$CONFIGS_DIR/ratty/ratty.toml" "$HOME/.config/ratty/ratty.toml" "Ratty"
+# Comment out pacman Include lines whose literal target does not exist yet
+# (for example a vendor repo that its own package sets up), so a fresh
+# machine can still run pacman.
+drop_missing_includes() {
+    local file="$1"
+    local line
+    local path
 
-# Editors
-create_link "$CONFIGS_DIR/nvim"             "$HOME/.config/nvim"            "Neovim"
-create_link "$CONFIGS_DIR/zed"              "$HOME/.config/zed"             "Zed"
+    while IFS= read -r line || [ -n "$line" ]; do
+        if [[ "$line" =~ ^[[:space:]]*Include[[:space:]]*=[[:space:]]*([^[:space:]]+) ]]; then
+            path="${BASH_REMATCH[1]}"
+            if ! [[ "$path" =~ [*?[] ]] && ! [ -e "$path" ]; then
+                printf '# archpostinstall: skipped, %s does not exist\n#%s\n' "$path" "$line"
+                continue
+            fi
+        fi
+        printf '%s\n' "$line"
+    done < "$file" > "$file.tmp"
+    mv -- "$file.tmp" "$file"
+}
 
-# Tools
-create_link "$CONFIGS_DIR/lazygit"           "$HOME/.config/lazygit" \
-       "Lazygit"
-create_link "$CONFIGS_DIR/tmux"             "$HOME/.config/tmux"            "Tmux"
-create_link "$CONFIGS_DIR/zellij"           "$HOME/.config/zellij"          "Zellij"
-create_link "$CONFIGS_DIR/yazi"             "$HOME/.config/yazi"            "Yazi"
-create_link "$CONFIGS_DIR/zathura"          "$HOME/.config/zathura"         "Zathura"
-create_link "$CONFIGS_DIR/fastfetch"        "$HOME/.config/fastfetch"       "Fastfetch"
-create_link "$CONFIGS_DIR/mpv"              "$HOME/.config/mpv"             "mpv"
-create_link "$CONFIGS_DIR/obs-studio/basic/profiles" "$HOME/.config/obs-studio/basic/profiles" "OBS Profiles"
-create_link "$CONFIGS_DIR/obs-studio/basic/scenes"   "$HOME/.config/obs-studio/basic/scenes"   "OBS Scenes"
-create_link "$CONFIGS_DIR/obs-studio/scripts"        "$HOME/.config/obs-studio/scripts"        "OBS Scripts"
-create_link "$CONFIGS_DIR/xdg-desktop-portal" "$HOME/.config/xdg-desktop-portal" "XDG Portal"
-create_link "$CONFIGS_DIR/xdg-desktop-portal-termfilechooser" "$HOME/.config/xdg-desktop-portal-termfilechooser" "XDG Portal Filechooser"
-if [ -f "$CONFIGS_DIR/baidupcs/pcs_config.json" ]; then
-    create_link "$CONFIGS_DIR/baidupcs" "$HOME/.config/BaiduPCS-Go" "BaiduPCS-Go"
-else
-    echo "  [BaiduPCS-Go] Skipped (pcs_config.json missing in configs/baidupcs)"
-fi
-create_link "$CONFIGS_DIR/fcitx5"           "$HOME/.config/fcitx5"          "Fcitx5"
-create_link "$CONFIGS_DIR/rime"             "$HOME/.local/share/fcitx5/rime" "Fcitx5 Rime"
-create_link "$CONFIGS_DIR/archpostinstall/dpms.conf" "$HOME/.config/archpostinstall/dpms.conf" "DPMS Config"
-create_link "$CONFIGS_DIR/archpostinstall/screensaver.conf" "$HOME/.config/archpostinstall/screensaver.conf" "Saver Config"
-create_link "$CONFIGS_DIR/archpostinstall/screensaver.txt" "$HOME/.config/archpostinstall/screensaver.txt" "Saver Art"
-create_link "$CONFIGS_DIR/bottom/bottom.toml" "$HOME/.config/bottom/bottom.toml" "bottom"
-create_link "$CONFIGS_DIR/btop/btop.conf"   "$HOME/.config/btop/btop.conf"  "btop"
+# Print the path of the file to install for a copy/template entry.
+render_source() {
+    local src="$1"
+    local mode="$2"
+    local dest="$3"
+    local out
 
-# Applications
-create_link "$CONFIGS_DIR/mimeapps.list" "$HOME/.config/mimeapps.list" "MIME Apps"
-create_link "$CONFIGS_DIR/applications/google-chrome.desktop" "$HOME/.local/share/applications/google-chrome.desktop" "Chrome (Custom)"
-create_link "$CONFIGS_DIR/applications/QQ.desktop"     "$HOME/.local/share/applications/QQ.desktop"     "QQ"
-create_link "$CONFIGS_DIR/applications/yazi.desktop"  "$HOME/.local/share/applications/yazi.desktop"  "Yazi"
-create_link "$CONFIGS_DIR/applications/WeChat.desktop" "$HOME/.local/share/applications/WeChat.desktop" "WeChat"
-create_link "$CONFIGS_DIR/applications/nowledge-mem.desktop" "$HOME/.local/share/applications/nowledge-mem.desktop" "Nowledge Mem"
-create_link "$CONFIGS_DIR/applications/ratty.desktop" "$HOME/.local/share/applications/ratty.desktop" "Ratty"
+    if [[ "$mode" != sudo-template && "$dest" != /etc/pacman.conf ]]; then
+        printf '%s\n' "$src"
+        return
+    fi
 
-# Bin (User)
-create_link "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$HOME/.local/bin/archpostinstall-gnome-sync" "Gnome Sync Bin"
-create_link "$REPO_DIR/scripts/archpostinstall.sh" "$HOME/.local/bin/archpostinstall" "Archpostinstall Bin"
-create_link "$REPO_DIR/scripts/gnome/dpms-toggle.sh" "$HOME/.local/bin/dpms-toggle" "DPMS Toggle"
-create_link "$REPO_DIR/scripts/gnome/screensaver.sh" "$HOME/.local/bin/archpostinstall-screensaver" "Screensaver Bin"
-create_link "$REPO_DIR/scripts/launchers/nowledge-mem-desktop.sh" "$HOME/.local/bin/nowledge-mem-desktop" "Nowledge Mem Bin"
-create_link "$REPO_DIR/scripts/launchers/yazi-desktop.sh" "$HOME/.local/bin/yazi-desktop" "Yazi Desktop"
-create_link "$REPO_DIR/scripts/launchers/yazi-open-nautilus.sh" "$HOME/.local/bin/yazi-open-nautilus" "Yazi Nautilus"
-create_link "$REPO_DIR/scripts/zathura/page-to-clipboard.sh" "$HOME/.local/bin/zathura-page-to-clipboard" "Zathura Clipboard"
+    out="$RENDER_DIR/$(basename "$dest")"
+    if [[ "$mode" == sudo-template ]]; then
+        sed -e "s|@REPO_DIR@|$REPO_DIR|g" \
+            -e "s|@USER@|$USER_NAME|g" \
+            -e "s|@HOME@|$HOME|g" \
+            "$src" > "$out"
+    else
+        cp -- "$src" "$out"
+    fi
+    if [[ "$dest" == /etc/pacman.conf ]]; then
+        drop_missing_includes "$out"
+    fi
+    printf '%s\n' "$out"
+}
 
-# Systemd (User)
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.service" "$HOME/.config/systemd/user/archpostinstall-gnome-sync.service" "Gnome Sync Service"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-gnome-sync.path"    "$HOME/.config/systemd/user/archpostinstall-gnome-sync.path"    "Gnome Sync Path"
-create_link "$CONFIGS_DIR/systemd/user/archpostinstall-screensaver.service" "$HOME/.config/systemd/user/archpostinstall-screensaver.service" "Screensaver Service"
+install_link() {
+    local src="$1"
+    local dest="$2"
+    local label="$3"
+    shift 3
+
+    if [ -L "$dest" ] && [ "$(readlink -f "$dest")" == "$src" ]; then
+        status "$label" "✅ Already linked"
+        return
+    fi
+    if ((CHECK)); then
+        if [ -e "$dest" ] || [ -L "$dest" ]; then
+            issue "$label" "$dest is not linked to $src"
+        else
+            issue "$label" "$dest is missing"
+        fi
+        return
+    fi
+
+    make_room "$dest" "$@"
+    run "$@" mkdir -p -- "$(dirname "$dest")"
+    run "$@" ln -s -- "$src" "$dest"
+    status "$label" "$( ((DRY_RUN)) && echo "Would link" || echo "✅ Linked")${1:+ ($1)}"
+}
+
+install_copy() {
+    local src="$1"
+    local installed="$2"
+    local dest="$3"
+    local label="$4"
+    local file_mode=0644
+
+    if ! [ -L "$dest" ]; then
+        if [ -d "$installed" ] && [ -d "$dest" ] && diff -qr -- "$installed" "$dest" >/dev/null 2>&1; then
+            status "$label" "✅ Already copied"
+            return
+        fi
+        if [ -f "$installed" ] && [ -f "$dest" ] && cmp -s -- "$installed" "$dest"; then
+            status "$label" "✅ Already copied"
+            return
+        fi
+    fi
+    if ((CHECK)); then
+        if [ -L "$dest" ]; then
+            issue "$label" "$dest is a symlink; run 'archpostinstall sync-system'"
+        elif [ -e "$dest" ]; then
+            issue "$label" "$dest differs from $src"
+        else
+            issue "$label" "$dest is missing"
+        fi
+        return
+    fi
+
+    make_room "$dest" sudo
+    run sudo mkdir -p -- "$(dirname "$dest")"
+    if [ -d "$installed" ]; then
+        run sudo cp -a --reflink=auto --no-preserve=ownership -- "$installed" "$dest"
+    else
+        [ -x "$src" ] && file_mode=0755
+        run sudo install -m "$file_mode" -- "$installed" "$dest"
+    fi
+    status "$label" "$( ((DRY_RUN)) && echo "Would copy" || echo "✅ Copied") (sudo)"
+}
+
+report_backups() {
+    local dest="$1"
+    local label="$2"
+    local backups=()
+
+    mapfile -t backups < <(compgen -G "$dest.bak_*" || true)
+    if ((${#backups[@]})); then
+        issue "$label" "${#backups[@]} leftover backup(s): $dest.bak_*"
+    fi
+}
+
+process_entry() {
+    local mode="$1"
+    local src="$REPO_DIR/$2"
+    local dest="$3"
+    local label="$4"
+    local guard=""
+
+    if [[ "$dest" == "~/"* ]]; then
+        dest="$HOME/${dest:2}"
+    fi
+    if [[ "$mode" == link:* ]]; then
+        guard="$REPO_DIR/${mode#link:}"
+        mode=link
+    fi
+
+    if ! [ -e "$src" ]; then
+        issue "$label" "source not found: $src"
+        return
+    fi
+    if [ -n "$guard" ] && ! [ -e "$guard" ]; then
+        status "$label" "Skipped (${guard#"$REPO_DIR"/} missing)"
+        return
+    fi
+
+    case "$mode" in
+        link) install_link "$src" "$dest" "$label" ;;
+        sudo-link) install_link "$src" "$dest" "$label" sudo ;;
+        sudo-copy | sudo-template)
+            install_copy "$src" "$(render_source "$src" "$mode" "$dest")" "$dest" "$label"
+            ;;
+        *)
+            issue "$label" "unknown mode '$mode' in manifest.tsv"
+            return
+            ;;
+    esac
+
+    if ((CHECK)); then
+        report_backups "$dest" "$label"
+    fi
+}
+
+process_group() {
+    local wanted="$1"
+    local group mode src dest label
+
+    echo ""
+    echo "==========================================================="
+    echo "   🔗 ${wanted^} targets"
+    echo "==========================================================="
+
+    while read -r group mode src dest label <&3; do
+        [[ -z "$group" || "$group" == \#* ]] && continue
+        [[ "$group" == "$wanted" ]] || continue
+        process_entry "$mode" "$src" "$dest" "$label"
+    done 3< "$MANIFEST"
+}
+
+# --- Main ---
+
+for group in "${ALL_GROUPS[@]}"; do
+    [[ " ${SELECTED_GROUPS[*]} " == *" $group "* ]] || continue
+
+    # Initialize the recorded Rime upstream revision; upgrades remain manual.
+    if [[ "$group" == user ]] && ! [ -f "$REPO_DIR/vendor/rime-frost/default.yaml" ]; then
+        if ((CHECK)); then
+            issue "Rime Upstream" "vendor/rime-frost submodule is not initialized"
+        else
+            run git -C "$REPO_DIR" submodule update --init -- vendor/rime-frost
+        fi
+    fi
+
+    process_group "$group"
+done
 
 echo ""
-echo "✨ Configuration linking complete!"
+if ((CHECK)); then
+    if ((ISSUES)); then
+        echo "❗ $ISSUES issue(s) found."
+        exit 1
+    fi
+    echo "✨ Everything matches manifest.tsv."
+elif ((DRY_RUN)); then
+    echo "✨ Dry run complete; nothing was changed."
+else
+    echo "✨ Configuration linking complete!"
+fi

@@ -196,14 +196,6 @@ restore_backup() {
     cp -a -- "$backup_dir/arch-linux-zen.efi" "$ZEN_UKI"
 }
 
-install_link() {
-    local source="$1"
-    local target="$2"
-
-    mkdir -p "$(dirname "$target")"
-    ln -s "$source" "$target"
-}
-
 install_copy() {
     local source="$1"
     local target="$2"
@@ -224,20 +216,11 @@ install_tracked_configs() {
     remove_managed_target "$PLYMOUTH_CONFIG_TARGET" "$displaced_dir"
     install_copy "$PLYMOUTH_CONFIG_SOURCE" "$PLYMOUTH_CONFIG_TARGET"
     remove_managed_target "$MKINITCPIO_CONFIG_TARGET" "$displaced_dir"
-    install_link "$MKINITCPIO_CONFIG_SOURCE" "$MKINITCPIO_CONFIG_TARGET"
+    install_copy "$MKINITCPIO_CONFIG_SOURCE" "$MKINITCPIO_CONFIG_TARGET"
     remove_managed_target "$CMDLINE_CONFIG_TARGET" "$displaced_dir"
-    install_link "$CMDLINE_CONFIG_SOURCE" "$CMDLINE_CONFIG_TARGET"
+    install_copy "$CMDLINE_CONFIG_SOURCE" "$CMDLINE_CONFIG_TARGET"
     remove_managed_target "$ZEN_PRESET_TARGET" "$displaced_dir"
-    install_link "$ZEN_PRESET_SOURCE" "$ZEN_PRESET_TARGET"
-}
-
-verify_link() {
-    local source="$1"
-    local target="$2"
-
-    [[ -L "$target" ]] || die "expected symbolic link: $target"
-    [[ "$(readlink -f "$target")" == "$source" ]] \
-        || die "unexpected link target for $target: $(readlink -f "$target")"
+    install_copy "$ZEN_PRESET_SOURCE" "$ZEN_PRESET_TARGET"
 }
 
 verify_copy_file() {
@@ -325,9 +308,9 @@ verify_installation() {
     check_prerequisites
     verify_copy_dir "$THEME_SOURCE" "$THEME_TARGET"
     verify_copy_file "$PLYMOUTH_CONFIG_SOURCE" "$PLYMOUTH_CONFIG_TARGET"
-    verify_link "$MKINITCPIO_CONFIG_SOURCE" "$MKINITCPIO_CONFIG_TARGET"
-    verify_link "$CMDLINE_CONFIG_SOURCE" "$CMDLINE_CONFIG_TARGET"
-    verify_link "$ZEN_PRESET_SOURCE" "$ZEN_PRESET_TARGET"
+    verify_copy_file "$MKINITCPIO_CONFIG_SOURCE" "$MKINITCPIO_CONFIG_TARGET"
+    verify_copy_file "$CMDLINE_CONFIG_SOURCE" "$CMDLINE_CONFIG_TARGET"
+    verify_copy_file "$ZEN_PRESET_SOURCE" "$ZEN_PRESET_TARGET"
 
     [[ "$(plymouth-set-default-theme)" == "connect" ]] \
         || die "Plymouth default theme is not connect"

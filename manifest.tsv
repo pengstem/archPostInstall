@@ -1,0 +1,84 @@
+# Source-to-target map consumed by setup.sh (the single source of truth).
+#
+# Columns (whitespace-separated; the label takes the rest of the line):
+#   group   pacman | system | user   (setup.sh runs them in that order)
+#   mode    link           user symlink
+#           link:<guard>   user symlink, skipped unless <guard> exists
+#           sudo-link      root-owned symlink; only for files never run by root
+#           sudo-copy      root-owned copy (file or directory)
+#           sudo-template  root-owned copy with @REPO_DIR@/@USER@/@HOME@ filled in
+#   src     path relative to the repository
+#   dest    absolute path, or ~/ for the invoking user's home
+#
+# Anything root reads or executes must be copied, never symlinked into the
+# user-writable repository; re-run `archpostinstall sync-system` after edits.
+
+# --- Package manager (installed before packages by bootstrap.sh) ---
+pacman  sudo-copy      configs/pacman/pacman.conf                             /etc/pacman.conf                                            Pacman
+pacman  sudo-copy      configs/paru/paru.conf                                 /etc/paru.conf                                              Paru
+
+# --- System ---
+system  sudo-copy      configs/pacman/hooks/99-update-pkglist.hook            /etc/pacman.d/hooks/99-update-pkglist.hook                  Pkglist Hook
+system  sudo-template  configs/pacman/archpostinstall-update-pkglist.in       /usr/local/bin/archpostinstall-update-pkglist               Pkglist Sync
+# GNOME shortcuts do not see ~/.local/bin; this is only ever run as the user.
+system  sudo-link      scripts/gnome/dpms-toggle.sh                           /usr/local/bin/dpms-toggle                                  DPMS Toggle (System)
+system  sudo-copy      configs/tlp/99-archpostinstall.conf                    /etc/tlp.d/99-archpostinstall.conf                          TLP
+# mkinitcpio archives resolved paths, so Plymouth must live at its real path.
+system  sudo-copy      configs/plymouth/themes/connect                        /usr/share/plymouth/themes/connect                          Plymouth Theme
+system  sudo-copy      configs/plymouth/plymouthd.conf                        /etc/plymouth/plymouthd.conf                                Plymouth Config
+system  sudo-copy      configs/mkinitcpio/90-archpostinstall-nvidia-plymouth.conf  /etc/mkinitcpio.conf.d/90-archpostinstall-nvidia-plymouth.conf  Mkinitcpio Boot
+system  sudo-copy      configs/kernel/cmdline.d/90-archpostinstall-splash.conf  /etc/cmdline.d/90-archpostinstall-splash.conf            Kernel Splash
+system  sudo-copy      configs/mkinitcpio/linux-zen.preset                    /etc/mkinitcpio.d/linux-zen.preset                          Zen UKI Preset
+
+# --- Shell ---
+user    link           configs/zshrc                                          ~/.zshrc                                                    Zshrc
+user    link           configs/zsh                                            ~/.config/zsh                                               Zsh Modules
+user    link           configs/p10k.zsh                                       ~/.p10k.zsh                                                 P10k Config
+user    link           configs/gitconfig                                      ~/.gitconfig                                                Gitconfig
+
+# --- Terminals ---
+user    link           configs/kitty                                          ~/.config/kitty                                             Kitty
+user    link           configs/alacritty/alacritty.toml                       ~/.config/alacritty/alacritty.toml                          Alacritty
+user    link           configs/ghostty                                        ~/.config/ghostty                                           Ghostty
+user    link           configs/wezterm/wezterm.lua                            ~/.config/wezterm/wezterm.lua                               WezTerm
+user    link           configs/ratty/ratty.toml                               ~/.config/ratty/ratty.toml                                  Ratty
+
+# --- Editors and tools ---
+user    link           configs/nvim                                           ~/.config/nvim                                              Neovim
+user    link           configs/lazygit                                        ~/.config/lazygit                                           Lazygit
+user    link           configs/yazi                                           ~/.config/yazi                                              Yazi
+user    link           configs/zathura                                        ~/.config/zathura                                           Zathura
+user    link           configs/fastfetch                                      ~/.config/fastfetch                                         Fastfetch
+user    link           configs/mpv                                            ~/.config/mpv                                               mpv
+user    link           configs/obs-studio/basic/profiles                      ~/.config/obs-studio/basic/profiles                         OBS Profiles
+user    link           configs/obs-studio/basic/scenes                        ~/.config/obs-studio/basic/scenes                           OBS Scenes
+user    link           configs/obs-studio/scripts                             ~/.config/obs-studio/scripts                                OBS Scripts
+user    link           configs/xdg-desktop-portal                             ~/.config/xdg-desktop-portal                                XDG Portal
+user    link           configs/xdg-desktop-portal-termfilechooser             ~/.config/xdg-desktop-portal-termfilechooser                XDG Portal Filechooser
+user    link:configs/baidupcs/pcs_config.json  configs/baidupcs               ~/.config/BaiduPCS-Go                                       BaiduPCS-Go
+user    link           configs/fcitx5                                         ~/.config/fcitx5                                            Fcitx5
+user    link           configs/rime                                           ~/.local/share/fcitx5/rime                                  Fcitx5 Rime
+user    link           configs/archpostinstall/dpms.conf                      ~/.config/archpostinstall/dpms.conf                         DPMS Config
+user    link           configs/archpostinstall/screensaver.conf               ~/.config/archpostinstall/screensaver.conf                  Saver Config
+user    link           configs/archpostinstall/screensaver.txt                ~/.config/archpostinstall/screensaver.txt                   Saver Art
+
+# --- Desktop entries ---
+user    link           configs/mimeapps.list                                  ~/.config/mimeapps.list                                     MIME Apps
+user    link           configs/applications/google-chrome.desktop            ~/.local/share/applications/google-chrome.desktop           Chrome (Custom)
+user    link           configs/applications/QQ.desktop                        ~/.local/share/applications/QQ.desktop                      QQ
+user    link           configs/applications/yazi.desktop                      ~/.local/share/applications/yazi.desktop                    Yazi Desktop
+user    link           configs/applications/WeChat.desktop                    ~/.local/share/applications/WeChat.desktop                  WeChat
+
+# --- User bin ---
+user    link           scripts/archpostinstall.sh                             ~/.local/bin/archpostinstall                                Archpostinstall Bin
+user    link           scripts/gnome/backup_gnome_state.sh                    ~/.local/bin/archpostinstall-gnome-sync                     Gnome Sync Bin
+user    link           scripts/gnome/dpms-toggle.sh                           ~/.local/bin/dpms-toggle                                    DPMS Toggle
+user    link           scripts/gnome/screensaver.sh                           ~/.local/bin/archpostinstall-screensaver                    Screensaver Bin
+user    link           scripts/launchers/yazi-desktop.sh                      ~/.local/bin/yazi-desktop                                   Yazi Launcher
+user    link           scripts/launchers/yazi-open-nautilus.sh                ~/.local/bin/yazi-open-nautilus                             Yazi Nautilus
+user    link           scripts/zathura/page-to-clipboard.sh                   ~/.local/bin/zathura-page-to-clipboard                      Zathura Clipboard
+
+# --- Systemd user units ---
+user    link           configs/systemd/user/archpostinstall-gnome-sync.service  ~/.config/systemd/user/archpostinstall-gnome-sync.service  Gnome Sync Service
+user    link           configs/systemd/user/archpostinstall-gnome-sync.path   ~/.config/systemd/user/archpostinstall-gnome-sync.path      Gnome Sync Path
+user    link           configs/systemd/user/archpostinstall-screensaver.service  ~/.config/systemd/user/archpostinstall-screensaver.service  Screensaver Service

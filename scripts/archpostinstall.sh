@@ -15,7 +15,9 @@ Commands:
   install-packages        Install packages from scripts/pkglist.txt
   install-maplemono-cn    Install Maple Mono NF CN from a temporary Arch Linux CN repo
   install-shell           Install Oh My Zsh, plugins, and powerlevel10k
-  link-configs            Symlink tracked configs into place
+  link-configs [opts]     Install every manifest.tsv entry (see setup.sh --help)
+  sync-system             Re-copy root-owned targets after editing them in the repo
+  doctor                  Report missing sources, drifted targets, and old backups
   boot-splash <action>    Apply, verify, or roll back the Zen Connect splash
   dpms-toggle             Toggle display power (GNOME)
   dpms-off                Force display off
@@ -47,7 +49,13 @@ case "$cmd" in
         "$REPO_DIR/scripts/install/install_shell_tools.sh"
         ;;
     link-configs)
-        "$REPO_DIR/setup.sh"
+        "$REPO_DIR/setup.sh" "$@"
+        ;;
+    sync-system)
+        "$REPO_DIR/setup.sh" --group pacman --group system "$@"
+        ;;
+    doctor)
+        "$REPO_DIR/setup.sh" --check "$@"
         ;;
     boot-splash)
         "$REPO_DIR/scripts/install/install_boot_splash.sh" "$@"
