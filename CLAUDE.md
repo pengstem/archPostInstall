@@ -20,6 +20,8 @@ archpostinstall --help
 archpostinstall doctor                # = setup.sh --check; must report no issues
 archpostinstall lint [--fix]          # bash -n, shellcheck (uvx fallback), shfmt -i 4 -ci, Python syntax
 archpostinstall sync-system           # re-copy root-owned targets after editing them
+archpostinstall adopt                 # an app replaced a linked file (e.g. mimeapps.list): pull it into the repo, relink
+archpostinstall prune-backups         # review and delete leftover <target>.bak_*
 archpostinstall bootstrap | install-packages | install-maplemono-cn | install-shell | link-configs
 archpostinstall boot-splash <apply|verify|rollback>
 archpostinstall screensaver [toggle|start|stop|status|upgrade|install|uninstall]
@@ -42,7 +44,7 @@ There is no test suite. Run `archpostinstall lint` before committing script chan
 - `link` / `link:<guard>` - User symlink (the guard variant is skipped unless the guard file exists)
 - `sudo-copy` - Root-owned copy. Required for anything root reads or executes: pacman/paru config, pacman hook, TLP, mkinitcpio preset and drop-in, kernel cmdline, Plymouth (mkinitcpio also needs real paths)
 - `sudo-template` - Copy with `@REPO_DIR@`/`@USER@`/`@HOME@` substituted (the pkglist hook wrapper)
-- `sudo-link` - Only for `/usr/local/bin/dpms-toggle`, which GNOME shortcuts need (their PATH has no `~/.local/bin`) and which only runs as the user
+- `sudo-link` - Only for user-run helpers that GUI-launched commands must find on PATH (GNOME shortcuts and zathura `exec` do not see `~/.local/bin`): `dpms-toggle`, `zathura-page-to-clipboard`
 
 `/etc/pacman.conf` is rendered with `Include` lines for missing files commented out. Replaced targets are backed up as `<target>.bak_<epoch>`, except old symlinks into the repo, which are simply removed.
 
@@ -74,7 +76,8 @@ There is no test suite. Run `archpostinstall lint` before committing script chan
 - Ignored app-generated files: `configs/rime/{user.yaml,installation.yaml,*.userdb/,build/,sync/}`, fcitx5 `cached_layouts` and `profile_*`
 - `vendor/rime-frost` - Submodule pinned to a recorded revision; upgrades are manual (`git pull --ff-only` inside it, commit the submodule bump, then redeploy in Fcitx5)
 - `configs/mpv/scripts/uosc/` - Vendored; only the Linux `ziggy` binary is kept
-- Hard-coded `/home/nastem` paths remain in zathura (its `exec` has no shell), kitty (kitten path), and OBS `basic.ini` (OBS rewrites it)
+- OBS `basic.ini` keeps absolute `/home/nastem/Videos` paths: OBS rewrites the file from its settings UI, so templating would fight it
+- `configs/mimeapps.list` gets replaced by a regular file whenever an app registers a handler; `doctor` flags it and `adopt` merges it back
 - `backups/` - Archive output; tarballs are git-ignored
 
 ## Conventions

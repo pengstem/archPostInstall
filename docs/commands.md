@@ -14,6 +14,8 @@ archpostinstall install-shell
 archpostinstall link-configs [--dry-run] [--group pacman|system|user]
 archpostinstall sync-system
 archpostinstall doctor
+archpostinstall adopt [--dry-run]
+archpostinstall prune-backups [--dry-run]
 archpostinstall lint [--fix]
 archpostinstall boot-splash apply
 archpostinstall boot-splash verify
@@ -35,7 +37,7 @@ Use these when you want explicit control:
 
 ```
 ./bootstrap.sh
-./setup.sh [--dry-run] [--check] [--group pacman|system|user]...
+./setup.sh [--dry-run] [--check|--adopt|--prune-backups] [--group pacman|system|user]...
 ./scripts/install/install_packages.sh
 ./scripts/install/install_maplemono_cn_font.sh
 ./scripts/install/install_ttfx.sh [install|upgrade]

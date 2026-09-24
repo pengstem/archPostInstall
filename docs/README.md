@@ -36,6 +36,12 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
 - `/usr/local/bin/dpms-toggle` stays a symlink because GNOME shortcuts do not see `~/.local/bin`; it only ever runs as the user.
 
+## When an App Rewrites a Linked File
+- Some apps replace a symlinked file with a regular file when they save (for example `mimeapps.list`
+  whenever a URL handler registers). `archpostinstall doctor` reports it; `archpostinstall adopt` shows the
+  diff, copies the live file into the repo, and restores the link. Review with `git diff`, then commit.
+- `archpostinstall prune-backups` lists leftover `<target>.bak_*` files and deletes them after confirmation.
+
 ## Animated Screensaver
 - `Super+F11` or `archpostinstall screensaver toggle` opens the custom full-screen animation.
 - `archpostinstall screensaver upgrade` builds the latest stable Rust renderer release.

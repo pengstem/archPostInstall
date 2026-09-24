@@ -40,4 +40,5 @@
 - The pacman hook runs the root-owned wrapper `/usr/local/bin/archpostinstall-update-pkglist`, which drops to the repo owner via `runuser`; `scripts/update_pkglist.sh` refuses to run as root.
 - `configs/baidupcs/pcs_config.json` is ignored; keep secrets there and use `pcs_config.json.example` as a template.
 - App-generated files (`configs/rime/user.yaml`, `installation.yaml`, fcitx5 caches) are ignored to avoid churn.
-- `setup.sh` backs up replaced targets as `<target>.bak_<epoch>`; `archpostinstall doctor` lists leftovers to review.
+- `setup.sh` backs up replaced targets as `<target>.bak_<epoch>`; `archpostinstall doctor` lists leftovers and `archpostinstall prune-backups` removes them after confirmation.
+- If an app replaced a linked file with a regular one, use `archpostinstall adopt` rather than copying by hand.
