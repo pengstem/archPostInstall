@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=WeChat
-Exec=env QT_IM_MODULE=fcitx GTK_IM_MODULE=fcitx XMODIFIERS=@im=fcitx /home/nastem/Applications/WeChat.AppImage
+Exec=env QT_IM_MODULE=fcitx GTK_IM_MODULE=fcitx XMODIFIERS=@im=fcitx sh -c "exec \\"\\$HOME/Applications/WeChat.AppImage\\""
 Type=Application
-Icon=/home/nastem/.local/share/icons/wechat.png
+Icon=wechat
 Terminal=false
 StartupWMClass=wechat
 Categories=Network;InstantMessaging;
