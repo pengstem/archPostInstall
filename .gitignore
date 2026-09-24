@@ -17,3 +17,6 @@ configs/rime/installation.yaml
 # uosc ships every platform's ziggy helper; only Linux is used here.
 vendor/uosc/scripts/uosc/bin/ziggy-darwin
 vendor/uosc/scripts/uosc/bin/ziggy-windows.exe
+# Installed by `ya pkg install` from configs/yazi/package.toml (pinned rev + hash).
+configs/yazi/plugins/
+configs/yazi/flavors/
