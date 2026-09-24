@@ -3,7 +3,7 @@
 This folder contains reference notes and quick guidance for maintaining the Arch post-install setup. It is intentionally concise and kept in sync with the automation scripts.
 
 ## Where to Look
-- `docs/fileLocationList.md` is the source-to-target mapping for symlinked configs.
+- `manifest.tsv` (repo root) is the source-to-target mapping that `setup.sh` installs; `archpostinstall doctor` checks it.
 - `docs/gnome-extensions.md` and `docs/gnome-appearrance.md` are updated by the GNOME sync script.
 - `docs/bug-history.md` tracks notable config issues and fixes.
 - `docs/thoughts.md` is a freeform notes file for future changes.
@@ -12,7 +12,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 
 ## Quick Start
 - Full setup: `./bootstrap.sh`
-- Symlink configs only: `./setup.sh`
+- Install configs only: `./setup.sh` (`--dry-run`, `--group pacman|system|user`, `--check`)
 - Unified CLI: `./scripts/archpostinstall.sh --help` (or `archpostinstall --help` after linking)
 
 ## GNOME Sync and Backups
@@ -34,7 +34,7 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - The default config restarts `zen-browser`, `wechat`, and `qq`, leaves Kitty running,
   and stops Steam and Firefox without reopening them.
 - `dpms-toggle` does not switch TLP or power-profiles-daemon profiles; power policy stays under GNOME/TLP/user control.
-- If an old `/usr/local/bin/dpms-toggle` exists, re-run `./setup.sh` to replace it.
+- `/usr/local/bin/dpms-toggle` stays a symlink because GNOME shortcuts do not see `~/.local/bin`; it only ever runs as the user.
 
 ## Animated Screensaver
 - `Super+F11` or `archpostinstall screensaver toggle` opens the custom full-screen animation.
@@ -44,12 +44,23 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 - It is not a lock screen and does not change GNOME lock, suspend, or DPMS settings.
 - Customize the art and effect allowlist in `configs/archpostinstall/screensaver.*`; see `docs/screensaver.md`.
 
-## Package List Updates
-- Pacman hook triggers `archpostinstall-update-pkglist` after transactions.
-- Manual refresh: `./scripts/update_pkglist.sh` (writes `scripts/pkglist.txt`).
+## Package Lists
+- `scripts/pkglist/native.txt` and `aur.txt` are regenerated after every pacman transaction by the hook,
+  which runs the root-owned wrapper `/usr/local/bin/archpostinstall-update-pkglist`; it drops to the repo
+  owner with `runuser` before running `scripts/update_pkglist.sh`.
+- `hw-<hostname>.txt` is hand-maintained and only installed on that host; its packages never appear in
+  `native.txt`/`aur.txt`. `ignore.txt` lists packages that are never recorded (AUR helpers, script-installed fonts).
+- Manual refresh: `archpostinstall update-pkglist`.
+
+## System Targets
+- Everything root reads or executes (pacman/paru config, pacman hook, TLP, mkinitcpio, kernel cmdline,
+  Plymouth) is copied, not symlinked, so editing the user-owned repo cannot change root behavior.
+- After editing one of those files in the repo, run `archpostinstall sync-system`.
+- `/etc/pacman.conf` is installed with any `Include` of a missing file commented out, so a fresh
+  machine can run pacman before vendor repos are set up.
 
 ## TLP Power Management
-- TLP overrides live in `configs/tlp/99-archpostinstall.conf` and are linked to `/etc/tlp.d/99-archpostinstall.conf`.
+- TLP overrides live in `configs/tlp/99-archpostinstall.conf` and are copied to `/etc/tlp.d/99-archpostinstall.conf`.
 
 ## BaiduPCS-Go
 - Copy your real config to `configs/baidupcs/pcs_config.json` before running `./setup.sh`.

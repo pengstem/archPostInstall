@@ -1,22 +1,25 @@
 # Arch Post-Install
 
-A personal Arch Linux post-install and dotfiles repo. It automates package installs, symlinks configs into place, and captures GNOME theme/extension state for easy rebuilds.
+A personal Arch Linux post-install and dotfiles repo. It automates package installs, installs configs from `manifest.tsv`, and captures GNOME theme/extension state for easy rebuilds.
 
 ## Quick Start
 - Initialize Rime upstream after cloning: `git submodule update --init -- vendor/rime-frost` (also handled by `setup.sh`).
 - Full setup: `./bootstrap.sh`
-- Symlink configs only: `./setup.sh`
+- Install configs only: `./setup.sh` (`--dry-run` to preview)
+- Health check: `archpostinstall doctor`; lint: `archpostinstall lint`
 - Unified CLI: `./scripts/archpostinstall.sh --help` (or `archpostinstall --help` after linking)
 
 ## Repository Layout
 - `configs/` tracked configs for shells, editors, terminals, DE/IMEs, and tools.
 - `vendor/rime-frost/` upstream Rime submodule; see [Rime maintenance](configs/rime/README.md) for manual updates.
-- `scripts/` grouped by purpose: `install/`, `backup/`, `gnome/`.
+- `manifest.tsv` every source-to-target mapping; user configs are symlinked, root-read files are copied.
+- `scripts/` grouped by purpose: `install/`, `backup/`, `gnome/`; package lists in `scripts/pkglist/`.
 - `docs/` reference notes and mappings (`docs/README.md` is the entry point).
 - `backups/` archive output (ignored in Git).
 
 ## Notes
-- Pacman hook updates `scripts/pkglist.txt` automatically after transactions.
+- Pacman hook updates `scripts/pkglist/{native,aur}.txt` after transactions; `hw-<host>.txt` is maintained by hand.
+- After editing a root-read config (pacman, TLP, mkinitcpio, ...), run `archpostinstall sync-system`.
 - GNOME sync writes extension/theme notes into `docs/` and archives assets into `backups/gnome/`.
 - DPMS automation is configured in `configs/archpostinstall/dpms.conf` with a small helper DSL and is controlled through `dpms-toggle`.
 - The Omarchy-inspired GNOME screensaver uses custom ASCII art, the Rust `ttfx` renderer, `Super+F11`, and a Mutter idle monitor; see `docs/screensaver.md`.

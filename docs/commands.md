@@ -11,7 +11,10 @@ archpostinstall bootstrap
 archpostinstall install-packages
 archpostinstall install-maplemono-cn
 archpostinstall install-shell
-archpostinstall link-configs
+archpostinstall link-configs [--dry-run] [--group pacman|system|user]
+archpostinstall sync-system
+archpostinstall doctor
+archpostinstall lint [--fix]
 archpostinstall boot-splash apply
 archpostinstall boot-splash verify
 archpostinstall boot-splash rollback
@@ -32,7 +35,7 @@ Use these when you want explicit control:
 
 ```
 ./bootstrap.sh
-./setup.sh
+./setup.sh [--dry-run] [--check] [--group pacman|system|user]...
 ./scripts/install/install_packages.sh
 ./scripts/install/install_maplemono_cn_font.sh
 ./scripts/install/install_ttfx.sh [install|upgrade]
@@ -46,6 +49,7 @@ Use these when you want explicit control:
 ./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle]
 ./scripts/gnome/screensaver.sh [start|stop|toggle|status|upgrade|install|uninstall]
 ./scripts/update_pkglist.sh
+./scripts/lint.sh [--fix]
 ```
 
 ## Systemd (GNOME Sync)
