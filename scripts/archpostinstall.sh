@@ -18,6 +18,8 @@ Commands:
   link-configs [opts]     Install every manifest.tsv entry (see setup.sh --help)
   sync-system             Re-copy root-owned targets after editing them in the repo
   doctor                  Report missing sources, drifted targets, and old backups
+  adopt                   Pull app-rewritten linked files back into the repo and relink
+  prune-backups           Review and delete leftover <target>.bak_* backups
   lint [--fix]            Run bash -n, shellcheck, shfmt, and Python syntax checks
   boot-splash <action>    Apply, verify, or roll back the Zen Connect splash
   dpms-toggle             Toggle display power (GNOME)
@@ -57,6 +59,12 @@ case "$cmd" in
         ;;
     doctor)
         "$REPO_DIR/setup.sh" --check "$@"
+        ;;
+    adopt)
+        "$REPO_DIR/setup.sh" --adopt "$@"
+        ;;
+    prune-backups)
+        "$REPO_DIR/setup.sh" --prune-backups "$@"
         ;;
     lint)
         "$REPO_DIR/scripts/lint.sh" "$@"

@@ -14,19 +14,24 @@ ALL_GROUPS=(pacman system user)
 USER_NAME="$(id -un)"
 
 DRY_RUN=0
-CHECK=0
+ACTION=install
 SELECTED_GROUPS=()
 ISSUES=0
 RENDER_DIR=""
 
 usage() {
     cat <<'EOF'
-Usage: setup.sh [--group pacman|system|user]... [--dry-run] [--check]
+Usage: setup.sh [--group pacman|system|user]... [--dry-run]
+                [--check | --adopt | --prune-backups]
 
-  --group G   Only install group G (repeatable; default: all, in manifest order)
-  --dry-run   Print what would change without touching anything
-  --check     Report missing sources, drifted targets, and leftover backups;
-              exits 1 when something needs attention (never uses sudo)
+  --group G          Only process group G (repeatable; default: all, in order)
+  --dry-run          Print what would change without touching anything
+  --check            Report missing sources, drifted targets, and leftover
+                     backups; exits 1 when something needs attention (no sudo)
+  --adopt            When an application replaced a linked file with a regular
+                     file, copy its content into the repo and relink it
+  --prune-backups    List leftover <target>.bak_* files and delete them after
+                     confirmation
 EOF
 }
 
@@ -41,7 +46,15 @@ while (($#)); do
             shift
             ;;
         --check)
-            CHECK=1
+            ACTION=check
+            shift
+            ;;
+        --adopt)
+            ACTION=adopt
+            shift
+            ;;
+        --prune-backups)
+            ACTION=prune
             shift
             ;;
         -h | --help)
@@ -77,7 +90,7 @@ trap 'rm -rf "$RENDER_DIR"' EXIT
 # --- Helpers ---
 
 status() {
-    printf '  %-24s %s\n' "[$1]" "$2"
+    printf '  %-30s %s\n' "[$1]" "$2"
 }
 
 issue() {
@@ -172,8 +185,10 @@ install_link() {
         status "$label" "✅ Already linked"
         return
     fi
-    if ((CHECK)); then
-        if [ -e "$dest" ] || [ -L "$dest" ]; then
+    if [[ "$ACTION" == check ]]; then
+        if [ -f "$dest" ] && ! [ -L "$dest" ]; then
+            issue "$label" "$dest was replaced by a regular file; review with 'archpostinstall adopt'"
+        elif [ -e "$dest" ] || [ -L "$dest" ]; then
             issue "$label" "$dest is not linked to $src"
         else
             issue "$label" "$dest is missing"
@@ -204,7 +219,7 @@ install_copy() {
             return
         fi
     fi
-    if ((CHECK)); then
+    if [[ "$ACTION" == check ]]; then
         if [ -L "$dest" ]; then
             issue "$label" "$dest is a symlink; run 'archpostinstall sync-system'"
         elif [ -e "$dest" ]; then
@@ -225,6 +240,35 @@ install_copy() {
     fi
     status "$label" "$( ((DRY_RUN)) && echo "Would copy" || echo "✅ Copied") (sudo)"
 }
+
+# Take back a linked file that an application rewrote in place (for example
+# mimeapps.list, which is replaced atomically when a handler registers).
+adopt_link() {
+    local src="$1"
+    local dest="$2"
+    local label="$3"
+
+    if [ -L "$dest" ] || ! [ -e "$dest" ]; then
+        return
+    fi
+    if [ -d "$dest" ]; then
+        status "$label" "Skipped: $dest is a directory; merge it by hand"
+        return
+    fi
+    if ! git -C "$REPO_DIR" diff --quiet -- "$src"; then
+        issue "$label" "Skipped: ${src#"$REPO_DIR"/} has uncommitted changes"
+        return
+    fi
+
+    status "$label" "Adopting $dest:"
+    diff -u --label "repo" --label "live" -- "$src" "$dest" | sed 's/^/      /' || true
+    run cp -- "$dest" "$src"
+    run rm -f -- "$dest"
+    run ln -s -- "$src" "$dest"
+    status "$label" "$( ((DRY_RUN)) && echo "Would adopt" || echo "✅ Adopted; review with git diff")"
+}
+
+PRUNE_LIST=()
 
 report_backups() {
     local dest="$1"
@@ -262,6 +306,15 @@ process_entry() {
         return
     fi
 
+    if [[ "$ACTION" == prune ]]; then
+        mapfile -t -O "${#PRUNE_LIST[@]}" PRUNE_LIST < <(compgen -G "$dest.bak_*" || true)
+        return
+    fi
+    if [[ "$ACTION" == adopt ]]; then
+        [[ "$mode" == link ]] && adopt_link "$src" "$dest" "$label"
+        return
+    fi
+
     case "$mode" in
         link) install_link "$src" "$dest" "$label" ;;
         sudo-link) install_link "$src" "$dest" "$label" sudo ;;
@@ -274,7 +327,7 @@ process_entry() {
             ;;
     esac
 
-    if ((CHECK)); then
+    if [[ "$ACTION" == check ]]; then
         report_backups "$dest" "$label"
     fi
 }
@@ -301,8 +354,8 @@ for group in "${ALL_GROUPS[@]}"; do
     [[ " ${SELECTED_GROUPS[*]} " == *" $group "* ]] || continue
 
     # Initialize the recorded Rime upstream revision; upgrades remain manual.
-    if [[ "$group" == user ]] && ! [ -f "$REPO_DIR/vendor/rime-frost/default.yaml" ]; then
-        if ((CHECK)); then
+    if [[ "$group" == user && "$ACTION" != prune && "$ACTION" != adopt ]] && ! [ -f "$REPO_DIR/vendor/rime-frost/default.yaml" ]; then
+        if [[ "$ACTION" == check ]]; then
             issue "Rime Upstream" "vendor/rime-frost submodule is not initialized"
         else
             run git -C "$REPO_DIR" submodule update --init -- vendor/rime-frost
@@ -312,8 +365,46 @@ for group in "${ALL_GROUPS[@]}"; do
     process_group "$group"
 done
 
+prune_backups() {
+    local backup
+    local answer
+
+    echo ""
+    if ((${#PRUNE_LIST[@]} == 0)); then
+        echo "✨ No leftover backups."
+        return
+    fi
+    echo "Leftover backups:"
+    for backup in "${PRUNE_LIST[@]}"; do
+        printf '  %s  (%s)\n' "$backup" "$(du -sh -- "$backup" 2>/dev/null | cut -f1)"
+    done
+    if ((DRY_RUN)); then
+        echo "✨ Dry run: nothing deleted."
+        return
+    fi
+    # No terminal (for example under a script) counts as "no".
+    { read -r -p "Delete these ${#PRUNE_LIST[@]} backup(s)? [y/N] " answer </dev/tty; } 2>/dev/null || answer=""
+    if [[ "$answer" != [yY] ]]; then
+        echo "Kept all backups."
+        return
+    fi
+    for backup in "${PRUNE_LIST[@]}"; do
+        if [[ "$backup" == "$HOME"/* ]]; then
+            rm -rf -- "$backup"
+        else
+            sudo rm -rf -- "$backup"
+        fi
+    done
+    echo "✨ Deleted ${#PRUNE_LIST[@]} backup(s)."
+}
+
+if [[ "$ACTION" == prune ]]; then
+    prune_backups
+    exit 0
+fi
+
 echo ""
-if ((CHECK)); then
+if [[ "$ACTION" == check ]]; then
     if ((ISSUES)); then
         echo "❗ $ISSUES issue(s) found."
         exit 1
@@ -321,6 +412,8 @@ if ((CHECK)); then
     echo "✨ Everything matches manifest.tsv."
 elif ((DRY_RUN)); then
     echo "✨ Dry run complete; nothing was changed."
+elif [[ "$ACTION" == adopt ]]; then
+    echo "✨ Adopt complete."
 else
     echo "✨ Configuration linking complete!"
 fi
