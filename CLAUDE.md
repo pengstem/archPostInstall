@@ -4,86 +4,91 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-Personal Arch Linux post-install automation and dotfiles repository. Automates package installation, symlinks configs into place, and captures GNOME theme/extension state for easy rebuilds.
+Personal Arch Linux (GNOME, linux-zen) post-install automation and dotfiles repository. Installs packages, symlinks configs into place, manages a Plymouth boot splash, a GNOME screensaver/DPMS helper, and captures GNOME theme/extension state for easy rebuilds.
 
 ## Key Commands
 
 ```bash
-# Full post-install setup (packages, shell tools, symlinks, sets zsh as default shell)
+# Full post-install setup: packages + ttfx -> shell tools -> setup.sh -> screensaver install (GNOME) -> zsh default shell
 ./bootstrap.sh
 
-# Symlink configs only (no package installation)
+# Symlink configs only (also inits the vendor/rime-frost submodule if missing)
 ./setup.sh
 
-# Unified CLI (after setup.sh links it to ~/.local/bin/archpostinstall)
+# Unified CLI (setup.sh links it to ~/.local/bin/archpostinstall)
 archpostinstall --help
-archpostinstall bootstrap
-archpostinstall install-packages
-archpostinstall install-shell
-archpostinstall link-configs
-archpostinstall backup-gnome
-archpostinstall backup-themes
-archpostinstall restore-themes <files>
-archpostinstall backup-firefox
-archpostinstall restore-firefox <file>
+archpostinstall bootstrap | install-packages | install-maplemono-cn | install-shell | link-configs
+archpostinstall boot-splash <apply|verify|rollback>
+archpostinstall screensaver [toggle|start|stop|status|upgrade|install|uninstall]
+archpostinstall dpms-toggle | dpms-off | dpms-on
+archpostinstall backup-gnome | backup-themes | restore-themes <files>
+archpostinstall backup-firefox | restore-firefox <file>
 archpostinstall update-pkglist
-archpostinstall dpms-toggle
-archpostinstall dpms-off
-archpostinstall dpms-on
 
-# Syntax-check a script without running it
+# No test suite; syntax-check scripts before running them
 bash -n scripts/some_script.sh
 ```
 
 ## Repository Architecture
 
 **Entry points:**
-- `bootstrap.sh` - Full setup orchestrator (runs install_packages -> install_shell_tools -> setup.sh -> sets zsh)
-- `setup.sh` - Symlinks all tracked configs; handles both user (`~/.config`) and system (`/etc`) targets
-- `scripts/archpostinstall.sh` - Unified CLI wrapper for all common operations
+- `bootstrap.sh` - Full setup orchestrator
+- `setup.sh` - Links all tracked configs (user and system targets)
+- `scripts/archpostinstall.sh` - Unified CLI wrapper; resolves its own symlink to find the repo
 
-**Scripts organized by purpose:**
-- `scripts/install/` - Package and shell tool installation
-- `scripts/backup/` - Firefox and GNOME theme/extension backup/restore
-- `scripts/gnome/` - GNOME state sync and DPMS automation
-- `scripts/zathura/` - Zathura PDF viewer helpers
+**Scripts by purpose:**
+- `scripts/install/` - Packages (`pkglist.txt` via paru/yay/pacman), shell tools (Oh My Zsh, p10k), `ttfx` (Rust screensaver renderer), Maple Mono CN font, boot splash (`install_boot_splash.sh`, backs up to `/var/lib/archpostinstall/boot-splash-backups`)
+- `scripts/gnome/` - GNOME state sync, DPMS toggle (`dpms-common.sh` + `dpms-toggle.sh`), screensaver (`screensaver.sh` + `screensaver-idle.py` Mutter idle monitor)
+- `scripts/backup/` - Firefox and GNOME theme/icon/extension archives (default output `backups/`)
+- `scripts/launchers/` - Yazi desktop/Nautilus wrappers
+- `scripts/zathura/` - Zathura helpers
+- `scripts/update_pkglist.sh` - Called by the pacman hook
 
 **Config structure:**
-- `configs/<tool>/` - Each tool's config mirrors its target location
-- System configs (`pacman/`, `paru/`) require sudo to link
-- `configs/systemd/user/` - User systemd units for GNOME sync
+- `configs/<tool>/` mirrors the target location; see `docs/fileLocationList.md` for the full mapping
+- `configs/zsh/` → `~/.config/zsh`; `configs/zshrc` is a loader-only `~/.zshrc` that sources `rc.d/*.zsh` in numeric order (see `configs/zsh/README.md` for what belongs in each file; p10k is the sole prompt)
+- `configs/archpostinstall/` - `dpms.conf`, `screensaver.conf`, `screensaver.txt` (ASCII art)
+- `configs/systemd/user/` - GNOME sync `.path`/`.service` and screensaver service
+- `configs/rime/` - Rime (白霜拼音) config; most files are relative symlinks into the `vendor/rime-frost` git submodule, with local patches kept as regular files (`*.custom.yaml`, `rime_frost.dict.yaml`, modified `lua/` modules). Edit the local files, never the symlink targets. See `configs/rime/README.md`.
 
-**Key files:**
-- `scripts/pkglist.txt` - Package source of truth; auto-updated by pacman hook
-- `configs/archpostinstall/dpms.conf` - DPMS application configuration (`dpms_app`)
-- `docs/fileLocationList.md` - Complete source-to-target symlink mapping
+**Docs:**
+- `docs/bug-history.md` - Append dated entries for fixed bugs (non-DPMS)
+- `docs/dpms-past-bugs.md` - DPMS pitfalls; update when touching DPMS scripts/configs
+- `docs/screensaver.md` - Screensaver design and its DPMS interaction
+- `docs/gnome-extensions.md`, `docs/gnome-appearrance.md` - Auto-generated by the GNOME sync script
+- `docs/CODEMAPS/` - Older architecture notes (may be stale)
 
-## Symlink Behavior
+## Linking Behavior
 
-`setup.sh` uses two helper functions:
-- `create_link()` - User-space symlinks with backup of existing files
-- `create_sudo_link()` - System symlinks (`/etc/*`) requiring sudo
+`setup.sh` has three helpers:
+- `create_link()` - User-space symlinks
+- `create_sudo_link()` - System symlinks (`/etc/*`, `/usr/local/bin/*`)
+- `install_sudo_copy()` - Real copies for Plymouth theme/config, because mkinitcpio would otherwise archive the repo path into the initramfs
 
-Existing files are backed up with timestamp suffix (`.bak_<epoch>`) before linking.
+Existing targets are moved to `<target>.bak_<epoch>` before linking. A missing source prints `❌ Source not found` and continues; `setup.sh` still references several configs that have been removed from the repo (zed, tmux, zellij, bottom, btop, nowledge-mem, ratty.desktop).
+
+System targets: `pacman.conf`, `paru.conf`, pacman pkglist hook, TLP drop-in, Plymouth, mkinitcpio drop-in and `linux-zen.preset` (UKI), kernel `cmdline.d` splash args.
 
 ## Special Cases
 
-- `configs/baidupcs/pcs_config.json` - Ignored; copy from `.example` template locally
-- `configs/rime/user.yaml` - Ignored; changes constantly during typing
-- `configs/rime/build/`, `configs/rime/*.userdb/` - Build artifacts, may be git-ignored
-- `backups/` - Git-ignored archive output directory
+- `configs/baidupcs/pcs_config.json` - Ignored secret; copy from `.example`. Linked only if present.
+- `configs/rime/user.yaml`, `*.userdb/`, `build/`, `sync/` - Ignored user data/build output
+- `vendor/rime-frost` - Submodule pinned to a recorded revision; upgrades are manual (`git pull --ff-only` inside it, then commit the submodule bump and redeploy in Fcitx5)
+- `scripts/pkglist.txt` - Auto-updated by the pacman hook, so it's frequently dirty
+- `backups/` - Archive output; tarballs are git-ignored
 
 ## Systemd Integration
 
-After running `setup.sh`, enable user units:
+After running `setup.sh`:
 ```bash
 systemctl --user daemon-reload
 systemctl --user enable --now archpostinstall-gnome-sync.path  # Auto-sync GNOME state
+archpostinstall screensaver install                             # Enables screensaver service + Super+F11
 ```
 
-## Shell Script Conventions
+## Conventions
 
-- Use `#!/bin/bash` with `set -euo pipefail` for fail-fast behavior
-- 4-space indentation
-- `lower_snake_case` for functions, `UPPER_SNAKE_CASE` for constants
-- Scripts must not be run as root; check `EUID` and require sudo privileges instead
+- `#!/bin/bash` with `set -euo pipefail`; 4-space indent; `lower_snake_case` functions, `UPPER_SNAKE_CASE` constants
+- Scripts must not run as root; check `EUID` and use sudo for privileged steps
+- Commits use Conventional Commit prefixes (`feat:`, `fix:`, `chore:`, `refactor(scope):`), short imperative subjects
+- `AGENTS.md` holds further workflow rules (research policy, bug-history recording, commit guidance)
