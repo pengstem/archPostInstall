@@ -35,6 +35,11 @@ patch:
     states:
     - 半角
     - 全角
+  - name: pin_cand
+    reset: 1
+    states:
+    - 固顶关
+    - 固顶开
   engine/translators:
   - punct_translator
   - table_translator@frost_aux
