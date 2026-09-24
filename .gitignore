@@ -14,3 +14,6 @@ configs/obs-studio/basic/scenes/*.bak
 configs/fcitx5/conf/cached_layouts
 configs/fcitx5/profile_*
 configs/rime/installation.yaml
+# uosc ships every platform's ziggy helper; only Linux is used here.
+configs/mpv/scripts/uosc/bin/ziggy-darwin
+configs/mpv/scripts/uosc/bin/ziggy-windows.exe
