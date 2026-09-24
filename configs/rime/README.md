@@ -42,12 +42,12 @@ git pull --ff-only
 ## 个人配置
 
 - `default.custom.yaml`：方案列表、F4 等切换键、候选数和开关记忆。
-- `rime_frost*.custom.yaml`：保留原来的全拼/双拼行为、辅助码、长词优先、反查与计算器前缀。
+- `rime_frost*.custom.yaml`：保留原来的全拼/双拼行为、长词优先、反查与计算器前缀；辅助码使用上游的
+  `table_translator@frost_aux`（单字）和 `lua_filter@*aux_lookup_filter`（词组/整句），触发键仍是 `` ` ``，
+  例如 `shishi`b` → 事实。
 - `custom_phrase.txt`：个人短语。
 - `rime_frost.dict.yaml`：本地词库入口，保留原来的词库选择；导入的词库内容随子模块更新。
-- `lua/`：修改过的模块保留为普通文件（包括辅助码、计算器、纠错和置顶逻辑）；其余模块链接上游。
-  上游已在 2026-04-28 删除 `aux_code.lua`（改用 `aux_lookup_filter.lua`），本地版本仍被各方案的
-  `lua_filter@*aux_code` 使用，并依赖上游的 `lua/aux_code/` 数据目录。
+- `lua/`：修改过的模块保留为普通文件（计算器、纠错和置顶逻辑）；其余模块链接上游。
 - `*.userdb/`、`user.yaml`、`sync/`、`build/`：用户数据和部署产物，不参与子模块更新。
 
 编辑 `.custom.yaml` 和本地普通文件，避免直接编辑上游软链接目标。

@@ -4,6 +4,7 @@ patch:
   schema/dependencies:
   - melt_eng
   - radical_pinyin
+  - rime_frost_aux
   switches:
   - name: ascii_mode
     states:
@@ -27,6 +28,7 @@ patch:
     - 全角
   engine/translators:
   - punct_translator
+  - table_translator@frost_aux
   - script_translator
   - lua_translator@*date_translator
   - lua_translator@*lunar
@@ -47,9 +49,9 @@ patch:
   - lua_filter@*pin_cand_filter
   - lua_filter@*long_word_filter
   - lua_filter@*reduce_english_filter
+  - lua_filter@*aux_lookup_filter
   - simplifier@emoji
   - simplifier@traditionalize
-  - lua_filter@*aux_code
   - uniquifier
   pin_cand_filter: null
   translator/max_homographs: null
@@ -59,11 +61,9 @@ patch:
   radical_lookup/prefix: uU
   recognizer/patterns/radical_lookup: ^uU[a-z]+$
   recognizer/patterns/calculator: ^V.*$
-  key_binder/aux_code_trigger: '`'
   key_binder/bindings: null
   chaifen_all: null
   chaifen: null
-  frost_aux: null
   chinese_english: null
   grammar: null
   mars: null

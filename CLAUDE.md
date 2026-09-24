@@ -75,7 +75,7 @@ There is no test suite. Run `archpostinstall lint` before committing script chan
 
 - `configs/baidupcs/pcs_config.json` - Ignored secret; copy from `.example`. Linked only if present
 - Ignored app-generated files: `configs/rime/{user.yaml,installation.yaml,*.userdb/,build/,sync/}`, fcitx5 `cached_layouts` and `profile_*`
-- `vendor/rime-frost` - Submodule pinned to a recorded revision; update with `archpostinstall update-vendor rime` (stages the bump, flags upstream Lua changes and changes to locally overridden files, then asks Fcitx5 to reload Rime). Upstream Lua runs inside the input method, so review it before deploying. Local `lua/aux_code.lua` is a fork of a module upstream deleted on 2026-04-28
+- `vendor/rime-frost` - Submodule pinned to a recorded revision; update with `archpostinstall update-vendor rime` (stages the bump, flags upstream Lua changes and changes to locally overridden files, then asks Fcitx5 to reload Rime). Upstream Lua runs inside the input method, so review it before deploying. Auxiliary codes use upstream's `frost_aux` translator + `aux_lookup_filter`; the remaining local Lua forks are `calculator`, `corrector`, `pin_cand_filter`
 - `configs/mpv/scripts/uosc/` - Vendored pristine release (only the Linux `ziggy` binary is kept); update with `archpostinstall update-vendor mpv`, which refuses if the scripts were edited locally and 3-way merges `uosc.conf` onto the new sample
 - OBS `basic.ini` keeps absolute `/home/nastem/Videos` paths: OBS rewrites the file from its settings UI, so templating would fight it
 - `configs/mimeapps.list` gets replaced by a regular file whenever an app registers a handler; `doctor` flags it and `adopt` merges it back
