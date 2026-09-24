@@ -348,6 +348,41 @@ process_group() {
     done 3<"$MANIFEST"
 }
 
+# Print "<plugins|flavors> <use>" for every dependency in yazi's package.toml.
+yazi_deps() {
+    awk '/^\[\[plugin\.deps\]\]/ { kind = "plugins" }
+         /^\[\[flavor\.deps\]\]/ { kind = "flavors" }
+         /^use = / { gsub(/"/, "", $3); print kind, $3 }' "$1"
+}
+
+# yazi plugins and flavors are not tracked; `ya pkg install` restores the
+# revisions pinned (with content hashes) in configs/yazi/package.toml.
+install_yazi_packages() {
+    local yazi_dir="$REPO_DIR/configs/yazi"
+    local kind
+    local use
+    local name
+    local missing=()
+
+    [ -f "$yazi_dir/package.toml" ] || return 0
+    while read -r kind use; do
+        name="${use##*:}"
+        name="${name##*/}"
+        [ -d "$yazi_dir/$kind/${name%.yazi}.yazi" ] || missing+=("$use")
+    done < <(yazi_deps "$yazi_dir/package.toml")
+
+    if ((${#missing[@]} == 0)); then
+        status "Yazi Packages" "✅ Installed"
+    elif [[ "$ACTION" == check ]]; then
+        issue "Yazi Packages" "missing ${missing[*]}; run 'ya pkg install'"
+    elif ! command -v ya >/dev/null 2>&1; then
+        issue "Yazi Packages" "ya is not installed; skipped ${missing[*]}"
+    else
+        run env YAZI_CONFIG_HOME="$yazi_dir" ya pkg install
+        status "Yazi Packages" "$( ((DRY_RUN)) && echo "Would install" || echo "✅ Installed") ${missing[*]}"
+    fi
+}
+
 # --- Main ---
 
 for group in "${ALL_GROUPS[@]}"; do
@@ -365,6 +400,10 @@ for group in "${ALL_GROUPS[@]}"; do
     fi
 
     process_group "$group"
+
+    if [[ "$group" == user && "$ACTION" != prune && "$ACTION" != adopt ]]; then
+        install_yazi_packages
+    fi
 done
 
 prune_backups() {

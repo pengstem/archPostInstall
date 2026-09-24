@@ -30,7 +30,7 @@ archpostinstall restore-themes <archives...>
 archpostinstall backup-firefox
 archpostinstall restore-firefox <archive>
 archpostinstall update-pkglist
-archpostinstall update-vendor [--check] [rime|mpv]
+archpostinstall update-vendor [--check] [rime|mpv|yazi]
 ```
 
 ## Direct Script Calls
@@ -53,7 +53,7 @@ Use these when you want explicit control:
 ./scripts/gnome/screensaver.sh [start|stop|toggle|status|upgrade|install|uninstall]
 ./scripts/update_pkglist.sh
 ./scripts/lint.sh [--fix]
-./scripts/update_vendor.sh [--check] [rime|mpv]
+./scripts/update_vendor.sh [--check] [rime|mpv|yazi]
 ```
 
 ## Systemd (GNOME Sync)

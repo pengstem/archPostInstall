@@ -4,8 +4,9 @@
 #   rime  the rime-frost dictionaries and schemas (vendor/rime-frost submodule)
 #   mpv   uosc (release snapshot in vendor/uosc) and thumbfast (vendor/thumbfast
 #         submodule), both linked into configs/mpv
+#   yazi  plugins and flavors pinned in configs/yazi/package.toml (ya pkg)
 #
-# Usage: update_vendor.sh [--check] [rime|mpv]...   (default: both)
+# Usage: update_vendor.sh [--check] [rime|mpv|yazi]...   (default: all)
 #
 # Updates are staged, not committed, so they can be reviewed with git diff.
 
@@ -24,16 +25,19 @@ UOSC_DIR="$REPO_DIR/vendor/uosc"
 UOSC_REPO="tomasklaen/uosc"
 THUMBFAST_SUB="$REPO_DIR/vendor/thumbfast"
 
+YAZI_DIR="$REPO_DIR/configs/yazi"
+
 CHECK=0
 TARGETS=()
 
 usage() {
     cat <<'EOF'
-Usage: update_vendor.sh [--check] [rime|mpv]...
+Usage: update_vendor.sh [--check] [rime|mpv|yazi]...
 
   rime      Fast-forward vendor/rime-frost to upstream master and redeploy Rime
   mpv       Update uosc to its latest release (merging uosc.conf) and
             fast-forward the thumbfast submodule
+  yazi      Upgrade yazi plugins and flavors with `ya pkg upgrade`
   --check   Only report what is outdated; change nothing
 EOF
 }
@@ -41,7 +45,7 @@ EOF
 while (($#)); do
     case "$1" in
         --check) CHECK=1 ;;
-        rime | mpv) TARGETS+=("$1") ;;
+        rime | mpv | yazi) TARGETS+=("$1") ;;
         -h | --help)
             usage
             exit 0
@@ -55,7 +59,7 @@ while (($#)); do
     shift
 done
 if ((${#TARGETS[@]} == 0)); then
-    TARGETS=(rime mpv)
+    TARGETS=(rime mpv yazi)
 fi
 
 if [[ "${EUID}" -eq 0 ]]; then
@@ -317,6 +321,44 @@ update_mpv() {
         git -C "$REPO_DIR" add vendor/uosc vendor/thumbfast configs/mpv/script-opts/uosc.conf
         note "Staged; commit with: git commit -m 'chore(mpv): update uosc and thumbfast'"
     fi
+}
+
+# --- yazi ---
+
+update_yazi() {
+    local use
+    local rev
+    local latest
+    local outdated=0
+
+    header "yazi packages (configs/yazi/package.toml)"
+    if ! command -v ya >/dev/null 2>&1; then
+        warn "ya is not installed; skipped."
+        return
+    fi
+
+    # ya records the repository HEAD it installed from, so a newer HEAD means
+    # the repo moved (the package itself may be unchanged).
+    while read -r use rev; do
+        latest="$(git ls-remote "https://github.com/${use%%:*}.git" HEAD | cut -c1-7)"
+        if [[ "$latest" == "$rev" ]]; then
+            note "✅ $use is up to date ($rev)."
+        else
+            note "$use $rev -> $latest"
+            outdated=1
+        fi
+    done < <(awk '/^use = / { gsub(/"/, "", $3); use = $3 }
+                  /^rev = / { gsub(/"/, "", $3); print use, $3 }' "$YAZI_DIR/package.toml")
+
+    if ((CHECK || ! outdated)); then
+        return
+    fi
+    # ya refuses to overwrite locally modified packages and says so; that
+    # message is shown as is instead of discarding the edits here.
+    YAZI_CONFIG_HOME="$YAZI_DIR" ya pkg upgrade
+    git -C "$REPO_DIR" add configs/yazi/package.toml
+    note "✅ Upgraded; package.toml staged:"
+    note "  git commit -m 'chore(yazi): upgrade plugins and flavors'"
 }
 
 for target in "${TARGETS[@]}"; do

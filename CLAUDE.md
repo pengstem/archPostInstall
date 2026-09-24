@@ -29,7 +29,7 @@ archpostinstall dpms-toggle | dpms-off | dpms-on
 archpostinstall backup-gnome | backup-themes | restore-themes <files>
 archpostinstall backup-firefox | restore-firefox <file>
 archpostinstall update-pkglist
-archpostinstall update-vendor [--check] [rime|mpv]  # fast-forward rime-frost + redeploy; uosc release + conf 3-way merge; thumbfast
+archpostinstall update-vendor [--check] [rime|mpv|yazi]  # fast-forward rime-frost + redeploy; uosc release + conf 3-way merge; thumbfast
 ```
 
 There is no test suite. Run `archpostinstall lint` before committing script changes; preview installs with `HOME=$(mktemp -d) ./setup.sh --group user --dry-run`.
@@ -77,6 +77,7 @@ There is no test suite. Run `archpostinstall lint` before committing script chan
 - Ignored app-generated files: `configs/rime/{user.yaml,installation.yaml,*.userdb/,build/,sync/}`, fcitx5 `cached_layouts` and `profile_*`
 - `vendor/rime-frost` - Submodule pinned to a recorded revision; update with `archpostinstall update-vendor rime` (stages the bump, flags upstream Lua changes and changes to locally overridden files, then asks Fcitx5 to reload Rime). Upstream Lua runs inside the input method, so review it before deploying. Auxiliary codes use upstream's `frost_aux` translator + `aux_lookup_filter`; all Lua modules are upstream symlinks (no local forks). Candidate pinning is disabled on purpose: no `pin_cand` switch, no `pin_cand_filter` filter, and `pin_cand_filter: null` in every patch
 - `vendor/` holds all third-party code (see `vendor/README.md`); never edit it, since updates replace it. `thumbfast` is a submodule; `uosc` is a release-zip snapshot (its `ziggy` binary only exists in releases; only `ziggy-linux` kept). `configs/mpv/scripts/{uosc,thumbfast.lua}` and `configs/mpv/fonts` are symlinks into it; `configs/mpv/script-opts/uosc.conf` stays local. `update-vendor mpv` refuses if `vendor/uosc` was edited and 3-way merges `uosc.conf` onto the new sample
+- `configs/yazi/{plugins,flavors}/` are untracked: `package.toml` pins them (rev + hash), `setup.sh` runs `ya pkg install` for missing ones (reported by `doctor`), `update-vendor yazi` runs `ya pkg upgrade`. Never edit installed packages; ya refuses to upgrade modified ones
 - OBS `basic.ini` keeps absolute `/home/nastem/Videos` paths: OBS rewrites the file from its settings UI, so templating would fight it
 - `configs/mimeapps.list` gets replaced by a regular file whenever an app registers a handler; `doctor` flags it and `adopt` merges it back
 - `backups/` - Archive output; tarballs are git-ignored

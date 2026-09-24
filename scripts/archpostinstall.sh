@@ -32,8 +32,8 @@ Commands:
   backup-firefox          Archive ~/.mozilla
   restore-firefox <file>  Restore ~/.mozilla from an archive
   update-pkglist          Refresh scripts/pkglist/ from pacman
-  update-vendor [--check] [rime|mpv]
-                          Update the Rime dictionaries and mpv uosc/thumbfast
+  update-vendor [--check] [rime|mpv|yazi]
+                          Update Rime dictionaries, mpv uosc/thumbfast, yazi packages
 EOF
 }
 
