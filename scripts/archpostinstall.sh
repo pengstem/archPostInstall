@@ -32,6 +32,8 @@ Commands:
   backup-firefox          Archive ~/.mozilla
   restore-firefox <file>  Restore ~/.mozilla from an archive
   update-pkglist          Refresh scripts/pkglist/ from pacman
+  update-vendor [--check] [rime|mpv]
+                          Update the Rime dictionaries and mpv uosc/thumbfast
 EOF
 }
 
@@ -98,6 +100,9 @@ case "$cmd" in
         ;;
     restore-firefox)
         "$REPO_DIR/scripts/backup/restore_firefox.sh" "$@"
+        ;;
+    update-vendor)
+        "$REPO_DIR/scripts/update_vendor.sh" "$@"
         ;;
     update-pkglist)
         "$REPO_DIR/scripts/update_pkglist.sh"
