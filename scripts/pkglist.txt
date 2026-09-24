@@ -1,4 +1,4 @@
-# Package list generated on Sun Sep 13 03:22:42 PM +08 2026
+# Package list generated on Thu Sep 24 10:12:02 AM +08 2026
 7zip
 abduco
 alacritty
@@ -12,12 +12,13 @@ base
 base-devel
 bash-language-server
 bat
+bc
 bear
+beekeeper-studio-bin
 bibata-cursor-theme-bin
 bind
 bluez
 bluez-utils
-bottom
 bpftrace
 brightnessctl
 btop
@@ -26,14 +27,13 @@ btrfs-progs
 cargo-flamegraph
 cc-switch-bin
 chafa
-chatgpt-desktop
+chatgpt-bin
 clang
 cli11
 cmake
 compsize
 conntrack-tools
 cowsay
-cuda
 cursor-bin
 devtools
 dictd
@@ -73,7 +73,7 @@ git
 git-filter-repo
 github-cli
 git-zsh-completion
-gnome-browser-connector
+gnirehtet-bin
 gnome-color-manager
 gnome-control-center
 gnome-disk-utility
@@ -104,14 +104,15 @@ gvfs-smb
 gvfs-wsdd
 harper
 heroic-games-launcher-bin
-htop
 hyperfine
 inotify-tools
-jdk21-openjdk
+jadx
+jdk-openjdk
 jpegoptim
 jq
 kitty
 lazygit
+lazysql-bin
 libdwarf
 libgda6
 libgpiod
@@ -135,6 +136,7 @@ marksman
 maven
 mediainfo
 minicom
+mitmproxy
 mkinitcpio
 mokutil
 mold
@@ -148,7 +150,6 @@ nano
 nautilus
 neovim
 networkmanager
-network-manager-applet
 newsflash
 ngrep
 nlohmann-json
@@ -160,7 +161,6 @@ noto-fonts-extra
 npm
 nvidia-open-dkms
 nvme-cli
-nvtop
 obs-studio
 opencode
 os-prober
@@ -180,14 +180,18 @@ pnpm
 postgresql
 power-profiles-daemon
 powertop
+qemu-img
+qemu-system-loongarch64
+qemu-system-riscv
 qpdf
+rainfrog
 repo
 resvg
+rtkit
 ruff
 rust-analyzer
 rygel
 sassc
-scc
 sccache
 scrcpy
 shfmt
@@ -202,6 +206,7 @@ steam
 strace
 stylua
 sudo
+sunshine-bin
 sysstat
 systemctl-tui
 tailscale
@@ -259,6 +264,7 @@ xh
 yaml-language-server
 yay
 yazi
+ydotool
 yt-dlp
 zathura
 zathura-pdf-mupdf
