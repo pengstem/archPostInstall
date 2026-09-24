@@ -46,7 +46,6 @@ patch:
   - reverse_lookup_filter@radical_reverse_lookup
   - lua_filter@*autocap_filter
   - lua_filter@*v_filter
-  - lua_filter@*pin_cand_filter
   - lua_filter@*long_word_filter
   - lua_filter@*reduce_english_filter
   - lua_filter@*aux_lookup_filter
