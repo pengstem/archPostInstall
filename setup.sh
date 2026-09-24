@@ -244,12 +244,13 @@ process_entry() {
     local label="$4"
     local guard=""
 
+    # shellcheck disable=SC2088 # the manifest stores a literal "~/"
     if [[ "$dest" == "~/"* ]]; then
         dest="$HOME/${dest:2}"
     fi
     if [[ "$mode" == link:* ]]; then
         guard="$REPO_DIR/${mode#link:}"
-        mode=link
+        mode="link"
     fi
 
     if ! [ -e "$src" ]; then

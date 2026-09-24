@@ -18,6 +18,7 @@ Commands:
   link-configs [opts]     Install every manifest.tsv entry (see setup.sh --help)
   sync-system             Re-copy root-owned targets after editing them in the repo
   doctor                  Report missing sources, drifted targets, and old backups
+  lint [--fix]            Run bash -n, shellcheck, shfmt, and Python syntax checks
   boot-splash <action>    Apply, verify, or roll back the Zen Connect splash
   dpms-toggle             Toggle display power (GNOME)
   dpms-off                Force display off
@@ -56,6 +57,9 @@ case "$cmd" in
         ;;
     doctor)
         "$REPO_DIR/setup.sh" --check "$@"
+        ;;
+    lint)
+        "$REPO_DIR/scripts/lint.sh" "$@"
         ;;
     boot-splash)
         "$REPO_DIR/scripts/install/install_boot_splash.sh" "$@"
