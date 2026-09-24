@@ -10,3 +10,7 @@ configs/baidupcs/pcs_config.json
 configs/baidupcs/pcs_command_history.txt
 configs/obs-studio/basic/scenes/*.bak
 .codex
+# Written by the applications themselves; tracking them only produces churn.
+configs/fcitx5/conf/cached_layouts
+configs/fcitx5/profile_*
+configs/rime/installation.yaml
