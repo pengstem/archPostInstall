@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=WeChat
-Exec=/home/nastem/Applications/WeChat.AppImage
+Exec=env QT_IM_MODULE=fcitx GTK_IM_MODULE=fcitx XMODIFIERS=@im=fcitx /home/nastem/Applications/WeChat.AppImage
 Type=Application
 Icon=/home/nastem/.local/share/icons/wechat.png
 Terminal=false
