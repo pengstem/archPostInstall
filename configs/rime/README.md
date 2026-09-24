@@ -6,20 +6,21 @@ Git 子模块管理，词库目录和方案通过相对软链接直接引用它�
 ## 日常更新
 
 ```bash
-cd /home/nastem/Project/archPostInstall/vendor/rime-frost
-git pull --ff-only
-```
-
-随后在 Fcitx5 的 Rime 菜单选择「重新部署」，编译完成后新词库才生效。
-`git pull` 本身不会触发重新部署。不要删除本目录的 `default.yaml` 软链接。
-
-如需把更新后的上游版本记录到 dotfiles 仓库：
-
-```bash
-cd /home/nastem/Project/archPostInstall
-git add vendor/rime-frost
+archpostinstall update-vendor --check rime   # 只看上游有什么新提交
+archpostinstall update-vendor rime           # 快进子模块、暂存、尝试重新部署
 git commit -m "chore(rime): update upstream dictionaries"
 ```
+
+脚本会：
+
+- 列出新提交和改动统计；
+- 单独列出上游改动的 Lua 模块（它们运行在输入法里、能看到每一次按键），部署前请先审阅；
+- 提示上游改动或删除了本目录用普通文件覆盖的文件（需要手动合并）；
+- 提示上游新增、但本目录还没有软链接的顶层文件，以及上游删除后留下的断链；
+- 通过 D-Bus 让 Fcitx5 重新加载 Rime，并检查词库是否真的重新编译；确认不了时会提示你在
+  Rime 菜单里手动选择「重新部署」。
+
+不要删除本目录的 `default.yaml` 软链接。
 
 ## 新机器
 
@@ -45,6 +46,8 @@ git pull --ff-only
 - `custom_phrase.txt`：个人短语。
 - `rime_frost.dict.yaml`：本地词库入口，保留原来的词库选择；导入的词库内容随子模块更新。
 - `lua/`：修改过的模块保留为普通文件（包括辅助码、计算器、纠错和置顶逻辑）；其余模块链接上游。
+  上游已在 2026-04-28 删除 `aux_code.lua`（改用 `aux_lookup_filter.lua`），本地版本仍被各方案的
+  `lua_filter@*aux_code` 使用，并依赖上游的 `lua/aux_code/` 数据目录。
 - `*.userdb/`、`user.yaml`、`sync/`、`build/`：用户数据和部署产物，不参与子模块更新。
 
 编辑 `.custom.yaml` 和本地普通文件，避免直接编辑上游软链接目标。
