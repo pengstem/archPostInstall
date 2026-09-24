@@ -70,5 +70,5 @@ set synctex "true"
 # =========================================================
 # Convert the current page to a PNG and copy to clipboard.
 # Requires: poppler (pdftoppm) + wl-clipboard (wl-copy)
-map <C-c> exec "/home/nastem/.local/bin/zathura-page-to-clipboard $FILE $PAGE"
+map <C-c> exec "zathura-page-to-clipboard $FILE $PAGE"
 set guioptions "svh"

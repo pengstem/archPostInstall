@@ -20,8 +20,10 @@ pacman  sudo-copy      configs/paru/paru.conf                                 /e
 # --- System ---
 system  sudo-copy      configs/pacman/hooks/99-update-pkglist.hook            /etc/pacman.d/hooks/99-update-pkglist.hook                  Pkglist Hook
 system  sudo-template  configs/pacman/archpostinstall-update-pkglist.in       /usr/local/bin/archpostinstall-update-pkglist               Pkglist Sync
-# GNOME shortcuts do not see ~/.local/bin; this is only ever run as the user.
+# GUI-launched commands (GNOME shortcuts, zathura exec) do not see ~/.local/bin.
+# Both are only ever run as the user, never by root.
 system  sudo-link      scripts/gnome/dpms-toggle.sh                           /usr/local/bin/dpms-toggle                                  DPMS Toggle (System)
+system  sudo-link      scripts/zathura/page-to-clipboard.sh                   /usr/local/bin/zathura-page-to-clipboard                    Zathura Clipboard (System)
 system  sudo-copy      configs/tlp/99-archpostinstall.conf                    /etc/tlp.d/99-archpostinstall.conf                          TLP
 # mkinitcpio archives resolved paths, so Plymouth must live at its real path.
 system  sudo-copy      configs/plymouth/themes/connect                        /usr/share/plymouth/themes/connect                          Plymouth Theme
