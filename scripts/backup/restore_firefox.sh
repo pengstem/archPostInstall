@@ -23,7 +23,7 @@ echo "Destination: $DEST_DIR/.mozilla"
 
 # Check if Firefox is running
 if command -v pgrep >/dev/null 2>&1; then
-    if pgrep -x "firefox" > /dev/null; then
+    if pgrep -x "firefox" >/dev/null; then
         echo "WARNING: Firefox seems to be running."
         echo "It is recommended to close Firefox before restoring."
         read -r -p "Continue anyway? (y/N) " -n 1
@@ -54,12 +54,12 @@ if [ -d "$DEST_DIR/.mozilla" ]; then
         echo "Restore cancelled."
         exit 1
     fi
-    
+
     # Optional: clean existng directory for a clean restore?
-    # For now, let's just overwrite as requested, but tar usually merges. 
-    # To be "seamless override" and avoid mixing old junk files, 
+    # For now, let's just overwrite as requested, but tar usually merges.
+    # To be "seamless override" and avoid mixing old junk files,
     # it's often safer to move the old one aside.
-    
+
     TIMESTAMP=$(date +%s)
     echo "Moving existing .mozilla to .mozilla.old_$TIMESTAMP..."
     mv "$DEST_DIR/.mozilla" "$DEST_DIR/.mozilla.old_$TIMESTAMP"

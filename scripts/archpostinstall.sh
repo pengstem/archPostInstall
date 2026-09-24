@@ -94,7 +94,7 @@ case "$cmd" in
     update-pkglist)
         "$REPO_DIR/scripts/update_pkglist.sh"
         ;;
-    ""|-h|--help|help)
+    "" | -h | --help | help)
         usage
         ;;
     *)

@@ -151,7 +151,7 @@ runner_is_running() {
     [ -r "/proc/$pid/cmdline" ] || return 1
     cmdline="$(tr '\0' ' ' <"/proc/$pid/cmdline")"
 
-    [[ "$cmdline" == *"screensaver.sh run"* || \
+    [[ "$cmdline" == *"screensaver.sh run"* ||
         "$cmdline" == *"archpostinstall-screensaver run"* ]]
 }
 

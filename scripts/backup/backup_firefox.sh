@@ -23,7 +23,7 @@ echo "Destination: $OUTPUT_FILE"
 
 # Check if Firefox is running
 if command -v pgrep >/dev/null 2>&1; then
-    if pgrep -x "firefox" > /dev/null; then
+    if pgrep -x "firefox" >/dev/null; then
         echo "WARNING: Firefox seems to be running."
         echo "It is recommended to close Firefox before backing up to ensure data consistency."
         read -r -p "Continue anyway? (y/N) " -n 1

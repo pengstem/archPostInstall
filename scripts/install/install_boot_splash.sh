@@ -74,7 +74,7 @@ find_zen_kernel_release() {
 
     for pkgbase_file in /usr/lib/modules/*/pkgbase; do
         [[ -f "$pkgbase_file" ]] || continue
-        read -r pkgbase < "$pkgbase_file"
+        read -r pkgbase <"$pkgbase_file"
         if [[ "$pkgbase" == "linux-zen" ]]; then
             releases+=("$(basename "$(dirname "$pkgbase_file")")")
         fi
@@ -112,12 +112,12 @@ check_prerequisites() {
 
     kernel_release="$(find_zen_kernel_release)"
     for module_name in nvidia nvidia_modeset nvidia_uvm nvidia_drm; do
-        modinfo -k "$kernel_release" -F filename "$module_name" >/dev/null \
-            || die "NVIDIA module missing for $kernel_release: $module_name"
+        modinfo -k "$kernel_release" -F filename "$module_name" >/dev/null ||
+            die "NVIDIA module missing for $kernel_release: $module_name"
     done
 
-    [[ "$(find -L "$THEME_SOURCE" -maxdepth 1 -type f -name 'progress-*.png' | wc -l)" -eq 120 ]] \
-        || die "the Connect theme must contain 120 animation frames"
+    [[ "$(find -L "$THEME_SOURCE" -maxdepth 1 -type f -name 'progress-*.png' | wc -l)" -eq 120 ]] ||
+        die "the Connect theme must contain 120 animation frames"
 }
 
 create_backup() {
@@ -129,24 +129,24 @@ create_backup() {
     timestamp="$(date +%Y%m%d-%H%M%S)"
     backup_dir="$BACKUP_ROOT/$timestamp"
     mkdir -p "$backup_dir/files"
-    : > "$backup_dir/manifest.tsv"
+    : >"$backup_dir/manifest.tsv"
 
     for target in "${MANAGED_TARGETS[@]}"; do
         backup_path="$backup_dir/files$target"
         mkdir -p "$(dirname "$backup_path")"
         if [[ -e "$target" || -L "$target" ]]; then
             cp -a --no-dereference -- "$target" "$backup_path"
-            printf 'present\t%s\n' "$target" >> "$backup_dir/manifest.tsv"
+            printf 'present\t%s\n' "$target" >>"$backup_dir/manifest.tsv"
         else
-            printf 'absent\t%s\n' "$target" >> "$backup_dir/manifest.tsv"
+            printf 'absent\t%s\n' "$target" >>"$backup_dir/manifest.tsv"
         fi
     done
 
     cp -a -- "$ZEN_UKI" "$backup_dir/arch-linux-zen.efi"
-    sha256sum "$ZEN_UKI" > "$backup_dir/zen-uki.sha256"
+    sha256sum "$ZEN_UKI" >"$backup_dir/zen-uki.sha256"
     if [[ -f "$LTS_UKI" ]]; then
-        sha256sum "$LTS_UKI" > "$backup_dir/lts-uki.sha256"
-        stat -c '%n %s %Y' "$LTS_UKI" > "$backup_dir/lts-uki.stat"
+        sha256sum "$LTS_UKI" >"$backup_dir/lts-uki.sha256"
+        stat -c '%n %s %Y' "$LTS_UKI" >"$backup_dir/lts-uki.stat"
     fi
 
     if [[ -e "$BACKUP_ROOT/latest" && ! -L "$BACKUP_ROOT/latest" ]]; then
@@ -184,15 +184,15 @@ restore_backup() {
         remove_managed_target "$target" "$displaced_dir"
         if [[ "$state" == "present" ]]; then
             backup_path="$backup_dir/files$target"
-            [[ -e "$backup_path" || -L "$backup_path" ]] \
-                || die "backup entry missing: $backup_path"
+            [[ -e "$backup_path" || -L "$backup_path" ]] ||
+                die "backup entry missing: $backup_path"
             mkdir -p "$(dirname "$target")"
             cp -a --no-dereference -- "$backup_path" "$target"
         fi
-    done < "$backup_dir/manifest.tsv"
+    done <"$backup_dir/manifest.tsv"
 
-    [[ -f "$backup_dir/arch-linux-zen.efi" ]] \
-        || die "Zen UKI backup missing: $backup_dir/arch-linux-zen.efi"
+    [[ -f "$backup_dir/arch-linux-zen.efi" ]] ||
+        die "Zen UKI backup missing: $backup_dir/arch-linux-zen.efi"
     cp -a -- "$backup_dir/arch-linux-zen.efi" "$ZEN_UKI"
 }
 
@@ -236,8 +236,8 @@ verify_copy_dir() {
     local target="$2"
 
     [[ -d "$target" && ! -L "$target" ]] || die "expected regular directory: $target"
-    diff -qr -- "$source" "$target" >/dev/null \
-        || die "installed directory differs from tracked source: $target"
+    diff -qr -- "$source" "$target" >/dev/null ||
+        die "installed directory differs from tracked source: $target"
 }
 
 verify_cmdline() {
@@ -246,14 +246,14 @@ verify_cmdline() {
     local token
     local token_count
 
-    cmdline="$(tr -d '\0' < "$cmdline_file")"
-    grep -qE '(^|[[:space:]])root=' <<< "$cmdline" \
-        || die "Zen UKI cmdline lost its root= parameter"
+    cmdline="$(tr -d '\0' <"$cmdline_file")"
+    grep -qE '(^|[[:space:]])root=' <<<"$cmdline" ||
+        die "Zen UKI cmdline lost its root= parameter"
 
     for token in quiet loglevel=3 splash; do
-        token_count="$(tr ' ' '\n' <<< "$cmdline" | grep -Fxc "$token" || true)"
-        [[ "$token_count" -eq 1 ]] \
-            || die "expected exactly one '$token' token in Zen UKI cmdline, found $token_count"
+        token_count="$(tr ' ' '\n' <<<"$cmdline" | grep -Fxc "$token" || true)"
+        [[ "$token_count" -eq 1 ]] ||
+            die "expected exactly one '$token' token in Zen UKI cmdline, found $token_count"
     done
 }
 
@@ -261,28 +261,28 @@ verify_initrd() {
     local initrd_file="$1"
     local listing_file="$2"
 
-    lsinitcpio "$initrd_file" > "$listing_file"
+    lsinitcpio "$initrd_file" >"$listing_file"
 
-    grep -Eq '/nvidia\.ko(\.zst)?$' "$listing_file" \
-        || die "nvidia.ko is missing from the Zen initramfs"
-    grep -Eq '/nvidia-modeset\.ko(\.zst)?$' "$listing_file" \
-        || die "nvidia-modeset.ko is missing from the Zen initramfs"
-    grep -Eq '/nvidia-uvm\.ko(\.zst)?$' "$listing_file" \
-        || die "nvidia-uvm.ko is missing from the Zen initramfs"
-    grep -Eq '/nvidia-drm\.ko(\.zst)?$' "$listing_file" \
-        || die "nvidia-drm.ko is missing from the Zen initramfs"
+    grep -Eq '/nvidia\.ko(\.zst)?$' "$listing_file" ||
+        die "nvidia.ko is missing from the Zen initramfs"
+    grep -Eq '/nvidia-modeset\.ko(\.zst)?$' "$listing_file" ||
+        die "nvidia-modeset.ko is missing from the Zen initramfs"
+    grep -Eq '/nvidia-uvm\.ko(\.zst)?$' "$listing_file" ||
+        die "nvidia-uvm.ko is missing from the Zen initramfs"
+    grep -Eq '/nvidia-drm\.ko(\.zst)?$' "$listing_file" ||
+        die "nvidia-drm.ko is missing from the Zen initramfs"
     if grep -Eq '/nouveau\.ko(\.zst)?$' "$listing_file"; then
         die "nouveau.ko is still present in the Zen initramfs"
     fi
 
-    grep -Fq 'usr/bin/plymouthd' "$listing_file" \
-        || die "plymouthd is missing from the Zen initramfs"
-    grep -Fq 'usr/lib/plymouth/script.so' "$listing_file" \
-        || die "Plymouth script plugin is missing from the Zen initramfs"
-    grep -Fq 'usr/share/plymouth/themes/connect/connect.plymouth' "$listing_file" \
-        || die "Connect theme is missing from the Zen initramfs"
-    [[ "$(grep -Ec 'usr/share/plymouth/themes/connect/progress-[0-9]+\.png$' "$listing_file")" -eq 120 ]] \
-        || die "the Zen initramfs does not contain all 120 Connect frames"
+    grep -Fq 'usr/bin/plymouthd' "$listing_file" ||
+        die "plymouthd is missing from the Zen initramfs"
+    grep -Fq 'usr/lib/plymouth/script.so' "$listing_file" ||
+        die "Plymouth script plugin is missing from the Zen initramfs"
+    grep -Fq 'usr/share/plymouth/themes/connect/connect.plymouth' "$listing_file" ||
+        die "Connect theme is missing from the Zen initramfs"
+    [[ "$(grep -Ec 'usr/share/plymouth/themes/connect/progress-[0-9]+\.png$' "$listing_file")" -eq 120 ]] ||
+        die "the Zen initramfs does not contain all 120 Connect frames"
 }
 
 verify_lts_unchanged() {
@@ -296,8 +296,8 @@ verify_lts_unchanged() {
 
     expected_hash="$(awk '{print $1}' "$backup_dir/lts-uki.sha256")"
     current_hash="$(sha256sum "$LTS_UKI" | awk '{print $1}')"
-    [[ "$current_hash" == "$expected_hash" ]] \
-        || die "LTS UKI changed during the Zen-only rebuild"
+    [[ "$current_hash" == "$expected_hash" ]] ||
+        die "LTS UKI changed during the Zen-only rebuild"
 }
 
 verify_installation() {
@@ -312,20 +312,20 @@ verify_installation() {
     verify_copy_file "$CMDLINE_CONFIG_SOURCE" "$CMDLINE_CONFIG_TARGET"
     verify_copy_file "$ZEN_PRESET_SOURCE" "$ZEN_PRESET_TARGET"
 
-    [[ "$(plymouth-set-default-theme)" == "connect" ]] \
-        || die "Plymouth default theme is not connect"
+    [[ "$(plymouth-set-default-theme)" == "connect" ]] ||
+        die "Plymouth default theme is not connect"
 
     splash_geometry="$(identify -format '%wx%h %[channels]' "$THEME_TARGET/connect.bmp")"
-    [[ "$splash_geometry" == "800x600 srgba 4.0" ]] \
-        || die "unexpected UKI splash format: $splash_geometry"
+    [[ "$splash_geometry" == "800x600 srgba 4.0" ]] ||
+        die "unexpected UKI splash format: $splash_geometry"
 
     temporary_dir="$(mktemp -d)"
     objcopy --dump-section ".splash=$temporary_dir/splash.bmp" "$ZEN_UKI"
     objcopy --dump-section ".cmdline=$temporary_dir/cmdline" "$ZEN_UKI"
     objcopy --dump-section ".initrd=$temporary_dir/initrd" "$ZEN_UKI"
 
-    cmp -s "$temporary_dir/splash.bmp" "$THEME_TARGET/connect.bmp" \
-        || die "Zen UKI .splash does not match connect.bmp"
+    cmp -s "$temporary_dir/splash.bmp" "$THEME_TARGET/connect.bmp" ||
+        die "Zen UKI .splash does not match connect.bmp"
     verify_cmdline "$temporary_dir/cmdline"
     verify_initrd "$temporary_dir/initrd" "$temporary_dir/initrd.list"
     verify_lts_unchanged "$backup_dir"
@@ -377,7 +377,7 @@ main() {
     local action="${1:-}"
 
     case "$action" in
-        -h|--help|help|"")
+        -h | --help | help | "")
             usage
             return 0
             ;;

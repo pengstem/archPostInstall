@@ -17,9 +17,9 @@ for FILE in "$@"; do
         echo "File not found: $FILE"
         continue
     fi
-    
+
     echo "Processing $FILE..."
-    
+
     # Try to detect content by listing first few files
     CONTENT=$(tar -tf "$FILE" | head -n 1)
     TOP_LEVEL="${CONTENT#./}"
@@ -29,19 +29,19 @@ for FILE in "$@"; do
         echo "  Detected Themes backup."
         echo "  Extracting to $HOME..."
         tar -xzf "$FILE" -C "$HOME"
-    
+
     elif [[ "$TOP_LEVEL" == "icons" ]]; then
         echo "  Detected Icons backup."
         mkdir -p "$HOME/.local/share"
         echo "  Extracting to $HOME/.local/share..."
         tar -xzf "$FILE" -C "$HOME/.local/share"
-        
+
     elif [[ "$TOP_LEVEL" == "extensions" ]]; then
         echo "  Detected Gnome Extensions backup."
         mkdir -p "$HOME/.local/share/gnome-shell"
         echo "  Extracting to $HOME/.local/share/gnome-shell..."
         tar -xzf "$FILE" -C "$HOME/.local/share/gnome-shell"
-        
+
     else
         echo "  Unknown backup format (top level directory: $TOP_LEVEL). Skipping."
     fi

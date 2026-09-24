@@ -76,10 +76,10 @@ upgrade_latest() {
     require_cmd cargo
     require_cmd git
     latest_tag="$(
-        git ls-remote --refs --tags "$TTFX_REPOSITORY" \
-            | awk -F/ '$3 ~ /^v[0-9]+[.][0-9]+[.][0-9]+$/ {print $3}' \
-            | sort -V \
-            | tail -n 1
+        git ls-remote --refs --tags "$TTFX_REPOSITORY" |
+            awk -F/ '$3 ~ /^v[0-9]+[.][0-9]+[.][0-9]+$/ {print $3}' |
+            sort -V |
+            tail -n 1
     )"
     if [ -z "$latest_tag" ]; then
         echo "Error: no stable ttfx release tag was found." >&2

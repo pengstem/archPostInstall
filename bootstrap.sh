@@ -4,7 +4,7 @@
 # Arch Linux Post-Install Bootstrap
 # =============================================================================
 
-set -euo pipefail  # Exit on error, undefined vars, or pipe failures
+set -euo pipefail # Exit on error, undefined vars, or pipe failures
 
 if [[ "${EUID}" -eq 0 ]]; then
     echo "Please run this script as a regular user with sudo privileges."
@@ -57,13 +57,17 @@ chmod +x \
 log_info "Requesting sudo privileges..."
 sudo -v
 # Keep sudo alive
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+done 2>/dev/null &
 
 # 0. Package manager configuration must precede package installation:
 # scripts/pkglist/ depends on repositories that only the tracked pacman.conf enables.
 log_header "🧰 [0/3] Configuring pacman"
 "$REPO_DIR/setup.sh" --group pacman
-sudo pacman -Syu --noconfirm  # refresh newly enabled repos without a partial upgrade
+sudo pacman -Syu --noconfirm # refresh newly enabled repos without a partial upgrade
 
 # 1. Packages
 log_header "📦 [1/3] Installing System Packages"

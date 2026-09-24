@@ -131,7 +131,7 @@ drop_missing_includes() {
             fi
         fi
         printf '%s\n' "$line"
-    done < "$file" > "$file.tmp"
+    done <"$file" >"$file.tmp"
     mv -- "$file.tmp" "$file"
 }
 
@@ -152,7 +152,7 @@ render_source() {
         sed -e "s|@REPO_DIR@|$REPO_DIR|g" \
             -e "s|@USER@|$USER_NAME|g" \
             -e "s|@HOME@|$HOME|g" \
-            "$src" > "$out"
+            "$src" >"$out"
     else
         cp -- "$src" "$out"
     fi
@@ -292,7 +292,7 @@ process_group() {
         [[ -z "$group" || "$group" == \#* ]] && continue
         [[ "$group" == "$wanted" ]] || continue
         process_entry "$mode" "$src" "$dest" "$label"
-    done 3< "$MANIFEST"
+    done 3<"$MANIFEST"
 }
 
 # --- Main ---

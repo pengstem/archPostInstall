@@ -25,11 +25,11 @@ get_dir_hash() {
         return 0
     fi
 
-    find "$path" -type f -print0 2>/dev/null \
-        | sort -z \
-        | xargs -0 sha256sum 2>/dev/null \
-        | sha256sum \
-        | awk '{print $1}'
+    find "$path" -type f -print0 2>/dev/null |
+        sort -z |
+        xargs -0 sha256sum 2>/dev/null |
+        sha256sum |
+        awk '{print $1}'
 }
 
 hash_changed() {
@@ -93,7 +93,7 @@ if [ -d "$HOME/.themes" ]; then
         THEME_BACKUP="$OUTPUT_DIR/themes_backup_$TIMESTAMP.tar.gz"
         echo "Backing up ~/.themes to $THEME_BACKUP ..."
         tar -czf "$THEME_BACKUP" -C "$HOME" .themes
-        echo "$THEMES_HASH" > "$THEMES_HASH_FILE"
+        echo "$THEMES_HASH" >"$THEMES_HASH_FILE"
     else
         echo "Themes unchanged, skipping."
     fi
@@ -111,7 +111,7 @@ if [ -d "$HOME/.local/share/icons" ]; then
         echo "Backing up ~/.local/share/icons to $ICON_BACKUP ..."
         # We cd to ~/.local/share so the archive starts with 'icons'
         tar -czf "$ICON_BACKUP" -C "$HOME/.local/share" icons
-        echo "$ICONS_HASH" > "$ICONS_HASH_FILE"
+        echo "$ICONS_HASH" >"$ICONS_HASH_FILE"
     else
         echo "Icons unchanged, skipping."
     fi

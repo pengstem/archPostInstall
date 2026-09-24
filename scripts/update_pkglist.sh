@@ -27,14 +27,14 @@ read_lists() {
     cat -- "$@" 2>/dev/null | sed -e 's/#.*//' -e 's/[[:space:]]//g' | sed '/^$/d' || true
 }
 
-read_lists "$PKGLIST_DIR/ignore.txt" "$PKGLIST_DIR"/hw-*.txt | LC_ALL=C sort -u > "$tmp_dir/exclude"
+read_lists "$PKGLIST_DIR/ignore.txt" "$PKGLIST_DIR"/hw-*.txt | LC_ALL=C sort -u >"$tmp_dir/exclude"
 
 write_list() {
     local name="$1"
     local pacman_flag="$2"
 
-    LC_ALL=C pacman -Qqe"$pacman_flag" | LC_ALL=C sort \
-        | LC_ALL=C comm -23 - "$tmp_dir/exclude" > "$tmp_dir/$name"
+    LC_ALL=C pacman -Qqe"$pacman_flag" | LC_ALL=C sort |
+        LC_ALL=C comm -23 - "$tmp_dir/exclude" >"$tmp_dir/$name"
     # Only touch the tracked file when its content changes.
     if ! cmp -s -- "$tmp_dir/$name" "$PKGLIST_DIR/$name"; then
         install -m 0644 -- "$tmp_dir/$name" "$PKGLIST_DIR/$name"

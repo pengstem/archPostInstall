@@ -67,8 +67,8 @@ else
     echo "⚠️  shellcheck not found (sudo pacman -S shellcheck); skipped."
 fi
 if ((${#SHELLCHECK[@]})); then
-    "${SHELLCHECK[@]}" --external-sources --source-path=SCRIPTDIR -- "${SHELL_FILES[@]}" \
-        || fail "shellcheck reported problems"
+    "${SHELLCHECK[@]}" --external-sources --source-path=SCRIPTDIR -- "${SHELL_FILES[@]}" ||
+        fail "shellcheck reported problems"
 fi
 
 step "shfmt ${SHFMT_OPTS[*]}"
@@ -76,8 +76,8 @@ if command -v shfmt >/dev/null 2>&1; then
     if ((FIX)); then
         shfmt -w "${SHFMT_OPTS[@]}" -- "${SHELL_FILES[@]}"
     else
-        shfmt -d "${SHFMT_OPTS[@]}" -- "${SHELL_FILES[@]}" \
-            || fail "shfmt: formatting differs (run: archpostinstall lint --fix)"
+        shfmt -d "${SHFMT_OPTS[@]}" -- "${SHELL_FILES[@]}" ||
+            fail "shfmt: formatting differs (run: archpostinstall lint --fix)"
     fi
 else
     echo "⚠️  shfmt not found (sudo pacman -S shfmt); skipped."
@@ -85,8 +85,8 @@ fi
 
 step "python compile (${#PYTHON_FILES[@]} files)"
 for file in "${PYTHON_FILES[@]}"; do
-    python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read(), sys.argv[1])' "$file" \
-        || fail "syntax error in $file"
+    python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read(), sys.argv[1])' "$file" ||
+        fail "syntax error in $file"
 done
 
 echo ""
