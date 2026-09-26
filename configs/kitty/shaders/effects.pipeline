@@ -1,0 +1,20 @@
+# Loaded by `custom_shaders effects` in kitty.conf. Groups render in order, so
+# later groups draw on top. Shader sources: /usr/lib/kitty/kitty/shaders/custom/
+
+# Click ripple, see click-ripple.slang. STYLE: 0=RING 1=SONAR 2=DROP
+# (SONAR looks better with animation_stop 1100)
+startgroup
+    animation_start pointer-left-button-press
+    animation_stop 700
+    animation_curve linear
+    animation_step 16
+    var int STYLE = 2
+    shaders click-ripple
+endgroup
+
+# Replaces kitty's built-in cursor trail while it runs
+startgroup
+    animation_start cursor-trail-move
+    animation_stop cursor-trail-stop
+    shaders cursor-trail-lightning
+endgroup

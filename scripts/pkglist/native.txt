@@ -177,6 +177,7 @@ rygel
 sassc
 sccache
 scrcpy
+shader-slang
 shfmt
 silicon
 sleuthkit
