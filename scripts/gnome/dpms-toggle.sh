@@ -2,21 +2,17 @@
 
 set -euo pipefail
 
-SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
-SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-
-# shellcheck source=scripts/gnome/dpms-common.sh
-. "$SCRIPT_DIR/dpms-common.sh"
-
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/archpostinstall/dpms.conf"
-RUNTIME_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/archpostinstall"
-LOCK_FILE="$RUNTIME_DIR/dpms.lock"
-DISPLAY_OFF_MODE=1
-DISPLAY_ON_MODE=0
-CURRENT_UID="$(id -u)"
+DISPLAY_HELPER="$SCRIPT_DIR/dpms-display.py"
+HOLD_UNIT="archpostinstall-dpms-hold"
+STATE_FILE="${XDG_RUNTIME_DIR:-/run/user/$UID}/archpostinstall-dpms.state"
 START_WAIT_SEC=15
 START_RETRIES=3
 KILL_WAIT_SEC=6
+
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
+export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
 
 usage() {
     cat <<'EOF'
@@ -28,219 +24,176 @@ Usage: dpms-toggle [--on|--off|--toggle]
 EOF
 }
 
-case "${1:-}" in
-    -h | --help | help)
-        usage
-        exit 0
-        ;;
-esac
-
-setup_runtime_env
-load_dpms_config "$CONFIG_FILE"
-require_cmd busctl
-require_cmd flock
-require_cmd pgrep
-require_cmd pkill
-acquire_lock "$LOCK_FILE"
-
-is_match_running() {
-    local match="$1"
-
-    pgrep -u "$CURRENT_UID" -f -i -- "$match" >/dev/null 2>&1
+dpms_log() {
+    printf "[dpms] %s\n" "$*" >&2
 }
 
-wait_for_exit() {
-    local match="$1"
-    local timeout="$2"
-    local elapsed=0
+die() {
+    echo "Error: $*" >&2
+    exit 1
+}
 
-    while is_match_running "$match"; do
-        if [ "$elapsed" -ge "$timeout" ]; then
-            return 1
-        fi
-        sleep 1
-        elapsed=$((elapsed + 1))
+# Config DSL, see dpms.conf.
+APP_NAME=()
+APP_MATCH=()
+APP_START=()
+APP_ACTION=()
+APP_SIGNAL=()
+
+dpms_app() {
+    local name="" match="" start="" action="restart" signal="TERM"
+
+    while [ "$#" -ge 2 ]; do
+        case "$1" in
+            --name) name="$2" ;;
+            --match) match="$2" ;;
+            --start) start="$2" ;;
+            --action) action="$2" ;;
+            --signal) signal="$2" ;;
+            *) die "unknown dpms_app option $1" ;;
+        esac
+        shift 2
     done
+    [ "$#" -eq 0 ] || die "missing value for dpms_app option $1"
+    [ -n "$name" ] && [ -n "$match" ] || die "dpms_app requires --name and --match."
+    case "$action" in
+        restart | start) [ -n "$start" ] || die "$action action requires --start for $name." ;;
+        stop) ;;
+        *) die "unsupported app action '$action' for $name." ;;
+    esac
 
-    return 0
+    APP_NAME+=("$name")
+    APP_MATCH+=("$match")
+    APP_START+=("$start")
+    APP_ACTION+=("$action")
+    APP_SIGNAL+=("$signal")
 }
 
-wait_for_start() {
-    local match="$1"
-    local timeout="$2"
-    local elapsed=0
+app_running() {
+    pgrep -u "$UID" -f -i -- "$1" >/dev/null 2>&1
+}
 
-    while ! is_match_running "$match"; do
-        if [ "$elapsed" -ge "$timeout" ]; then
-            return 1
-        fi
-        sleep 1
-        elapsed=$((elapsed + 1))
+app_gone() {
+    ! app_running "$1"
+}
+
+# wait_until SECONDS COMMAND...: poll COMMAND every 0.2 s.
+wait_until() {
+    local tries=$(($1 * 5))
+
+    shift
+    until "$@"; do
+        ((tries-- > 0)) || return 1
+        sleep 0.2
     done
-
-    return 0
-}
-
-start_command() {
-    local command="$1"
-
-    dpms_log "Executing: $command"
-    # Do not let the child inherit fd 9, otherwise it keeps the DPMS lock open.
-    nohup /bin/bash -lc "exec 9>&-; $command" >/dev/null 2>&1 &
 }
 
 stop_app() {
-    local name="$1"
-    local match="$2"
+    local name="${APP_NAME[$1]}" match="${APP_MATCH[$1]}"
 
-    if ! is_match_running "$match"; then
-        return 0
-    fi
-
+    pkill -u "$UID" -"${APP_SIGNAL[$1]}" -f -i -- "$match" >/dev/null 2>&1 || return 0
     dpms_log "Stopping $name"
-    pkill -u "$CURRENT_UID" -TERM -f -i -- "$match" >/dev/null 2>&1 || true
-    if wait_for_exit "$match" "$KILL_WAIT_SEC"; then
-        return 0
-    fi
+    wait_until "$KILL_WAIT_SEC" app_gone "$match" && return 0
 
     dpms_log "Sending KILL to $name"
-    pkill -u "$CURRENT_UID" -KILL -f -i -- "$match" >/dev/null 2>&1 || true
-    if ! wait_for_exit "$match" 2; then
-        dpms_log "Warning: $name is still running."
-        return 1
-    fi
-
-    return 0
+    pkill -u "$UID" -KILL -f -i -- "$match" >/dev/null 2>&1 || true
+    wait_until 2 app_gone "$match" || dpms_log "Warning: $name is still running."
 }
 
 start_app() {
-    local name="$1"
-    local match="$2"
-    local start_cmd="$3"
-    local attempt=1
+    local name="${APP_NAME[$1]}" match="${APP_MATCH[$1]}" command="${APP_START[$1]}" attempt
 
-    if is_match_running "$match"; then
-        return 0
-    fi
-
-    while [ "$attempt" -le "$START_RETRIES" ]; do
+    app_running "$match" && return 0
+    for ((attempt = 1; attempt <= START_RETRIES; attempt++)); do
         dpms_log "Starting $name (attempt $attempt)"
-        start_command "$start_cmd"
-        if wait_for_start "$match" "$START_WAIT_SEC"; then
-            return 0
-        fi
-        attempt=$((attempt + 1))
+        # Do not let the app inherit fd 8, otherwise it keeps the app lock open.
+        nohup /bin/bash -lc "$command" 8>&- >/dev/null 2>&1 &
+        wait_until "$START_WAIT_SEC" app_running "$match" && return 0
     done
-
     dpms_log "Error: failed to start $name."
-    return 1
 }
 
-get_display_mode() {
-    local mode
+# Apps are handled concurrently; each one still escalates or retries alone.
+for_each_app() {
+    local skip_action="$1" handler="$2" i
 
-    if ! mode="$(busctl --user get-property org.gnome.Mutter.DisplayConfig \
-        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode)"; then
-        dpms_log "Error: unable to read display power state."
-        return 1
-    fi
-    mode="${mode##* }"
-
-    if ! [[ "$mode" =~ ^[0-9]+$ ]]; then
-        dpms_log "Error: invalid display power state: $mode"
-        return 1
-    fi
-
-    printf "%s\n" "$mode"
+    for i in "${!APP_NAME[@]}"; do
+        [ "${APP_ACTION[i]}" = "$skip_action" ] && continue
+        "$handler" "$i" &
+    done
+    wait
 }
 
-set_display_mode() {
-    local mode="$1"
-
-    dpms_log "Setting PowerSaveMode to $mode"
-    busctl --user set-property org.gnome.Mutter.DisplayConfig \
-        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode i "$mode" \
-        >/dev/null 2>&1
+release_hold() {
+    systemctl --user stop "$HOLD_UNIT" >/dev/null 2>&1 || true
 }
 
-stop_active_screensaver() {
-    local screensaver_bin="$SCRIPT_DIR/screensaver.sh"
+display_off() {
+    release_hold
+    # Returns once the display is off (READY=1); see dpms-display.py.
+    systemd-run --user --quiet --collect --unit="$HOLD_UNIT" \
+        -p Type=notify -p TimeoutStartSec=5 -p SyslogIdentifier=dpms-hold \
+        /usr/bin/python3 "$DISPLAY_HELPER" hold || return 1
 
-    if [ ! -x "$screensaver_bin" ]; then
-        dpms_log "Warning: screensaver controller not found: $screensaver_bin"
-        return 0
-    fi
-    if ! "$screensaver_bin" stop; then
+    if ! "$SCRIPT_DIR/screensaver.sh" stop; then
         dpms_log "Warning: failed to stop the active screensaver."
     fi
 }
 
-dpms_off() {
-    local record app_name app_match app_action
-
-    if ! set_display_mode "$DISPLAY_OFF_MODE"; then
-        dpms_log "Error: failed to turn the display off."
-        return 1
-    fi
-
-    stop_active_screensaver
-
-    for record in "${DPMS_APPS[@]}"; do
-        IFS="$DPMS_RECORD_SEP" read -r app_name app_match _ app_action <<<"$record"
-        case "$app_action" in
-            restart | stop)
-                stop_app "$app_name" "$app_match" || true
-                ;;
-            start)
-                ;;
-        esac
-    done
-
-    dpms_log "Display off."
+display_on() {
+    release_hold
+    /usr/bin/python3 "$DISPLAY_HELPER" on
 }
 
-dpms_on() {
-    local record app_name app_match app_start app_action
-
-    if ! set_display_mode "$DISPLAY_ON_MODE"; then
-        dpms_log "Error: failed to turn the display on."
-        return 1
-    fi
-
-    for record in "${DPMS_APPS[@]}"; do
-        IFS="$DPMS_RECORD_SEP" read -r app_name app_match app_start app_action <<<"$record"
-        case "$app_action" in
-            restart | start)
-                start_app "$app_name" "$app_match" "$app_start" || true
-                ;;
-            stop)
-                ;;
-        esac
-    done
-
-    dpms_log "Display on."
+apps_off() {
+    for_each_app start stop_app
 }
 
-case "${1:-}" in
-    --off)
-        dpms_off
-        ;;
-    --on)
-        dpms_on
-        ;;
-    --toggle | "")
-        if [ "$(get_display_mode)" -eq 0 ]; then
-            dpms_off
-        else
-            dpms_on
-        fi
-        ;;
+apps_on() {
+    for_each_app stop start_app
+}
+
+display_is_on() {
+    local mode
+
+    mode="$(busctl --user get-property org.gnome.Mutter.DisplayConfig \
+        /org/gnome/Mutter/DisplayConfig org.gnome.Mutter.DisplayConfig PowerSaveMode)"
+    [ "${mode##* }" = 0 ]
+}
+
+case "${1:---toggle}" in
+    --on) action=on ;;
+    --off) action=off ;;
+    --toggle) action=toggle ;;
     -h | --help | help)
         usage
+        exit 0
         ;;
     *)
         echo "Unknown option: $1" >&2
-        usage
+        usage >&2
         exit 1
         ;;
 esac
+
+# shellcheck source=configs/archpostinstall/dpms.conf
+. "$CONFIG_FILE"
+
+# The display switch and the app phase take separate locks, so an app that
+# is slow to exit (QQ ignores SIGTERM) never delays the next key press. Both
+# queue instead of skipping. Queued app phases act on the latest request in
+# STATE_FILE, so rapid toggles converge on the final state.
+exec 9>"$XDG_RUNTIME_DIR/archpostinstall-dpms.lock"
+flock -w 10 9 || die "timed out waiting for another DPMS instance."
+if [ "$action" = toggle ]; then
+    if display_is_on; then action=off; else action=on; fi
+fi
+"display_$action" || die "failed to turn the display $action."
+echo "$action" >"$STATE_FILE"
+dpms_log "Display $action."
+exec 9>&-
+
+exec 8>"$XDG_RUNTIME_DIR/archpostinstall-dpms-apps.lock"
+flock 8
+action="$(<"$STATE_FILE")"
+"apps_$action"

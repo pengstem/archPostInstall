@@ -1,5 +1,83 @@
 # DPMS Past Bug List
 
+## Restructure (2026-09-30)
+
+- Folded `dpms-common.sh` (its only consumer was `dpms-toggle.sh`) into the
+  toggle; `dpms_app` now appends to parallel arrays and validates on the spot
+  instead of packing `\037`-separated records. `dpms.conf` is unchanged.
+- One Python helper, `dpms-display.py` (`hold` / `on`), replaces the guard
+  and relight scripts. systemd owns the hold's lifecycle, which removed the
+  nohup/ready-file/pgrep/pkill supervision, the fixed 0.3 s sleep, and the
+  risk of `pkill -f dpms-guard.py` hitting an editor with that file open.
+- Apps are stopped and started concurrently (each still escalates to KILL or
+  retries on its own), and waits poll every 0.2 s instead of 1 s. Before, the
+  waits ran back to back: one off took 9 s, 6.3 s of it QQ ignoring SIGTERM.
+- Key presses were dropped for ~7.5 s after an off: the single `flock -n`
+  lock covered the app phase too, and QQ ignores SIGTERM for the full 6 s
+  wait. The display switch and the app phase now take separate locks in
+  `$XDG_RUNTIME_DIR` and queue instead of skipping. The display switches at
+  once; a queued app phase reads the latest request from
+  `archpostinstall-dpms.state`, so rapid toggles converge on the final
+  state. Off-then-on quickly still lets the running stop phase finish before
+  the apps are started again. `dpms_app --signal KILL` now skips the SIGTERM
+  wait for apps that ignore it; `dpms.conf` uses it for QQ.
+
+## Display Stayed Dark After DPMS-On (2026-09-30)
+
+- Symptom: `dpms-toggle --on` logged `Display on.` and Mutter reported
+  `PowerSaveMode=0`, but both screens stayed black. The kernel agreed with the
+  screens: every connected connector (`/sys/class/drm/card1-*`) was
+  `enabled=disabled`, `dpms=Off`. The eDP backlight write failed with `EPROTO`
+  (`nvidia_0: Failed to write brightness`) around the off and on transitions.
+- Environment: Mutter 50.5, gnome-settings-daemon 50.1, nvidia-open-dkms
+  615.71.09 (`nvidia_drm modeset=1 fbdev=1`), linux-zen 7.2.7, HDMI 4K and eDP
+  panels. It happened once in several toggles; the cause inside Mutter's
+  native backend or the driver is unknown. Upstream has similar NVIDIA reports
+  about CRTC disable/re-enable cycles
+  ([mutter#4689](https://gitlab.gnome.org/GNOME/mutter/-/issues/4689),
+  [NVIDIA forum: display not recovering after DPMS off](https://forums.developer.nvidia.com/t/display-not-recovering-after-dpms-off/355551)).
+- What did not help: writing `PowerSaveMode=0` again (a no-op because Mutter
+  already thinks it is 0), and cycling it 1 -> 0.
+- What did: re-applying the unchanged layout with
+  `gdctl set -L ... -M HDMI-1 ... -L ... -M eDP-1 ...` (temporary method)
+  forced a modeset, and both connectors came back.
+- Fix: `dpms-display.py on` checks after the write. It waits up to
+  2 s for as many lit DRM connectors as Mutter has monitors in logical
+  monitors (a closed lid or a disabled monitor is not counted as missing). If
+  some are still dark, it re-applies the current configuration from
+  `GetCurrentState` via `ApplyMonitorsConfig` with method 1 (temporary: no
+  confirmation dialog, `monitors.xml` untouched), keeping each monitor's
+  current mode, `color-mode`, `rgb-range` and the layout mode, as gdctl does.
+  Validated on 2026-09-30 against `/usr/bin/gdctl` from mutter 50.5, and with
+  method 0 (verify) on the live session. The recovery path itself has only
+  been exercised by hand via gdctl.
+
+## Input Woke the Display (2026-09-30)
+
+- Symptom: after manual DPMS-off, a mouse move or key press sometimes turned
+  the display back on, while the stopped apps stayed stopped.
+- Cause (gnome-settings-daemon 50.1 power plugin): with `idle-dim` true and
+  `idle-delay` 0 it arms a 60 s dim watch (30 s under power-saver). Once that
+  fires it installs a user-active watch, and the next input calls
+  `idle_set_mode(NORMAL)` -> `enable_monitors()`, which writes
+  `PowerSaveMode=0` whether or not gsd blanked the display. Hence "sometimes":
+  only input after at least a minute of idleness woke it. Mutter 50.5 itself
+  never unblanks on input.
+- Fix: `dpms_off` runs `dpms-display.py hold` as the transient user unit
+  `archpostinstall-dpms-hold` (`systemd-run --user`, `Type=notify`). It holds
+  a GNOME session idle inhibitor (Mutter pauses inhibitable idle watches, so
+  gsd never dims) and writes the off mode back if `PowerSaveMode` still
+  becomes 0 (resume from suspend, or gsd re-running `idle_configure` while
+  inhibited, which also calls `enable_monitors()`). `dpms_on` stops the unit
+  before turning the display on; the inhibitor dies with its bus connection.
+  It logs to the journal as `dpms-hold`.
+- Mutter re-emits `PropertiesChanged` for same-value writes, and gsd writes 0
+  as soon as it sees the inhibitor. The hold therefore turns the display off
+  only after that write arrives (or 300 ms pass), then sends `READY=1`, so
+  `systemd-run` returns with the display off; afterwards it reacts only to an
+  off -> on transition. The first version reacted to any 0 and turned a lit
+  display off during testing.
+
 ## Screensaver Coordination (2026-08-24)
 
 - Made manual DPMS-off authoritative over the animated screensaver: after the

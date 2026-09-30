@@ -57,7 +57,7 @@ There is no test suite. Run `archpostinstall lint` before committing script chan
 
 **Scripts by purpose:**
 - `scripts/install/` - Packages, shell tools (Oh My Zsh, p10k), `ttfx` (Rust screensaver renderer), Maple Mono CN font (temporary archlinuxcn repo), boot splash (`install_boot_splash.sh`, run as root, backs up to `/var/lib/archpostinstall/boot-splash-backups`)
-- `scripts/gnome/` - GNOME state sync, DPMS toggle (`dpms-common.sh` + `dpms-toggle.sh`), screensaver (`screensaver.sh` + `screensaver-idle.py` Mutter idle monitor)
+- `scripts/gnome/` - GNOME state sync, DPMS toggle (`dpms-toggle.sh` + `dpms-display.py`, which holds the display off as a transient user unit and re-lights it on NVIDIA), screensaver (`screensaver.sh` + `screensaver-idle.py` Mutter idle monitor)
 - `scripts/backup/` - Firefox and GNOME theme/icon/extension archives (default output `backups/`)
 - `scripts/launchers/`, `scripts/zathura/` - Small helpers linked into `~/.local/bin`
 - `scripts/lint.sh`, `scripts/update_pkglist.sh`
