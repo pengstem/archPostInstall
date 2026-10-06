@@ -18,3 +18,11 @@ patch:
   - emoji
   - full_shape
   menu/page_size: 8
+  # 追加到上游 key_binder 之后。候选框是竖排的，Up/Down 就是上/下一个候选。
+  # 光标在拼音间移动改用 Alt+←/→ 或 Tab / Shift+Tab（上游已有）。
+  key_binder/bindings/+:
+  - { when: has_menu, accept: Left, send: Up }
+  - { when: has_menu, accept: Right, send: Down }
+  # 逗号只在已经翻过页时才往回翻，第一页按逗号照常上屏「，」
+  - { when: paging, accept: comma, send: Page_Up }
+  - { when: has_menu, accept: period, send: Page_Down }
