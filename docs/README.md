@@ -17,7 +17,13 @@ This folder contains reference notes and quick guidance for maintaining the Arch
 
 ## GNOME Sync and Backups
 - GNOME sync writes the current extension list and theme settings into `docs/`.
-- Archives are stored under `backups/gnome/` by default.
+- It also exports extension settings (dconf `/org/gnome/shell/extensions/`) to the tracked
+  `configs/dconf/shell-extensions.ini`, skipping self-updating keys (Bing Wallpaper state, blur-my-shell's
+  `rounded-blur-found` probe) and GSConnect's machine identity. `archpostinstall restore-gnome-settings`
+  loads it back; `dconf load` merges, so keys not in the file are left alone. `bootstrap.sh` runs it on GNOME.
+- Archives are stored under `backups/gnome/` by default. They are git-ignored, so anything that must
+  survive a new machine belongs in the repo: the locally patched kimpanel extension is linked from
+  `configs/gnome-shell/extensions/kimpanel@kde.org` (see `configs/gnome-shell/README.md`).
 - Enable auto-sync after linking:
   - `systemctl --user daemon-reload`
   - `systemctl --user enable --now archpostinstall-gnome-sync.path`
