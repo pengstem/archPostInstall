@@ -41,7 +41,7 @@ git pull --ff-only
 
 ## 个人配置
 
-- `default.custom.yaml`：方案列表、F4 等切换键、候选数和开关记忆。
+- `default.custom.yaml`：方案列表、F4 等切换键、候选数和开关记忆；←/→ 选候选（候选框为竖排），逗号/句号翻页。
 - `rime_frost*.custom.yaml`：保留原来的全拼/双拼行为、长词优先、反查与计算器前缀；辅助码使用上游的
   `table_translator@frost_aux`（单字）和 `lua_filter@*aux_lookup_filter`（词组/整句），触发键仍是 `` ` ``，
   例如 `shishi`b` → 事实。
