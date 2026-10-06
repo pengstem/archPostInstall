@@ -18,7 +18,7 @@ REPO_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
 RIME_SUB="$REPO_DIR/vendor/rime-frost"
 RIME_BRANCH="master"
 RIME_CONF="$REPO_DIR/configs/rime"
-RIME_STAMP="$RIME_CONF/build/rime_frost.table.bin"
+RIME_SHARED="/usr/share/rime-data"
 
 MPV_DIR="$REPO_DIR/configs/mpv"
 UOSC_DIR="$REPO_DIR/vendor/uosc"
@@ -143,29 +143,28 @@ report_rime_changes() {
     fi
 }
 
-# Best effort: ask fcitx5 to reload the Rime addon, then confirm that the
-# dictionary was rebuilt. Falls back to asking for a manual redeploy.
+# Build the dictionaries and schemas with rime_deployer, then ask fcitx5 to
+# reload Rime so it picks them up. fcitx5-rime's ReloadAddonConfig restarts
+# Rime without a full check, so on its own it never rebuilds changed
+# dictionaries; the full-check 「重新部署」 is not exposed over D-Bus.
 redeploy_rime() {
-    local before
-    local waited=0
-
-    before="$(stat -c %Y "$RIME_STAMP" 2>/dev/null || echo 0)"
-    if ! busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 \
-        ReloadAddonConfig s rime >/dev/null 2>&1; then
-        note "Fcitx5 is not running; choose 「重新部署」 in the Rime menu next time it starts."
+    if ! command -v rime_deployer >/dev/null 2>&1; then
+        warn "rime_deployer (librime) not found; choose 「重新部署」 in the Rime menu."
         return
     fi
 
-    note "Asked Fcitx5 to reload Rime; waiting for the dictionary rebuild..."
-    while ((waited < 90)); do
-        if (($(stat -c %Y "$RIME_STAMP" 2>/dev/null || echo 0) > before)); then
-            note "✅ Rime redeployed."
-            return
-        fi
-        sleep 3
-        waited=$((waited + 3))
-    done
-    warn "could not confirm a rebuild; choose 「重新部署」 in the Rime menu."
+    note "Rebuilding Rime dictionaries..."
+    if ! rime_deployer --build "$RIME_CONF" "$RIME_SHARED" "$RIME_CONF/build" >/dev/null 2>&1; then
+        warn "rime_deployer failed; choose 「重新部署」 in the Rime menu for details."
+        return
+    fi
+
+    if busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 \
+        ReloadAddonConfig s rime >/dev/null 2>&1; then
+        note "✅ Rime redeployed and reloaded."
+    else
+        note "✅ Rime redeployed; Fcitx5 is not running and loads it on the next start."
+    fi
 }
 
 update_rime() {
