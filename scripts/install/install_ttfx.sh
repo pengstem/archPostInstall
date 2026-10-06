@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-readonly MIN_TTFX_VERSION="0.3.2"
-readonly PINNED_TTFX_REVISION="7203e354498462064b7c0a89375051f65cf2ce99"
+readonly MIN_TTFX_VERSION="0.5.0"
+readonly PINNED_TTFX_REVISION="112ebb310b848d8f1251a5c2919a9cd5a5c78e18"
 readonly TTFX_REPOSITORY="https://github.com/omacom-io/ttfx.git"
 
 INSTALL_ROOT="${TTFX_INSTALL_ROOT:-$HOME/.local}"
