@@ -20,7 +20,6 @@ btrfs-assistant
 btrfs-progs
 cargo-flamegraph
 chafa
-chatgpt-bin
 clang
 cli11
 cmake
@@ -55,6 +54,7 @@ fortune-mod
 fuse2
 fuse2fs
 fzf
+gamescope
 gdm
 gimp
 gimp-help-en
@@ -76,6 +76,7 @@ gnome-themes-extra
 gnome-tweaks
 go
 godot-mono
+gradle
 grilo-plugins
 gst-plugin-pipewire
 gst-thumbnailers
@@ -119,6 +120,7 @@ markdownlint-cli2
 marksman
 maven
 mediainfo
+memtest86+-efi
 minicom
 mitmproxy
 mkinitcpio
@@ -145,7 +147,6 @@ noto-fonts-extra
 npm
 nvme-cli
 obs-studio
-opencode
 os-prober
 pacman-contrib
 pamixer
@@ -170,6 +171,7 @@ qpdf
 rainfrog
 repo
 resvg
+ripgrep
 rtkit
 ruff
 rust-analyzer

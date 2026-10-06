@@ -2,14 +2,16 @@ baidunetdisk-bin
 beekeeper-studio-bin
 bibata-cursor-theme-bin
 cc-switch-bin
-cursor-bin
+claude-desktop
 downgrade
 fcitx5-vinput-bin
 feishu-bin
 gnirehtet-bin
+gnome-rounded-blur
 google-chrome
 heroic-games-launcher-bin
 lazysql-bin
+protonplus
 sparkle-bin
 sunshine-bin
 ttf-ms-fonts
