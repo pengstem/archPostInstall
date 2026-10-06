@@ -1,0 +1,87 @@
+.popup-menu-boxpointer.kimpanel-popup-boxpointer {
+  -arrow-border-radius: 0px;
+  -arrow-background-color: transparent;
+  -arrow-border-width: 0px;
+  -arrow-border-color: transparent;
+  -arrow-base: 0px;
+  -arrow-rise: 0px;
+  -boxpointer-gap: 1px;
+  background: none;
+}
+
+/* 毛玻璃候选框。模糊由 blur-my-shell 负责（gnome-rounded-blur 提供圆角），
+ * 这里只叠一层很淡的灰色，保证透明样式下压在亮色内容上也看得清字。
+ * 圆角 20px = blur-my-shell 的 menu-corner-radius，两者必须一致。
+ * 多一层 .kimpanel-popup-boxpointer 是为了压过 blur-my-shell 的 !important 背景/边框。 */
+.kimpanel-popup-boxpointer .popup-menu-content.kimpanel-popup-content {
+  min-width: 140px;
+  margin: 0;
+  padding: 6px;
+  spacing: 4px;
+  background-color: rgba(60, 60, 70, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+/* 拼音/提示行：略暗一些，和候选词区分开 */
+.kimpanel-popup-content .kimpanel-label {
+  font-weight: normal;
+  padding: 0 10px;
+  color: rgba(255, 255, 255, 0.62);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* 候选行与外框同心：20px - 1px 边框 - 6px 内边距 = 13px。
+ * Orchis 和 blur-my-shell 都对 .popup-menu-item 用了 !important，所以这里也要。 */
+.kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item {
+  cursor: pointer;
+  transition-duration: 0ms;
+  padding: 4px 10px;
+  border-radius: 13px;
+  color: rgba(255, 255, 255, 0.92) !important;
+  background-color: transparent !important;
+}
+
+.kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item:active,
+.kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item:active:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* blur-my-shell 背景样式选「浅色」时换成深字 */
+.bms-popup-background-light .kimpanel-popup-boxpointer .popup-menu-content.kimpanel-popup-content {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.bms-popup-background-light .kimpanel-popup-content .kimpanel-label {
+  color: rgba(34, 34, 38, 0.6);
+  text-shadow: none;
+}
+
+.bms-popup-background-light .kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item {
+  color: #222226 !important;
+}
+
+.bms-popup-background-light .kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.bms-popup-background-light .kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item:active,
+.bms-popup-background-light .kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item:active:hover {
+  color: #222226 !important;
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.minwidth-zero {
+  min-width: 0;
+}
+
+.icon-disable {
+  color:rgba(150,150,150,0.5);
+}
