@@ -27,6 +27,7 @@ Commands:
   dpms-on                 Force display on and restore apps
   screensaver [action]    Control the Omarchy-inspired GNOME screensaver
   backup-gnome            Sync GNOME extensions/themes and archive assets
+  restore-gnome-settings  Load tracked GNOME extension settings into dconf
   backup-themes           Archive GNOME themes, icons, and extensions
   restore-themes <files>  Restore themes/icons/extensions from archives
   backup-firefox          Archive ~/.mozilla
@@ -88,6 +89,9 @@ case "$cmd" in
         ;;
     backup-gnome)
         "$REPO_DIR/scripts/gnome/backup_gnome_state.sh" "$@"
+        ;;
+    restore-gnome-settings)
+        "$REPO_DIR/scripts/gnome/restore_gnome_settings.sh" "$@"
         ;;
     backup-themes)
         "$REPO_DIR/scripts/backup/backup_themes_extensions.sh" "$@"

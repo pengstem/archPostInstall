@@ -87,6 +87,8 @@ log_header "⚙️  Finalizing"
 if [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]]; then
     log_info "Enabling the GNOME idle screensaver and Super+F11 shortcut..."
     "$SCRIPTS_DIR/gnome/screensaver.sh" install
+    log_info "Loading tracked GNOME extension settings..."
+    "$SCRIPTS_DIR/gnome/restore_gnome_settings.sh"
 fi
 
 CURRENT_SHELL="${SHELL:-}"

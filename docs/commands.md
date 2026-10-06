@@ -25,6 +25,7 @@ archpostinstall dpms-off
 archpostinstall dpms-on
 archpostinstall screensaver <start|stop|toggle|status|upgrade|install|uninstall>
 archpostinstall backup-gnome
+archpostinstall restore-gnome-settings
 archpostinstall backup-themes
 archpostinstall restore-themes <archives...>
 archpostinstall backup-firefox
@@ -49,6 +50,7 @@ Use these when you want explicit control:
 ./scripts/backup/backup_firefox.sh [output_dir]
 ./scripts/backup/restore_firefox.sh <archive>
 ./scripts/gnome/backup_gnome_state.sh
+./scripts/gnome/restore_gnome_settings.sh
 ./scripts/gnome/dpms-toggle.sh [--on|--off|--toggle]
 ./scripts/gnome/screensaver.sh [start|stop|toggle|status|upgrade|install|uninstall]
 ./scripts/update_pkglist.sh
