@@ -24,7 +24,12 @@ export default class KimpanelStyleExtension extends Extension {
 
     _setIndicatorVisible(visible) {
         // Toggle the panel container: kimpanel calls show() on the indicator
-        // button itself whenever input method properties change.
-        Main.panel.statusArea[INDICATOR_ROLE]?.container.set_visible(visible);
+        // button itself whenever input method properties change. show()/hide()
+        // like Main.panel does; GNOME 51 dropped set_visible() on it.
+        const container = Main.panel.statusArea[INDICATOR_ROLE]?.container;
+        if (visible)
+            container?.show();
+        else
+            container?.hide();
     }
 }
