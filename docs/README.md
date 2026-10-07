@@ -22,8 +22,8 @@ This folder contains reference notes and quick guidance for maintaining the Arch
   `rounded-blur-found` probe) and GSConnect's machine identity. `archpostinstall restore-gnome-settings`
   loads it back; `dconf load` merges, so keys not in the file are left alone. `bootstrap.sh` runs it on GNOME.
 - Archives are stored under `backups/gnome/` by default. They are git-ignored, so anything that must
-  survive a new machine belongs in the repo: the locally patched kimpanel extension is linked from
-  `configs/gnome-shell/extensions/kimpanel@kde.org` (see `configs/gnome-shell/README.md`).
+  survive a new machine belongs in the repo: the candidate-window style extension is linked from
+  `configs/gnome-shell/extensions/kimpanel-style@nastem.github.com` (see `configs/gnome-shell/README.md`).
 - Enable auto-sync after linking:
   - `systemctl --user daemon-reload`
   - `systemctl --user enable --now archpostinstall-gnome-sync.path`
