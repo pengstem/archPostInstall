@@ -13,3 +13,4 @@ quake-terminal@diegodario88.github.io
 blur-my-shell@aunetx
 dash-to-dock@micxgx.gmail.com
 kimpanel@kde.org
+kimpanel-style@nastem.github.com
