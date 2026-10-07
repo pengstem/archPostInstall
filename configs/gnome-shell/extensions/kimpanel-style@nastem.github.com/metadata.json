@@ -1,0 +1,8 @@
+{
+  "uuid": "kimpanel-style@nastem.github.com",
+  "name": "Kimpanel Frosted Style",
+  "description": "Frosted-glass candidate window for the Input Method Panel (kimpanel) extension, and hides its redundant top-bar indicator.",
+  "shell-version": [
+    "51"
+  ]
+}

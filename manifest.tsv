@@ -60,8 +60,8 @@ user    link           configs/xdg-desktop-portal-termfilechooser             ~/
 user    link:configs/baidupcs/pcs_config.json  configs/baidupcs               ~/.config/BaiduPCS-Go                                       BaiduPCS-Go
 user    link           configs/fcitx5                                         ~/.config/fcitx5                                            Fcitx5
 user    link           configs/rime                                           ~/.local/share/fcitx5/rime                                  Fcitx5 Rime
-# Locally patched build (no metadata "version", so GNOME never auto-updates it).
-user    link           configs/gnome-shell/extensions/kimpanel@kde.org        ~/.local/share/gnome-shell/extensions/kimpanel@kde.org      Kimpanel Extension
+# Own extension that styles kimpanel@kde.org (installed from extensions.gnome.org).
+user    link           configs/gnome-shell/extensions/kimpanel-style@nastem.github.com  ~/.local/share/gnome-shell/extensions/kimpanel-style@nastem.github.com  Kimpanel Style
 user    link           configs/archpostinstall/dpms.conf                      ~/.config/archpostinstall/dpms.conf                         DPMS Config
 user    link           configs/archpostinstall/screensaver.conf               ~/.config/archpostinstall/screensaver.conf                  Saver Config
 user    link           configs/archpostinstall/screensaver.txt                ~/.config/archpostinstall/screensaver.txt                   Saver Art

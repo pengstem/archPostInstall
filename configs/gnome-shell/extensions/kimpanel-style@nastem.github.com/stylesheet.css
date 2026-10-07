@@ -1,4 +1,7 @@
-.popup-menu-boxpointer.kimpanel-popup-boxpointer {
+/* 覆盖 kimpanel@kde.org 自带的候选框样式。kimpanel 从 extensions.gnome.org 自动更新，
+ * 这里只依赖它的 CSS class 名（kimpanel-popup-*, kimpanel-label, kimpanel-candidate-item）。
+ * 选择器都比 kimpanel 自己的多一层，保证不依赖两个样式表的加载顺序。 */
+.popup-menu.popup-menu-boxpointer.kimpanel-popup-boxpointer {
   -arrow-border-radius: 0px;
   -arrow-background-color: transparent;
   -arrow-border-width: 0px;
@@ -7,14 +10,16 @@
   -arrow-rise: 0px;
   -boxpointer-gap: 1px;
   background: none;
+  /* 宽度随内容自适应：压掉主题给 .popup-menu 的 min-width: 10em */
+  min-width: 0;
 }
 
-/* 毛玻璃候选框。模糊由 blur-my-shell 负责（gnome-rounded-blur 提供圆角），
+/* 毛玻璃候选框。模糊由 blur-my-shell 负责（装了 gnome-rounded-blur 才有圆角模糊），
  * 这里只叠一层很淡的灰色，保证透明样式下压在亮色内容上也看得清字。
  * 圆角 20px = blur-my-shell 的 menu-corner-radius，两者必须一致。
  * 多一层 .kimpanel-popup-boxpointer 是为了压过 blur-my-shell 的 !important 背景/边框。 */
 .kimpanel-popup-boxpointer .popup-menu-content.kimpanel-popup-content {
-  min-width: 140px;
+  min-width: 0;
   margin: 0;
   padding: 6px;
   spacing: 4px;
@@ -76,12 +81,4 @@
 .bms-popup-background-light .kimpanel-popup-content .kimpanel-candidate-item.popup-menu-item:active:hover {
   color: #222226 !important;
   background-color: rgba(0, 0, 0, 0.1) !important;
-}
-
-.minwidth-zero {
-  min-width: 0;
-}
-
-.icon-disable {
-  color:rgba(150,150,150,0.5);
 }
