@@ -1,14 +1,24 @@
 # GNOME Shell extensions
 
-## kimpanel-style@nastem.github.com
+## shell-style@nastem.github.com
 
-Own extension that restyles the Fcitx5 candidate window drawn by
+Own extension for personal GNOME Shell style tweaks. Put new shell CSS tweaks here instead of forking
+an extension or editing the shell theme (both are replaced on update).
+
+Each GNOME major release: add the new version to `shell-version` in `metadata.json`, then log out and back
+in (Shell reads extension metadata only at login). No `version` key, so extensions.gnome.org never touches
+it. After editing the stylesheet, reload with
+`gnome-extensions disable shell-style@nastem.github.com && gnome-extensions enable shell-style@nastem.github.com`.
+
+### Candidate window (kimpanel)
+
+Restyles the Fcitx5 candidate window drawn by
 [kimpanel@kde.org](https://extensions.gnome.org/extension/261/kimpanel/). kimpanel itself is the
 unmodified extensions.gnome.org build, so it updates on its own; this extension depends only on its CSS
 class names (`kimpanel-popup-boxpointer`, `kimpanel-popup-content`, `kimpanel-label`,
 `kimpanel-candidate-item`) and its `kimpanel` status-area role. `manifest.tsv` links the directory.
 
-- `stylesheet.css`: frosted-glass candidate window. GNOME Shell loads the stylesheet of every enabled
+- `stylesheet.css` (first part): frosted-glass candidate window. GNOME Shell loads the stylesheet of every enabled
   extension; each selector here carries one more class than kimpanel's own, so the result does not depend
   on load order.
 - `extension.js`: hides kimpanel's top-bar indicator (the Fcitx tray icon already shows the state). It
@@ -16,15 +26,18 @@ class names (`kimpanel-popup-boxpointer`, `kimpanel-popup-content`, `kimpanel-la
   input method properties change, and re-applies on `extension-state-changed` since kimpanel recreates
   the indicator when it is re-enabled.
 
-Each GNOME major release: add the new version to `shell-version` in `metadata.json`, then log out and back
-in (Shell reads extension metadata only at login). No `version` key, so extensions.gnome.org never touches
-it. After editing the stylesheet, reload with
-`gnome-extensions disable kimpanel-style@nastem.github.com && gnome-extensions enable kimpanel-style@nastem.github.com`.
-
 Settings of kimpanel itself (`vertical`, `font`) live in dconf and are tracked in
 `configs/dconf/shell-extensions.ini`.
 
-### Stylesheet and blur-my-shell
+### blur-my-shell popup fixes
+
+The last part of `stylesheet.css` clears shell-theme backgrounds that only show once blur-my-shell makes
+the outer popup transparent. Orchis gives `.modal-dialog .modal-dialog-content-box` the same solid
+`#2C2C2C` as the dialog, which left an opaque block behind the text of the log-out, power-off and run
+dialogs. The rules are scoped to blur-my-shell's `bms-popup-*` classes on `uiGroup`, so they do nothing
+when its popup blur is off.
+
+### Candidate window and blur-my-shell
 
 blur-my-shell (v74+) blurs every `popup-menu`/`popup-menu-content` actor, which includes the candidate
 window, and sets its `border-radius` inline from the `menu-corner-radius` setting. The stylesheet is

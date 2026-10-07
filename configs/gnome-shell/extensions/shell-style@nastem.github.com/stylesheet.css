@@ -82,3 +82,17 @@
   color: #222226 !important;
   background-color: rgba(0, 0, 0, 0.1) !important;
 }
+
+/* ---- blur-my-shell 透明弹出层修正 ----
+ * blur-my-shell 只把 .modal-dialog 本身改成透明/半透明，Orchis 却给里面的内容区
+ * 另设了同色实底（.modal-dialog .modal-dialog-content-box { background-color: #2C2C2C }），
+ * 平时看不出来，模糊后就成了文字背后一块方形色块（注销、关机、运行对话框等）。
+ * 只在 blur-my-shell 启用弹出层模糊时（它给 uiGroup 加 bms-popup-* class）才生效。 */
+.bms-popup-background-transparent .modal-dialog .modal-dialog-content-box,
+.bms-popup-background-light .modal-dialog .modal-dialog-content-box,
+.bms-popup-background-dark .modal-dialog .modal-dialog-content-box,
+.bms-popup-surface-transparent .modal-dialog .modal-dialog-content-box,
+.bms-popup-surface-light .modal-dialog .modal-dialog-content-box,
+.bms-popup-surface-dark .modal-dialog .modal-dialog-content-box {
+  background-color: transparent;
+}

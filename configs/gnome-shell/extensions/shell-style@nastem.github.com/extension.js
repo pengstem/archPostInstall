@@ -1,13 +1,13 @@
-// The candidate-window styling is all in stylesheet.css, which GNOME Shell
-// loads for every enabled extension. The code only hides kimpanel's top-bar
-// indicator: the Fcitx tray icon already shows the input method state.
+// All styling is in stylesheet.css, which GNOME Shell loads for every enabled
+// extension. The code only hides kimpanel's top-bar indicator: the Fcitx tray
+// icon already shows the input method state.
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 // Main.panel.addToStatusArea() role used by kimpanel@kde.org
 const INDICATOR_ROLE = 'kimpanel';
 
-export default class KimpanelStyleExtension extends Extension {
+export default class ShellStyleExtension extends Extension {
     enable() {
         // kimpanel creates its indicator in its own enable(), which may run
         // before or after ours, and recreates it when re-enabled.

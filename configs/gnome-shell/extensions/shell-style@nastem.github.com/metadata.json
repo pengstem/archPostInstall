@@ -1,0 +1,8 @@
+{
+  "uuid": "shell-style@nastem.github.com",
+  "name": "Nastem Shell Style",
+  "description": "Personal GNOME Shell style tweaks: frosted-glass Fcitx5 candidate window for kimpanel (and its hidden top-bar indicator), and fixes for blur-my-shell's transparent popups.",
+  "shell-version": [
+    "51"
+  ]
+}
