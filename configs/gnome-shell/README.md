@@ -29,9 +29,17 @@ class names (`kimpanel-popup-boxpointer`, `kimpanel-popup-content`, `kimpanel-la
 Settings of kimpanel itself (`vertical`, `font`) live in dconf and are tracked in
 `configs/dconf/shell-extensions.ini`.
 
-### blur-my-shell popup fixes
+### blur-my-shell popups
 
-The last part of `stylesheet.css` clears shell-theme backgrounds that only show once blur-my-shell makes
+With blur-my-shell's popup style set to *transparent*, the stylesheet gives every blurred popup (menus,
+quick settings, notification banners, dialogs, OSDs, switchers, the screenshot panel) the candidate
+window's material: a 16% grey tint, a 1px 20%-white border, a soft text shadow, and 8%/20% white for
+hovered/pressed menu items. The rules are prefixed with `#uiGroup.bms-popup-background-transparent`
+(blur-my-shell puts its `bms-popup-*` classes on `uiGroup`), so the ID selector beats blur-my-shell's
+`!important` backgrounds and the light/dark styles are left alone. Corner radii still come from
+blur-my-shell's `*-corner-radius` settings.
+
+The last part of `stylesheet.css` also clears shell-theme backgrounds that only show once blur-my-shell makes
 the outer popup transparent. Orchis gives `.modal-dialog .modal-dialog-content-box` the same solid
 `#2C2C2C` as the dialog, which left an opaque block behind the text of the log-out, power-off and run
 dialogs. The rules are scoped to blur-my-shell's `bms-popup-*` classes on `uiGroup`, so they do nothing

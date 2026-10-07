@@ -83,6 +83,41 @@
   background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
+/* ---- blur-my-shell 透明弹出层：统一成候选框的毛玻璃质感 ----
+ * blur-my-shell「透明」样式只负责模糊，把底色和边框全部去掉了；这里给所有弹出层补上
+ * 和候选框同一套的淡灰底、细玻璃描边和文字阴影，让菜单、快速设置、通知、对话框、OSD、
+ * 切换器看起来是同一种材质。圆角仍由 blur-my-shell 的 *-corner-radius 设置决定。
+ * 挂在 #uiGroup（blur-my-shell 把 bms-popup-* class 加在它身上）上，ID 选择器
+ * 稳定压过 blur-my-shell 的 !important；只在「透明」样式下生效，浅色/深色样式不受影响。 */
+#uiGroup.bms-popup-background-transparent .popup-menu-content,
+#uiGroup.bms-popup-background-transparent .candidate-popup-content,
+#uiGroup.bms-popup-background-transparent .quick-settings,
+#uiGroup.bms-popup-background-transparent .quick-toggle-menu,
+#uiGroup.bms-popup-background-transparent .notification-banner,
+#uiGroup.bms-popup-background-transparent .osd-window,
+#uiGroup.bms-popup-background-transparent .resize-popup,
+#uiGroup.bms-popup-background-transparent .switcher-list,
+#uiGroup.bms-popup-background-transparent .workspace-switcher,
+#uiGroup.bms-popup-background-transparent .modal-dialog,
+#uiGroup.bms-popup-background-transparent .run-dialog,
+#uiGroup.bms-popup-background-transparent .screenshot-ui-panel {
+  background-color: rgba(60, 60, 70, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* 菜单项交互状态与候选项一致：悬停 8% 白，按下 20% 白 */
+#uiGroup.bms-popup-background-transparent .popup-menu-item:hover,
+#uiGroup.bms-popup-background-transparent .popup-menu-item:focus,
+#uiGroup.bms-popup-background-transparent .popup-menu-item.selected {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+#uiGroup.bms-popup-background-transparent .popup-menu-item:active {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
 /* ---- blur-my-shell 透明弹出层修正 ----
  * blur-my-shell 只把 .modal-dialog 本身改成透明/半透明，Orchis 却给里面的内容区
  * 另设了同色实底（.modal-dialog .modal-dialog-content-box { background-color: #2C2C2C }），
