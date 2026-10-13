@@ -12,6 +12,7 @@ google-chrome
 heroic-games-launcher-bin
 lazysql-bin
 protonplus
+rasdaemon
 sparkle-bin
 sunshine-bin
 ttf-ms-fonts

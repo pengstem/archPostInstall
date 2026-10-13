@@ -1,5 +1,6 @@
 7zip
 abduco
+acpica
 alacritty
 android-udev
 aria2
@@ -164,6 +165,8 @@ pnpm
 postgresql
 power-profiles-daemon
 powertop
+python-darkdetect
+python-pyqt6
 qemu-img
 qemu-system-loongarch64
 qemu-system-riscv
