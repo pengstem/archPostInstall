@@ -37,7 +37,15 @@ window's material: a 16% grey tint, a 1px 20%-white border, a soft text shadow, 
 hovered/pressed menu items. The rules are prefixed with `#uiGroup.bms-popup-background-transparent`
 (blur-my-shell puts its `bms-popup-*` classes on `uiGroup`), so the ID selector beats blur-my-shell's
 `!important` backgrounds and the light/dark styles are left alone. Corner radii still come from
-blur-my-shell's `*-corner-radius` settings.
+blur-my-shell's `*-corner-radius` settings. blur-my-shell v75 added a *preserve shell theme* switch that
+swaps those classes for `bms-popup-surface-*`; these rules only apply with it off (the current setting).
+
+The same block puts white text back on the parts Orchis draws as white cards with `!important` dark
+text: quick-settings submenus (`.quick-toggle-menu`, e.g. Sound Output), expanded top-bar submenus
+(`.popup-sub-menu`) and the `:checked` item that opens them. blur-my-shell removes the white card but
+leaves the text color alone. The hover rule repeats blur-my-shell's own 8% value because its three-part
+selector loses to Orchis's four-part submenu and checked-item hover rules. Keyboard selection is the
+`:selected` pseudo-class, not a `.selected` class.
 
 The last part of `stylesheet.css` also clears shell-theme backgrounds that only show once blur-my-shell makes
 the outer popup transparent. Orchis gives `.modal-dialog .modal-dialog-content-box` the same solid

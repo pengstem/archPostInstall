@@ -107,10 +107,37 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-/* 菜单项交互状态与候选项一致：悬停 8% 白，按下 20% 白 */
+/* Orchis 把快速设置的子菜单（.quick-toggle-menu）和顶栏菜单里展开的子菜单（.popup-sub-menu，
+ * 以及展开它的那一项 :checked）画成白底黑字的卡片，字色全带 !important。blur-my-shell 只去掉
+ * 白底、不管字色，结果毛玻璃上是一片黑字。这里改回 Orchis 顶层菜单的白字（禁用项 50%）。
+ * StLabel 要单独写：Orchis 直接给 .quick-toggle-menu .popup-menu-item StLabel 设了颜色，继承不到。 */
+#uiGroup.bms-popup-background-transparent .quick-toggle-menu,
+#uiGroup.bms-popup-background-transparent .quick-toggle-menu .popup-menu-item,
+#uiGroup.bms-popup-background-transparent .quick-toggle-menu .popup-menu-item StLabel,
+#uiGroup.bms-popup-background-transparent .popup-sub-menu,
+#uiGroup.bms-popup-background-transparent .popup-sub-menu .popup-menu-item,
+#uiGroup.bms-popup-background-transparent .popup-menu-item:checked {
+  color: #ffffff !important;
+}
+
+#uiGroup.bms-popup-background-transparent .quick-toggle-menu .popup-menu-item:insensitive,
+#uiGroup.bms-popup-background-transparent .quick-toggle-menu .popup-menu-item:insensitive StLabel,
+#uiGroup.bms-popup-background-transparent .popup-sub-menu .popup-menu-item:insensitive {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+#uiGroup.bms-popup-background-transparent .quick-toggle-menu .popup-separator-menu-item-separator,
+#uiGroup.bms-popup-background-transparent .popup-sub-menu .popup-separator-menu-item-separator {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 菜单项交互状态与候选项一致：悬停 8% 白，按下 20% 白。悬停值和 blur-my-shell 自己的一样，
+ * 但它的选择器只有三层，压不过 Orchis 四层的 .popup-menu .popup-sub-menu .popup-menu-item:hover
+ * （15% 黑）和 .popup-menu .popup-menu-item:checked:hover（白底），所以这里用 ID 再写一遍。
+ * 键盘选中是伪类 :selected（popupMenu.js 用 add_style_pseudo_class），不是 .selected。 */
 #uiGroup.bms-popup-background-transparent .popup-menu-item:hover,
 #uiGroup.bms-popup-background-transparent .popup-menu-item:focus,
-#uiGroup.bms-popup-background-transparent .popup-menu-item.selected {
+#uiGroup.bms-popup-background-transparent .popup-menu-item:selected {
   background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
